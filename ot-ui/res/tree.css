@@ -1,0 +1,77 @@
+.uiTree input,
+.uiTree select,
+.uiTree textarea,
+.uiTree button {
+  appearance: auto !important; /* Restore native OS look */
+  width: auto !important; /* Undo full-width */
+  height: auto !important; /* Undo calculated height */
+  padding: 0 !important; /* Remove custom padding (browser will add minimal) */
+  border: revert !important; /* Or '1px solid' if you want a basic border */
+  background: revert !important;
+  color: revert !important;
+  font: inherit !important; /* Keep app font, but revert size/style if needed */
+  outline: revert !important;
+  box-shadow: revert !important;
+  --pico-outline-width: revert !important; /* Unset custom var */
+}
+
+/* Placeholders */
+.uiTree input::placeholder,
+.uiTree input::-webkit-input-placeholder,
+.uiTree textarea::placeholder,
+.uiTree textarea::-webkit-input-placeholder,
+.uiTree select:invalid {
+  color: revert !important;
+  opacity: revert !important;
+}
+
+/* Text selection */
+.uiTree ::selection {
+  background-color: revert !important;
+}
+
+.uiTree {
+  padding-left: 0px;
+}
+
+.uiTree ul, .uiTree li {
+  list-style-type: none;
+}
+
+.uiTree ul {
+  margin-bottom: 0px;
+}
+
+.uiTree .node {
+  padding-bottom: 0px;
+}
+
+.uiTree .nodeInput {
+  display: flex;
+  align-items: center;
+}
+
+.uiTree input[type="text"],
+.uiTree input[type="number"],
+.uiTree input:not([type]),
+.uiTree textarea,
+.uiTree select {
+  background: transparent !important;
+  border: none !important;
+  border-bottom: 1px solid #4c566a !important;
+  padding: 0 0 2px 0 !important;
+  border-radius: 0 !important;
+  margin: 8px 8px 0px 0px;
+}
+
+.uiTree .mini-toolbar {
+  padding-left: 0px;
+}
+
+.node .uiTree {
+  margin-left: 32px;
+}
+
+.uiTree .nub {
+  margin-right: 8px;
+}

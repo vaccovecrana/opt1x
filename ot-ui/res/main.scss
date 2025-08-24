@@ -1,0 +1,45 @@
+@use "./ui-lock.css";
+@use "./flex.css";
+@use "./search.css";
+@use "./tree.css";
+@use "../node_modules/@picocss/pico/scss/pico";
+
+/* =========================== */
+/*           Opt1x             */
+/* =========================== */
+
+:root {
+  --pico-spacing: 0.5rem;
+  --pico-form-element-spacing-vertical: 0.5rem;
+}
+
+h1, h2, h3, h4, h5 { margin: 0px; }
+
+.txc { text-align: center; }
+.txl { text-align: left;   }
+.txr { text-align: right;  }
+
+.ml8  { margin-left: 8px;  }
+
+.mt16 { margin-top:    16px; }
+.mb16 { margin-bottom: 16px; }
+.pt16 { padding-top:   16px; }
+
+.p16  { padding: 16px; }
+
+.br16 { border-radius: 16px; }
+
+.pill {
+  font-size: 11px;
+  color: var(--nord6);
+  padding: 2px 12px;
+  text-align: center;
+  border-radius: 16px;
+}
+
+.pill-pale { background-color: var(--nord10-pale); }
+.pill-green { background-color: var(--nord14); }
+.pill-red { background-color: var(--nord11); }
+.pill-orange { background-color: var(--nord12); }
+
+.ptr { cursor: pointer; }

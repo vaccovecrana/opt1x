@@ -1,0 +1,23 @@
+{
+  "scripts": {
+    "build:scss": "sass res/main.scss build/ui/index.css",
+    "build": "rollup --config && npm run build:scss"
+  },
+  "author": "Vaccove Crana, LLC.",
+  "dependencies": {
+    "@picocss/pico": "2.1.1",
+    "ag-charts-react": "12.1.1",
+    "preact": "10.27.0",
+    "preact-router": "4.1.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-alias": "5.1.1",
+    "@rollup/plugin-node-resolve": "16.0.1",
+    "@rollup/plugin-typescript": "12.1.4",
+    "rollup": "4.46.2",
+    "sass": "1.90.0",
+    "tslib": "2.8.1",
+    "typescript": "5.9.2"
+  },
+  "type": "module"
+}

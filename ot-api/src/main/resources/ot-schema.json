@@ -1,0 +1,40 @@
+{
+  "changes": [
+    {
+      "id": "tbl_OtNamespace",
+      "hash": "2b49e9a8",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtNamespace (\n  nsId integer NOT NULL PRIMARY KEY,\n  pNsId integer,\n  name varchar(256) NOT NULL,\n  path varchar(256) NOT NULL,\n  createdAtUtcMs bigint,\n  CONSTRAINT fk_OtNamespace_3d5e7926 FOREIGN KEY (pNsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT unq_OtNamespace_c4530819 UNIQUE (path)\n)"
+    },
+    {
+      "id": "tbl_OtValue",
+      "hash": "56e5525f",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtValue (\n  vid integer NOT NULL PRIMARY KEY,\n  nsId integer,\n  name varchar(128) NOT NULL,\n  value varchar(4096) NOT NULL,\n  type varchar(64) NOT NULL,\n  notes varchar(4096),\n  encrypted boolean,\n  createdAtUtcMs bigint,\n  deletedAtUtcMs bigint,\n  CONSTRAINT fk_OtValue_2b22fe72 FOREIGN KEY (nsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT unq_OtValue_aa85f514 UNIQUE (nsId, name)\n)"
+    },
+    {
+      "id": "tbl_OtConfig",
+      "hash": "7de56987",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtConfig (\n  cid integer NOT NULL PRIMARY KEY,\n  nsId integer NOT NULL,\n  name varchar(256) NOT NULL,\n  createdAtUtcMs bigint,\n  CONSTRAINT fk_OtConfig_7d43e5d4 FOREIGN KEY (nsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT unq_OtConfig_aa85f514 UNIQUE (nsId, name)\n)"
+    },
+    {
+      "id": "tbl_OtNode",
+      "hash": "ae42f789",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtNode (\n  nid integer NOT NULL PRIMARY KEY,\n  cid integer,\n  label varchar(128) NOT NULL,\n  type varchar(64) NOT NULL,\n  vid integer,\n  pNid integer,\n  itemIdx integer,\n  CONSTRAINT fk_OtNode_4ae3c71e FOREIGN KEY (cid) REFERENCES OtConfig(cid),\n  CONSTRAINT fk_OtNode_1fac18cb FOREIGN KEY (vid) REFERENCES OtValue(vid),\n  CONSTRAINT fk_OtNode_62f3215d FOREIGN KEY (pNid) REFERENCES OtNode(nid),\n  CONSTRAINT unq_OtNode_32aebac8 UNIQUE (cid, label, itemIdx)\n)"
+    },
+    {
+      "id": "tbl_OtApiKey",
+      "hash": "79581cda",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtApiKey (\n  kid integer NOT NULL PRIMARY KEY,\n  pKid integer,\n  name varchar(64) NOT NULL,\n  path varchar(2048) NOT NULL,\n  hash varchar(64) NOT NULL,\n  role varchar(64) NOT NULL,\n  metadata0 varchar(2048),\n  metadata1 varchar(2048),\n  metadata2 varchar(2048),\n  metadata3 varchar(2048),\n  createdAtUtcMs bigint,\n  deletedAtUtcMs bigint,\n  CONSTRAINT fk_OtApiKey_f23de6bc FOREIGN KEY (pKid) REFERENCES OtApiKey(kid),\n  CONSTRAINT unq_OtApiKey_e671bd2d UNIQUE (name),\n  CONSTRAINT unq_OtApiKey_c4530819 UNIQUE (path)\n)"
+    },
+    {
+      "id": "tbl_OtKeyNamespace",
+      "hash": "7530bc3a",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtKeyNamespace (\n  id integer NOT NULL PRIMARY KEY,\n  kid integer NOT NULL,\n  nsId integer NOT NULL,\n  grantKid integer NOT NULL,\n  writeAccess boolean,\n  grantUtcMs bigint,\n  CONSTRAINT fk_OtKeyNamespace_bad21539 FOREIGN KEY (kid) REFERENCES OtApiKey(kid),\n  CONSTRAINT fk_OtKeyNamespace_c4590e65 FOREIGN KEY (nsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT fk_OtKeyNamespace_800c5aeb FOREIGN KEY (grantKid) REFERENCES OtApiKey(kid),\n  CONSTRAINT unq_OtKeyNamespace_dbd07bb5 UNIQUE (kid, nsId)\n)"
+    }
+  ]
+}
