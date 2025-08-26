@@ -4,7 +4,7 @@ import io.vacco.opt1x.dao.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.impl.*;
 import io.vacco.opt1x.schema.*;
-import io.vacco.ronove.RvAttachmentParam;
+import io.vacco.ronove.*;
 import jakarta.ws.rs.*;
 import java.util.Objects;
 
@@ -149,6 +149,17 @@ public class OtApiHdl {
       }
     }
     return cfgService.update(cmd);
+  }
+
+  @GET @Path(apiV1NamespaceIdConfigIdFmt)
+  public RvResponse<Object> apiV1NamespaceIdConfigIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                                           @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                                           @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                                           @PathParam("fmt") String otFmt,
+                                                           @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
+    return cfgService.render(
+      myKey, nsId, cid, otFmt, encrypted == null || encrypted
+    );
   }
 
   @GET @Path(apiV1NamespaceIdConfigId)

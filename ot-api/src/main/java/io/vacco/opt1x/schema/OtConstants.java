@@ -27,6 +27,7 @@ public class OtConstants {
     apiV1NamespaceIdConfig        = "/api/v1/namespace/{nsId}/config",
     apiV1NamespaceIdConfigId      = "/api/v1/namespace/{nsId}/config/{cid}",
     apiV1NamespaceIdConfigIdNode  = "/api/v1/namespace/{nsId}/config/{cid}/node",
+    apiV1NamespaceIdConfigIdFmt   = "/api/v1/namespace/{nsId}/config/{cid}/{fmt}",
     apiV1NamespaceIdValue         = "/api/v1/namespace/{nsId}/value",
     apiV1NamespaceKey             = "/api/v1/namespace/key",
     apiV1Value                    = "/api/v1/value";

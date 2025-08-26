@@ -1,8 +1,12 @@
 package io.vacco.opt1x.impl;
 
+import com.google.gson.Gson;
+import io.vacco.murmux.http.MxMime;
 import io.vacco.opt1x.dao.OtConfigDao;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.schema.*;
+import io.vacco.ronove.RvResponse;
+import jakarta.ws.rs.core.Response;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,13 +20,17 @@ public class OtConfigService {
   public final OtValueService valService;
   public final OtNamespaceService nsService;
   public final OtSealService sealService;
+  public final Gson json;
 
-  public OtConfigService(OtDaos daos, OtValueService valService,
-                         OtNamespaceService nsService, OtSealService sealService) {
+  public OtConfigService(OtDaos daos,
+                         OtValueService valService,
+                         OtNamespaceService nsService,
+                         OtSealService sealService, Gson json) {
     this.daos = requireNonNull(daos);
     this.valService = requireNonNull(valService);
     this.nsService = requireNonNull(nsService);
     this.sealService = requireNonNull(sealService);
+    this.json = requireNonNull(json);
   }
 
   public OtConfigOp duplicateConfig(OtConfigOp cmd) {
@@ -127,6 +135,21 @@ public class OtConfigService {
         for (var e : treeIdx.entrySet()) {
           daos.ndd.save(e.getValue().node);
         }
+      }, conn -> {
+        try {
+          var warn = conn.getWarnings();
+          var sb = new StringBuilder();
+          while (warn != null) {
+            sb.append(warn.getMessage());
+            warn = warn.getNextWarning();
+          }
+          if (!sb.toString().isEmpty()) {
+            cmd.withError(sb.toString());
+          }
+        } catch (Exception e) {
+          onError("Config tree check error", e);
+          cmd.withError(e);
+        }
       });
       return cmd;
     } catch (Exception e) {
@@ -208,6 +231,48 @@ public class OtConfigService {
     } catch (Exception e) {
       onError("Config list error", e);
       return out.withError(e);
+    }
+  }
+
+  private <T> RvResponse<T> error(RvResponse<T> out, Response.Status status, T error) {
+    return out
+      .withStatus(status)
+      .withMediaType("text/plain")
+      .withBody(error);
+  }
+
+  private <T> RvResponse<T> ok(RvResponse<T> out, String mediaType, T body) {
+    return out
+      .withStatus(Response.Status.OK)
+      .withMediaType(mediaType)
+      .withBody(body);
+  }
+
+  public RvResponse<Object> render(OtApiKey key, Integer nsId, Integer cid, String otFormat, boolean encrypted) {
+    var out = new RvResponse<>();
+    try {
+      var cmd = new OtConfigOp();
+      var fmt = OtNodeFormat.valueOf(otFormat);
+      if (!nsService.nsAccess(cmd, key.kid, nsId, false).ok()) {
+        return error(out, Response.Status.UNAUTHORIZED, cmd.error);
+      }
+      cmd.cfg = new OtConfig();
+      cmd.cfg.cid = requireNonNull(cid);
+      cmd.cfg.nsId = nsId;
+      cmd.encrypted = encrypted;
+      cmd.key = key;
+      if (!load(cmd).ok()) {
+        return error(out, Response.Status.BAD_REQUEST, cmd.error);
+      }
+      var raw = OtRender.toMap(cmd.vars);
+      switch (fmt) {
+        case json: return ok(out, MxMime.json.type, raw);
+        case yaml: return ok(out, "application/yaml", OtYaml.toYaml(raw));
+        case toml: return ok(out, "application/toml", OtToml.toToml(raw));
+        default:   return ok(out, "text/x-java-properties", OtProperties.toProperties(raw));
+      }
+    } catch (Exception e) {
+      return error(out, Response.Status.BAD_REQUEST, e.getMessage());
     }
   }
 

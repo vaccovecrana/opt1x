@@ -3,6 +3,7 @@ package io.vacco.opt1x.web;
 import com.google.gson.Gson;
 import io.vacco.jwt.*;
 import io.vacco.murmux.http.*;
+import io.vacco.opt1x.dao.OtApiKeyDao;
 import io.vacco.opt1x.dto.OtUnsealOp;
 import io.vacco.opt1x.impl.*;
 import io.vacco.opt1x.schema.*;
@@ -99,6 +100,12 @@ public class OtApiKeyHdl implements MxHandler {
       var apiKey = apiKeyHeaderOf(xc);
       if (apiKey.isPresent()) {
         apiAuth(xc, apiKey.get());
+        return;
+      }
+      // optional API key query param here. Insecure, but practical in trusted networks. :P
+      var apiKeyParam = xc.getQueryParam(OtApiKeyDao.fld_kid);
+      if (apiKeyParam != null) {
+        apiAuth(xc, apiKeyParam);
         return;
       }
       var cook = cookieOf(xc);

@@ -296,6 +296,24 @@ export const apiV1NamespaceIdConfigIdGet = (nsId: number, cid: number, encrypted
   )
 }
 
+export const apiV1NamespaceIdConfigIdFmtGet = (nsId: number, cid: number, fmt: string, encrypted: boolean): Promise<Object> => {
+  let path = "/api/v1/namespace/{nsId}/config/{cid}/{fmt}"
+  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
+  path = path.replace("{ fmt }".replace(/\s+/g, ""), fmt.toString())
+  const qParams = new URLSearchParams()
+  if (encrypted) {
+    qParams.append("encrypted", encrypted.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
 export const apiV1NamespaceIdValueGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtValue, string>> => {
   let path = "/api/v1/namespace/{nsId}/value"
   path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())

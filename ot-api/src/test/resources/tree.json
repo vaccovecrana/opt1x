@@ -1,0 +1,281 @@
+{
+  "cfg": {
+    "cid": -565195148,
+    "nsId": -1291435579,
+    "name": "flooper-dev",
+    "createdAtUtcMs": 1756018379970
+  },
+  "encrypted": true,
+  "vars": [
+    {
+      "node": {
+        "nid": -257318405,
+        "cid": -565195148,
+        "label": "root",
+        "type": "Object",
+        "itemIdx": -1
+      }
+    },
+    {
+      "node": {
+        "nid": -510444514,
+        "cid": -565195148,
+        "label": "app",
+        "type": "Object",
+        "pNid": -257318405,
+        "itemIdx": 1
+      }
+    },
+    {
+      "node": {
+        "nid": -958864765,
+        "cid": -565195148,
+        "label": "regions",
+        "type": "Array",
+        "pNid": -510444514,
+        "itemIdx": 10
+      }
+    },
+    {
+      "node": {
+        "nid": 2026384324,
+        "cid": -565195148,
+        "label": "region.us-east-1",
+        "type": "Value",
+        "vid": 1578233871,
+        "pNid": -958864765,
+        "itemIdx": 11
+      },
+      "val": {
+        "vid": 1578233871,
+        "nsId": -1477932629,
+        "name": "region.us-east-1",
+        "value": "us-east-1",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756090273243,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": 930305798,
+        "cid": -565195148,
+        "label": "region.us-west-1",
+        "type": "Value",
+        "vid": -677286428,
+        "pNid": -958864765,
+        "itemIdx": 12
+      },
+      "val": {
+        "vid": -677286428,
+        "nsId": -1477932629,
+        "name": "region.us-west-1",
+        "value": "us-west-1",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756090286830,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -991077783,
+        "cid": -565195148,
+        "label": "sessionTimeout",
+        "type": "Value",
+        "vid": -69047578,
+        "pNid": -510444514,
+        "itemIdx": 13
+      },
+      "val": {
+        "vid": -69047578,
+        "nsId": -1291435579,
+        "name": "app.sessionTimeoutMs",
+        "value": "3600000",
+        "type": "Number",
+        "encrypted": false,
+        "createdAtUtcMs": 1756091760444,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -843260425,
+        "cid": -565195148,
+        "label": "url",
+        "type": "Value",
+        "vid": -374864173,
+        "pNid": -510444514,
+        "itemIdx": 2
+      },
+      "val": {
+        "vid": -374864173,
+        "nsId": -1291435579,
+        "name": "app.url",
+        "value": "https://dev.flooper.io",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756018367351,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -2145384516,
+        "cid": -565195148,
+        "label": "convFactor",
+        "type": "Value",
+        "vid": 513932294,
+        "pNid": -510444514,
+        "itemIdx": 14
+      },
+      "val": {
+        "vid": 513932294,
+        "nsId": -1291435579,
+        "name": "app.conversionFactor",
+        "value": "3.1415",
+        "type": "Number",
+        "encrypted": false,
+        "createdAtUtcMs": 1756092117198,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": 1387997966,
+        "cid": -565195148,
+        "label": "convEnabled",
+        "type": "Value",
+        "vid": -1716860731,
+        "pNid": -510444514,
+        "itemIdx": 15
+      },
+      "val": {
+        "vid": -1716860731,
+        "nsId": -1291435579,
+        "name": "app.conversionEnabled",
+        "value": "true",
+        "type": "Boolean",
+        "encrypted": false,
+        "createdAtUtcMs": 1756092141243,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -2088745138,
+        "cid": -565195148,
+        "label": "spring",
+        "type": "Object",
+        "pNid": -257318405,
+        "itemIdx": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -1565716750,
+        "cid": -565195148,
+        "label": "datasource",
+        "type": "Object",
+        "pNid": -2088745138,
+        "itemIdx": 5
+      }
+    },
+    {
+      "node": {
+        "nid": -1712137662,
+        "cid": -565195148,
+        "label": "password",
+        "type": "Value",
+        "vid": -1041746703,
+        "pNid": -1565716750,
+        "itemIdx": 7
+      },
+      "val": {
+        "vid": -1041746703,
+        "nsId": -1291435579,
+        "name": "db.password",
+        "value": "PfU8q2xhGWKJzwrgKOrfgw\u003d\u003d",
+        "type": "String",
+        "encrypted": true,
+        "createdAtUtcMs": 1756018326150,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -1151952740,
+        "cid": -565195148,
+        "label": "url",
+        "type": "Value",
+        "vid": -1213960442,
+        "pNid": -1565716750,
+        "itemIdx": 8
+      },
+      "val": {
+        "vid": -1213960442,
+        "nsId": -1291435579,
+        "name": "db.url",
+        "value": "jdbc:postgresql://localhost:5432/flooper",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756018304325,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -258922816,
+        "cid": -565195148,
+        "label": "user",
+        "type": "Value",
+        "vid": -952537373,
+        "pNid": -1565716750,
+        "itemIdx": 6
+      },
+      "val": {
+        "vid": -952537373,
+        "nsId": -1291435579,
+        "name": "db.user",
+        "value": "admin",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756018312883,
+        "deletedAtUtcMs": 0
+      }
+    },
+    {
+      "node": {
+        "nid": 837378779,
+        "cid": -565195148,
+        "label": "profiles",
+        "type": "Object",
+        "pNid": -2088745138,
+        "itemIdx": 3
+      }
+    },
+    {
+      "node": {
+        "nid": -174400169,
+        "cid": -565195148,
+        "label": "active",
+        "type": "Value",
+        "vid": 1486611791,
+        "pNid": 837378779,
+        "itemIdx": 4
+      },
+      "val": {
+        "vid": 1486611791,
+        "nsId": -1291435579,
+        "name": "app.profiles",
+        "value": "momo,momodev,momodevblue",
+        "type": "String",
+        "encrypted": false,
+        "createdAtUtcMs": 1756018348018,
+        "deletedAtUtcMs": 0
+      }
+    }
+  ],
+  "validations": []
+}

@@ -1,5 +1,5 @@
 plugins {
-  id("io.vacco.ronove") version "1.5.0"
+  id("io.vacco.ronove") version "1.5.1"
   application
 }
 
@@ -15,13 +15,13 @@ configure<io.vacco.ronove.plugin.RvPluginExtension> {
 }
 
 val api by configurations
-val mtVer = "3.7.1"
+val mtVer = "3.7.3"
 
 dependencies {
   api("com.google.code.gson:gson:2.11.0")
   api("am.ik.yavi:yavi:0.14.1")
   api("io.vacco.shax:shax:2.0.16.0.4.3")
-  api("io.vacco.ronove:rv-kit-murmux:1.5.0")
+  api("io.vacco.ronove:rv-kit-murmux:1.5.1")
   api("org.codejargon.feather:feather:1.0")
   api("io.vacco.metolithe:mt-core:${mtVer}")
   api("io.vacco.jwt:jwt:0.8.0")

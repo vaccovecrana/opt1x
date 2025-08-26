@@ -321,7 +321,7 @@ public class OtServiceTest {
       rootNode.type = OtNodeType.Value;
       rootNode.vid = testVal.vid;
       rootNode.pNid = null;
-      rootNode.itemIdx = null;
+      rootNode.itemIdx = 0;
 
       var rootV = OtVar.of(rootNode, testVal);
       var op = new OtConfigOp().withApiKey(adminKey.get()).withVars(rootV).withConfig(cfg);
@@ -336,7 +336,7 @@ public class OtServiceTest {
       childNode.vid = secureVal.vid;
       childNode.nid = -2;
       childNode.pNid = rootNode.nid;
-      childNode.itemIdx = null;
+      childNode.itemIdx = 1;
 
       var childV = OtVar.of(childNode, secureVal);
       op = new OtConfigOp().withApiKey(adminKey.get()).withVars(rootV, childV).withConfig(cfg);

@@ -75,8 +75,9 @@ public class OtService {
 
   @Provides @Singleton
   public OtConfigService configService(OtDaos daos, OtValueService valService,
-                                       OtNamespaceService nsService, OtSealService sealService) {
-    return new OtConfigService(daos, valService, nsService, sealService);
+                                       OtNamespaceService nsService, OtSealService sealService,
+                                       Gson g) {
+    return new OtConfigService(daos, valService, nsService, sealService, g);
   }
 
 }
