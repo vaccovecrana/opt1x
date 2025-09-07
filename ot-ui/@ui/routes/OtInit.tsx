@@ -3,7 +3,7 @@ import * as React from "preact/compat"
 import { apiV1InitGet, OtInitOp } from "@ui/rpc"
 import { RenderableProps } from "preact"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { uiUnseal } from "@ui/util"
+import { uiUnseal } from "@ui/routes"
 
 type OtInitProps = RenderableProps<{ s?: UiStore }>
 type OtInitState = {

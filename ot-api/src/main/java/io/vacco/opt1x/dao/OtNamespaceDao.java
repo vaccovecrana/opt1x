@@ -17,9 +17,10 @@ import java.util.Map;
 public class OtNamespaceDao extends MtWriteDao<io.vacco.opt1x.schema.OtNamespace, java.lang.Integer> {
 
   public static final String fld_nsId = "nsId";
+  public static final String fld_pNsId = "pNsId";
   public static final String fld_name = "name";
   public static final String fld_path = "path";
-  public static final String fld_createdAtUtcMs = "createdAtUtcMs";
+  public static final String fld_createUtcMs = "createUtcMs";
 
   public OtNamespaceDao(String schema, MtCaseFormat fmt, MtJdbc jdbc, MtIdFn<java.lang.Integer> idFn) {
     super(schema, jdbc, new MtDescriptor<>(io.vacco.opt1x.schema.OtNamespace.class, fmt), idFn);
@@ -27,6 +28,18 @@ public class OtNamespaceDao extends MtWriteDao<io.vacco.opt1x.schema.OtNamespace
 
   public MtFieldDescriptor fld_nsId() {
     return this.dsc.getField(fld_nsId);
+  }
+
+  public final Map<java.lang.Integer, List<io.vacco.opt1x.schema.OtNamespace>> loadWhereNsIdIn(java.lang.Integer ... values) {
+    return loadWhereIn(fld_nsId, values);
+  }
+
+  public MtFieldDescriptor fld_pNsId() {
+    return this.dsc.getField(fld_pNsId);
+  }
+
+  public List<io.vacco.opt1x.schema.OtNamespace> loadWherePNsIdEq(java.lang.Integer pNsId) {
+    return loadWhereEq(fld_pNsId, pNsId);
   }
 
   public MtFieldDescriptor fld_name() {
@@ -45,8 +58,8 @@ public class OtNamespaceDao extends MtWriteDao<io.vacco.opt1x.schema.OtNamespace
     return loadWhereEq(fld_path, path);
   }
 
-  public MtFieldDescriptor fld_createdAtUtcMs() {
-    return this.dsc.getField(fld_createdAtUtcMs);
+  public MtFieldDescriptor fld_createUtcMs() {
+    return this.dsc.getField(fld_createUtcMs);
   }
 
 }

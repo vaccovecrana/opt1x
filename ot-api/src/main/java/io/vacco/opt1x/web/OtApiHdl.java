@@ -8,22 +8,24 @@ import io.vacco.ronove.*;
 import jakarta.ws.rs.*;
 import java.util.Objects;
 
+import static io.vacco.opt1x.schema.OtGroup.group;
+import static io.vacco.opt1x.dto.OtAdminOp.adminOp;
 import static io.vacco.opt1x.schema.OtConstants.*;
 
 public class OtApiHdl {
 
-  private final OtSealService       sealService;
-  private final OtApiKeyService     keyService;
-  private final OtNamespaceService  nsService;
-  private final OtValueService      valService;
-  private final OtConfigService     cfgService;
+  private final OtSealService   sealService;
+  private final OtApiKeyService keyService;
+  private final OtAdminService  admService;
+  private final OtValueService  valService;
+  private final OtConfigService cfgService;
 
   public OtApiHdl(OtSealService sealService, OtApiKeyService keyService,
-                  OtNamespaceService nsService, OtValueService valService,
+                  OtAdminService admService, OtValueService valService,
                   OtConfigService cfgService) {
     this.sealService = Objects.requireNonNull(sealService);
     this.keyService  = Objects.requireNonNull(keyService);
-    this.nsService   = Objects.requireNonNull(nsService);
+    this.admService  = Objects.requireNonNull(admService);
     this.valService  = Objects.requireNonNull(valService);
     this.cfgService  = Objects.requireNonNull(cfgService);
   }
@@ -48,67 +50,76 @@ public class OtApiHdl {
   @POST @Path(apiV1Key)
   public OtApiKeyOp apiV1KeyPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                  @BeanParam OtApiKeyOp cmd) {
-    cmd.parentKid = myKey.kid;
+    if (cmd != null && cmd.key != null) {
+      cmd.key.pKid = myKey.kid;
+    }
     return keyService.createApiKey(cmd);
   }
 
-  @GET @Path(apiV1NamespaceId)
-  public OtList<OtNamespace, String> apiV1NamespaceIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                         @PathParam(OtNamespaceDao.fld_nsId) Integer nsId) {
-    return nsService.loadNamespace(myKey.kid, nsId);
+  @GET @Path(apiV1Group)
+  public OtKeyAccess apiV1GroupGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
+    return admService.accessGroupsOf(myKey.kid);
+  }
+
+  @POST @Path(apiV1Group)
+  public OtAdminOp apiV1GroupPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                  @BeanParam OtAdminOp adminOp) {
+    if (adminOp.keyGroupBind != null) {
+      return admService.bindKeyToGroup(adminOp.withKey(myKey));
+    }
+    return admService.createGroup(adminOp.withKey(myKey));
+  }
+
+  @GET @Path(apiV1GroupId)
+  public OtKeyAccess apiV1GroupIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                     @PathParam(OtGroupDao.fld_gid) Integer gid) {
+    return admService.accessGroupsOf(myKey.kid, gid);
+  }
+
+  @DELETE @Path(apiV1GroupId)
+  public OtAdminOp apiV1GroupIdDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                      @PathParam(OtGroupDao.fld_gid) Integer gid) {
+    var grp = group(null, null);
+    grp.gid = gid;
+    return admService.deleteGroup(adminOp().withKey(myKey).withGroup(grp));
   }
 
   @GET @Path(apiV1Namespace)
-  public OtList<OtNamespace, String> apiV1NamespaceGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                       @QueryParam(qPageSize) int pageSize,
-                                                       @QueryParam(qNext) String next) {
-    return nsService.loadNamespacesOf(myKey.kid, pageSize, next);
+  public OtKeyAccess apiV1NamespaceGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
+    return admService.accessNamespacesOf(myKey.kid);
   }
 
   @POST @Path(apiV1Namespace)
-  public OtNamespaceOp apiV1NamespacePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                          @BeanParam OtNamespaceOp cmd) {
-    if (cmd.keyNamespace != null) {
-      cmd.keyNamespace.kid = myKey.kid;
-      cmd.keyNamespace.grantKid = myKey.kid;
+  public OtAdminOp apiV1NamespacePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                      @BeanParam OtAdminOp adminOp) {
+    if (adminOp.groupNs != null) {
+      return admService.bindGroupToNamespace(adminOp.withKey(myKey));
     }
-    return nsService.createNamespace(cmd);
+    return admService.createNamespace(adminOp.withKey(myKey));
   }
 
-  @GET @Path(apiV1NamespaceKey)
-  public OtAssignmentList apiV1NamespaceKeyGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                               @QueryParam(qPageSize) int pageSize,
-                                               @QueryParam(OtKeyNamespaceDao.fld_nsId) Integer nsId,
-                                               @QueryParam(qNext) Long next) {
-    return nsService.loadAssignmentsBy(myKey.kid, nsId, pageSize, next);
+  @GET @Path(apiV1NamespaceId)
+  public OtKeyAccess apiV1NamespaceIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                         @PathParam(OtNamespaceDao.fld_nsId) Integer nsId) {
+    return admService.accessNamespacesOf(myKey.kid, nsId);
   }
 
-  @POST @Path(apiV1NamespaceKey)
-  public OtNamespaceOp apiV1NamespaceKeyPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                             @BeanParam OtNamespaceOp cmd) {
-    if (cmd.keyNamespace != null) {
-      cmd.keyNamespace.grantKid = myKey.kid;
-    }
-    return nsService.assignNamespaceKey(cmd);
-  }
-
-  @GET @Path(apiV1NamespaceIdValue)
-  public OtList<OtValue, String> apiV1NamespaceIdValueGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                          @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                                          @QueryParam(qPageSize) int pageSize,
-                                                          @QueryParam(qNext) String next) {
+  @GET @Path(apiV1ValueNsId)
+  public OtValueOp apiV1ValueNsIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                     @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                     @QueryParam(qPageSize) int pageSize,
+                                     @QueryParam(qNext) String next) {
     return valService.valuesOf(myKey.kid, nsId, pageSize, next);
   }
 
-  @POST @Path(apiV1NamespaceIdValue)
-  public OtValueOp apiV1NamespaceIdValuePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                             @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                             @BeanParam OtValueOp cmd) {
+  @POST @Path(apiV1ValueNsId)
+  public OtValueOp apiV1ValueNsIdPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                      @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                      @BeanParam OtValueOp cmd) {
     if (cmd.val != null) {
       cmd.val.nsId = nsId;
-      cmd.val.createdAtUtcMs = 1;
     }
-    return valService.createValue(cmd.withApiKey(myKey));
+    return valService.createValue(cmd.withKey(myKey));
   }
 
   @GET @Path(apiV1Value)
@@ -116,18 +127,18 @@ public class OtApiHdl {
     return valService.accessibleValuesFor(myKey);
   }
 
-  @GET @Path(apiV1NamespaceIdConfig)
-  public OtList<OtConfig, String> apiV1NamespaceIdConfigGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                            @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                                            @QueryParam(qPageSize) int pageSize,
-                                                            @QueryParam(qNext) String next) {
+  @GET @Path(apiV1Config)
+  public OtList<OtConfig, String> apiV1ConfigGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                                 @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                                 @QueryParam(qPageSize) int pageSize,
+                                                 @QueryParam(qNext) String next) {
     return cfgService.configsOf(myKey.kid, nsId, pageSize, next);
   }
 
-  @POST @Path(apiV1NamespaceIdConfig)
-  public OtConfigOp apiV1NamespaceIdConfigPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                               @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                               @BeanParam OtConfigOp cmd) {
+  @POST @Path(apiV1Config)
+  public OtConfigOp apiV1ConfigPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                    @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                    @BeanParam OtConfigOp cmd) {
     cmd.key = myKey;
     if (cmd.cfg != null) {
       cmd.cfg.nsId = nsId;
@@ -135,15 +146,25 @@ public class OtApiHdl {
     return cfgService.createConfig(cmd);
   }
 
-  @POST @Path(apiV1NamespaceIdConfigIdNode)
-  public OtConfigOp apiV1NamespaceIdConfigIdNodePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                     @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                                     @PathParam(OtConfigDao.fld_cid) Integer cid,
-                                                     @BeanParam OtConfigOp cmd) {
+  @GET @Path(apiV1ConfigCid)
+  public OtConfigOp apiV1ConfigCidGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                      @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                      @QueryParam(OtValueDao.fld_encrypted) boolean encrypted) {
+    var cmd = new OtConfigOp();
+    cmd.key = myKey;
+    cmd.cfg = new OtConfig();
+    cmd.cfg.cid = cid;
+    cmd.encrypted = encrypted;
+    return cfgService.load(cmd);
+  }
+
+  @POST @Path(apiV1ConfigCid)
+  public OtConfigOp apiV1ConfigCidPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                       @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                       @BeanParam OtConfigOp cmd) {
     cmd.key = myKey;
     if (cmd.vars != null && cmd.cfg != null) {
       cmd.cfg.cid = cid;
-      cmd.cfg.nsId = nsId;
       for (var otv : cmd.vars) {
         otv.node.cid = cid;
       }
@@ -151,29 +172,12 @@ public class OtApiHdl {
     return cfgService.update(cmd);
   }
 
-  @GET @Path(apiV1NamespaceIdConfigIdFmt)
-  public RvResponse<Object> apiV1NamespaceIdConfigIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                           @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                                           @PathParam(OtConfigDao.fld_cid) Integer cid,
-                                                           @PathParam("fmt") String otFmt,
-                                                           @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
-    return cfgService.render(
-      myKey, nsId, cid, otFmt, encrypted == null || encrypted
-    );
-  }
-
-  @GET @Path(apiV1NamespaceIdConfigId)
-  public OtConfigOp apiV1NamespaceIdConfigIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+  @GET @Path(apiV1ConfigIdFmt)
+  public RvResponse<Object> apiV1ConfigIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                                 @PathParam(OtConfigDao.fld_cid) Integer cid,
-                                                @QueryParam(OtValueDao.fld_encrypted) boolean encrypted) {
-    var cmd = new OtConfigOp();
-    cmd.key = myKey;
-    cmd.cfg = new OtConfig();
-    cmd.cfg.cid = cid;
-    cmd.cfg.nsId = nsId;
-    cmd.encrypted = encrypted;
-    return cfgService.load(cmd);
+                                                @PathParam(kFmt) String otFmt,
+                                                @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
+    return cfgService.render(myKey, cid, otFmt, encrypted == null || encrypted);
   }
 
 }

@@ -10,7 +10,7 @@ import io.vacco.metolithe.annotations.*;
 
   @MtFk(OtNamespace.class)
   @MtPk(idx = 0) @MtUnique(idx = 0)
-  @MtDao(loadEq = true)
+  @MtDao(loadEq = true, listIn = true) @MtNotNull
   public Integer nsId;
 
   @MtVarchar(128) @MtNotNull
@@ -31,14 +31,10 @@ import io.vacco.metolithe.annotations.*;
   public boolean encrypted;
 
   @MtCol @MtDao
-  public long createdAtUtcMs;
+  public long createUtcMs;
 
-  @MtCol
-  public long deletedAtUtcMs;
-
-  public static OtValue of(Integer nsId, OtValueType type,
-                           String name, String value, String notes,
-                           boolean encrypted, long createdAtUtcMs) {
+  public static OtValue value(Integer nsId, String name, String value,
+                              OtValueType type, String notes, boolean encrypted) {
     var ov = new OtValue();
     ov.nsId = nsId;
     ov.name = name;
@@ -46,7 +42,6 @@ import io.vacco.metolithe.annotations.*;
     ov.type = type;
     ov.notes = notes;
     ov.encrypted = encrypted;
-    ov.createdAtUtcMs = createdAtUtcMs;
     return ov;
   }
 

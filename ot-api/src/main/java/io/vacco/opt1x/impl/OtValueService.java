@@ -3,51 +3,34 @@ package io.vacco.opt1x.impl;
 import io.vacco.opt1x.dao.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.schema.*;
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
+import static io.vacco.opt1x.dto.OtValueOp.valueOp;
+import static io.vacco.opt1x.schema.OtConstants.*;
 import static io.vacco.opt1x.impl.OtOptions.onError;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.toList;
 
 public class OtValueService {
 
   public  final OtDaos daos;
-  private final OtNamespaceService nsService;
+  private final OtAdminService admService;
   private final OtSealService sealService;
 
-  public OtValueService(OtDaos daos, OtNamespaceService nsService, OtSealService sealService) {
+  public OtValueService(OtDaos daos,
+                        OtAdminService admService,
+                        OtSealService sealService) {
     this.daos = Objects.requireNonNull(daos);
-    this.nsService = Objects.requireNonNull(nsService);
+    this.admService = Objects.requireNonNull(admService);
     this.sealService = Objects.requireNonNull(sealService);
-  }
-
-  public OtList<OtValue, String> valuesOf(Integer kid, Integer nsId, int pageSize, String next) {
-    var out = new OtList<OtValue, String>();
-    try {
-      out = nsService.nsAccess(out, kid, nsId, false);
-      if (!out.ok()) {
-        return out;
-      }
-      var nsIdFld = daos.vld.fld_nsId();
-      out.page = daos.vld.loadPage1(
-        pageSize, false,
-        daos.vld.query().eq(nsIdFld, nsId),
-        OtValueDao.fld_name, next
-      );
-      return out;
-    } catch (Exception e) {
-      onError("Value list error", e);
-      return out.withError(e);
-    }
   }
 
   public OtValueOp duplicate(OtValueOp cmd) {
     var values = daos.vld.loadWhereNsIdEq(cmd.val.nsId);
     for (var val : values) {
       if (val.name.equals(cmd.val.name)) {
-        cmd = cmd
-          .withVal(val)
-          .withError(format("Value [%s] already exists in namespace [%s]", cmd.val.name, cmd.val.nsId));
+        var err = format("Value [%s] already exists in namespace [%s]", cmd.val.name, cmd.val.nsId);
+        cmd = cmd.withVal(val).withError(err);
         break;
       }
     }
@@ -87,13 +70,16 @@ public class OtValueService {
 
   public OtValueOp createValue(OtValueOp cmd) {
     try {
+      var kg = admService.canAccessNs(Objects.requireNonNull(cmd).key.kid, cmd.val.nsId, false, true, false);
+      if (kg.isEmpty()) {
+        return admService.noNsAccess(cmd, cmd.key.kid, cmd.val.nsId, write);
+      }
+      cmd.val.createUtcMs = System.currentTimeMillis();
       cmd = OtValid
         .validate(Objects.requireNonNull(cmd).val, cmd)
         .validate(this::duplicate)
-        .validate(this::valueType)
-        .validate(cmd0 -> nsService.nsAccess(cmd0, cmd0.key.kid, cmd0.val.nsId, true));
+        .validate(this::valueType);
       if (cmd.ok()) {
-        cmd.val.createdAtUtcMs = System.currentTimeMillis();
         if (cmd.val.encrypted) {
           cmd.val = sealService.encrypt(cmd.val);
         }
@@ -109,24 +95,45 @@ public class OtValueService {
   public OtValueOp accessibleValuesFor(OtApiKey key) {
     var cmd = new OtValueOp();
     try {
-      cmd.namespaces = new ArrayList<>();
-      cmd.values = new ArrayList<>();
-      var nsRes = nsService.loadNamespacesOf(key.kid, 1000, null); // TODO do these numbers need to be tweakable?
-      if (!nsRes.ok()) {
-        return cmd.withError(nsRes.error);
-      }
-      cmd.namespaces.addAll(nsRes.page.items);
-      for (var ns : nsRes.page.items) {
-        var valRes = valuesOf(key.kid, ns.nsId, 1000, null);
-        if (!valRes.ok()) {
-          return cmd.withError(valRes.error);
+      var nsd = daos.nsd;
+      var nsl = new ArrayList<OtNamespace>();
+      for (var ns : admService.accessNamespacesOf(key.kid).namespaces) {
+        nsl.add(ns);
+        var subNs = nsd.loadPageItems(nsd.query().like(nsd.fld_path(), daos.likeFmt(ns.path)));
+        for (var sns : subNs) {
+          if (!nsl.contains(sns)) {
+            nsl.add(sns);
+          }
         }
-        cmd.values.addAll(valRes.page.items);
       }
+      var nsIds = nsl.stream().map(ns -> ns.nsId).toArray(Integer[]::new);
+      var values = daos.vld.listWhereNsIdIn(nsIds);
+      cmd.namespaces = nsl;
+      cmd.values = values;
       return cmd;
     } catch (Exception e) {
       onError("Value user access error", e);
       return cmd.withError(e);
+    }
+  }
+
+  public OtValueOp valuesOf(Integer kid, Integer nsId, int pageSize, String next) {
+    var out = valueOp();
+    try {
+      var kg = admService.canAccessNs(kid, nsId, true, false, false);
+      if (kg.isEmpty()) {
+        return admService.noNsAccess(out, kid, nsId, read);
+      }
+      var nsIdFld = daos.vld.fld_nsId();
+      out.valPage = daos.vld.loadPage1(
+        daos.vld.query().eq(nsIdFld, nsId).limit(pageSize),
+        OtValueDao.fld_name, next
+      );
+      out.namespace = daos.nsd.loadExisting(nsId);
+      return out;
+    } catch (Exception e) {
+      onError("Value list error", e);
+      return out.withError(e);
     }
   }
 

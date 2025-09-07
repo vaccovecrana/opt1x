@@ -1,8 +1,18 @@
 import * as React from "preact/compat"
 
-import { uiRoot } from "@ui/util"
 import UiIdenticon from "@ui/components/UiIdenticon"
-import { OtApiKey, OtConfigOp, OtNodeType, OtVar } from "@ui/rpc"
+import { OtApiKey, OtGroupNs, OtList, OtResult } from "@ui/rpc"
+import { uiRoot } from "@ui/routes"
+
+export const utcYyyyMmDdHhMm = (timestamp: number): string => {
+  const date = new Date(timestamp)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hours}:${minutes}`
+}
 
 export const avatar = (k: OtApiKey, withLabel: boolean) => {
   return (
@@ -12,7 +22,6 @@ export const avatar = (k: OtApiKey, withLabel: boolean) => {
         {withLabel && (
           <small class="ml8 small">
             {k.name}
-            <code class="ml8">{k.role}</code>
           </small>
         )}
       </a>
@@ -40,10 +49,15 @@ export const row = (cells: any[]) => {
   )
 }
 
-export const options = (values: any[]) => {
-  return values.map(v => (
-    <option>{v}</option>
-  ))
+export const options = <T,>(values: T[], labelFn?: (v: T) => string, valFn?: (v: T) => any) => {
+  return values.map(v => {
+    let label = labelFn ? labelFn(v) : v.toString()
+    let value: any = undefined
+    if (valFn) {
+      value = valFn(v)
+    }
+    return (<option value={value}>{label}</option>)
+  })
 }
 
 export const box = (value: any) => {
@@ -54,66 +68,46 @@ export const box = (value: any) => {
   )
 }
 
-export const boxError = (value: any) => {
-  return (
-    <article class="error">
-      {value}
-    </article>
+export const boxError = (value: any) => (
+  <article class="error">
+    {value}
+  </article>
+)
+
+export const boxValidations = (result: OtResult) => (
+  boxError(
+    <ul>
+      {result.validations?.map(v => (
+        <li>{v.message}</li>
+      ))}
+    </ul>
   )
+)
+
+export const boxResult = (result: OtResult, okMsg: any) => {
+  return [
+    result?.error && boxError(result.error),
+    result?.validations?.length > 0 && boxValidations(result),
+    (!result?.error && result?.validations?.length === 0) && box(okMsg)
+  ]
 }
 
-export interface OtVarV extends OtVar {
-  children?: Map<string, OtVarV>
-  open?: boolean
-}
-
-export const readTree = (op: OtConfigOp): [OtVarV, number] => {
-  let maxIdx: number = -1
-  const { vars } = op
-  const nodeIdx: Map<number, OtVarV> = new Map()
-  for (const node of vars) {
-    const nv: OtVarV = node as OtVarV
-    nodeIdx.set(nv.node.nid, nv)
-    if (nv.node.itemIdx && nv.node.itemIdx > maxIdx) {
-      maxIdx = nv.node.itemIdx
-    }
+export const appendPage = <T, K>(p0: OtList<T, K>, p1: OtList<T, K>) => {
+  if (!p0 || p0.page.nx1 === p1.page.nx1) {
+    return p1
   }
-  let root: OtVarV
-  for (const v of nodeIdx.values()) {
-    const parent = nodeIdx.get(v.node.pNid)
-    if (parent) {
-      if (!parent.children) {
-        parent.children = new Map()
-      }
-      parent.children.set(v.node.label, v)
-    } else {
-      root = v
-    }
-  }
-  root = root || {
-    children: new Map(),
-    node: {
-      nid: -1, type: OtNodeType.Object,
-      label: "root", itemIdx: -1
-    }
-  }
-  return [root, maxIdx]
+  p0 = {...p0}
+  p0.page.items = p0.page.items.concat(p1.page.items)
+  p0.page.size = p0.page.size + p1.page.size
+  p0.page.nx1 = p1.page.nx1
+  p0.error = p1.error
+  p0.validations = p1.validations
+  return p0
 }
 
-const writeTreeTail = (root: OtVarV, idx: Map<number, OtVar>) => {
-  idx.set(root.node.nid, root)
-  root.children?.forEach(child => writeTreeTail(child, idx))
-}
-
-export const writeTree = (root: OtVarV): OtVar[] => {
-  var nodes: Map<number, OtVar> = new Map()
-  writeTreeTail(root, nodes)
-  return [...nodes.values()]
-}
-
-export const capFirst = (str: string): string => {
-  if (str.length === 0) {
-    return ""
-  }
-  return str.charAt(0).toUpperCase() + str.slice(1)
+export const flagsOf = (gns: OtGroupNs): string => {
+  const r = gns.read   ? "r" : "-"
+  const w = gns.write  ? "w" : "-"
+  const m = gns.manage ? "m" : "-"
+  return `${r}${w}${m}`
 }

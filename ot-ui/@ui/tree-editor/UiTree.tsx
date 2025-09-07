@@ -20,7 +20,7 @@ export interface NodeAdapter<K> {
   getId:              (node: K) => string
   getOpen:            (node: K) => boolean
   setOpen:            (node: K, open: boolean) => void
-  renderEditor:       (value: K, onChange: (newValue: K) => void, type: NodeType) => React.JSX.Element
+  renderEditor:       (value: K, onChange: (newValue: K) => void, onCancel: () => void, type: NodeType) => React.JSX.Element
   renderDisplay:      (value: K, type: NodeType) => React.JSX.Element
   renderAddPrimitive: (onSubmit: (newVal: K) => void, onCancel: () => void) => React.JSX.Element
 }
@@ -59,6 +59,7 @@ const ValueView = <K, >({ adapter, value, onChange }: { adapter: NodeAdapter<K>;
         onChange(newVal)
         setEditing(false)
       },
+      () => setEditing(false),
       type
     )
   ) : (

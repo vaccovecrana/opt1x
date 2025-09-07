@@ -34,4 +34,8 @@ public class OtConfigOp extends OtResult {
     return this;
   }
 
+  public static OtConfigOp configOp() {
+    return new OtConfigOp();
+  }
+
 }

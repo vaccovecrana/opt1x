@@ -12,14 +12,14 @@ public class OtApi {
 
   private final Murmux mx;
 
-  public OtApi(OtSealService sealService, OtApiKeyService keyService,
-               OtNamespaceService nsService, OtValueService valService,
-               OtConfigService cfgService, Gson g) {
+  public OtApi(OtSealService ss, OtApiKeyService ks,
+               OtAdminService as, OtValueService vs,
+               OtConfigService cs, Gson g) {
     var x = Executors.newCachedThreadPool(r -> new Thread(r, format("ot-api-%x", r.hashCode())));
     this.mx = new Murmux(OtOptions.host, x);
     var uiHdl = new OtUiHdl();
-    var apiHdl = new OtApiHdl(sealService, keyService, nsService, valService, cfgService);
-    var rootHdl = new OtRootHdl(sealService, keyService, uiHdl, apiHdl, g);
+    var apiHdl = new OtApiHdl(ss, ks, as, vs, cs);
+    var rootHdl = new OtRootHdl(ss, as, ks, uiHdl, apiHdl, g);
     mx.rootHandler(rootHdl);
   }
 

@@ -2,7 +2,14 @@ package io.vacco.opt1x.schema;
 
 public class OtConstants {
 
-  public static final String Opt1x = "opt1x";
+  public static String pathPrefix(String in) {
+    return "/" + in;
+  }
+
+  public static final String Opt1x = "o1x";
+  public static final String Opt1xRoot = pathPrefix(Opt1x);
+
+  public static final String read = "read", write = "write";
 
   public static final String AES = "AES";
   public static final String SHA256 = "SHA-256";
@@ -10,37 +17,37 @@ public class OtConstants {
 
   public static final io.vacco.jwt.Alg Alg = io.vacco.jwt.Alg.HS384;
   public static final int JwtKeySize = 384;
-  public static final int UiSessionTimeoutSec = 1800; // 30 min
+  public static final int UiSessionTimeoutSec = 1800; // 30 min TODO: should this be configurable?
 
   public static final String Opt1xKey = "X-Opt1x-Key";
-  public static final String kGoto = "goto";
-  public static final String qPageSize = "pageSize";
-  public static final String qNext = "next";
+  public static final String kGoto = "goto", kFmt = "fmt";
+  public static final String qPageSize = "pageSize", qNext = "next";
 
   public static final String
-    apiRoot                       = "/api",
-    apiV1Init                     = "/api/v1/init",
-    apiV1Unseal                   = "/api/v1/unseal",
-    apiV1Key                      = "/api/v1/key",
-    apiV1Namespace                = "/api/v1/namespace",
-    apiV1NamespaceId              = "/api/v1/namespace/{nsId}",
-    apiV1NamespaceIdConfig        = "/api/v1/namespace/{nsId}/config",
-    apiV1NamespaceIdConfigId      = "/api/v1/namespace/{nsId}/config/{cid}",
-    apiV1NamespaceIdConfigIdNode  = "/api/v1/namespace/{nsId}/config/{cid}/node",
-    apiV1NamespaceIdConfigIdFmt   = "/api/v1/namespace/{nsId}/config/{cid}/{fmt}",
-    apiV1NamespaceIdValue         = "/api/v1/namespace/{nsId}/value",
-    apiV1NamespaceKey             = "/api/v1/namespace/key",
-    apiV1Value                    = "/api/v1/value";
+    apiRoot           = "/api",
+    apiV1Init         = "/api/v1/init",
+    apiV1Unseal       = "/api/v1/unseal",
+    apiV1Key          = "/api/v1/key",
+    apiV1Group        = "/api/v1/group",
+    apiV1GroupId      = "/api/v1/group/{gid}",
+    apiV1Namespace    = "/api/v1/namespace",
+    apiV1NamespaceId  = "/api/v1/namespace/{nsId}",
+    apiV1Value        = "/api/v1/value",
+    apiV1ValueNsId    = "/api/v1/value/{nsId}",
+    apiV1Config       = "/api/v1/config",
+    apiV1ConfigCid    = "/api/v1/config/{cid}",
+    apiV1ConfigIdFmt  = "/api/v1/config/{cid}/{fmt}";
 
-  public static final String root = "/";
-  public static final String init = "/init";
-  public static final String unseal = "/unseal";
-  public static final String login = "/login";
+  public static final String uiRoot   = "/";
+  public static final String uiInit   = "/init";
+  public static final String uiUnseal = "/unseal";
+  public static final String uiLogin  = "/login";
 
   public static final String
     ui = "/@ui",
-    indexCss = "/index.css", indexCssMap = "/index.css.map", indexHtml = "/index.html",
-    indexJs = "/index.js", indexJsMap = "/index.js.map",
-    favicon = "/favicon.svg";
+    indexHtml = "/index.html",
+    indexCss  = "/index.css", indexCssMap = "/index.css.map",
+    indexJs   = "/index.js",  indexJsMap  = "/index.js.map",
+    favicon   = "/favicon.svg";
 
 }

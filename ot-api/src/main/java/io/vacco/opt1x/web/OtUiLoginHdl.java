@@ -12,11 +12,14 @@ import static java.lang.String.format;
 
 public class OtUiLoginHdl implements MxHandler {
 
+  private final OtAdminService  admService;
   private final OtApiKeyService keyService;
   private final OtSealService   sealService;
-  private final Gson g;
+  private final Gson            g;
 
-  public OtUiLoginHdl(OtApiKeyService keyService, OtSealService sealService, Gson g) {
+  public OtUiLoginHdl(OtAdminService admService, OtApiKeyService keyService,
+                      OtSealService sealService, Gson g) {
+    this.admService = Objects.requireNonNull(admService);
     this.keyService = Objects.requireNonNull(keyService);
     this.sealService = Objects.requireNonNull(sealService);
     this.g = Objects.requireNonNull(g);
@@ -34,12 +37,12 @@ public class OtUiLoginHdl implements MxHandler {
         tk.addGrant(kExp, tk.nowPlus(UiSessionTimeoutSec));
         xc
           .withCookie(new MxCookie(Opt1xKey, tk.encode(g::toJson))) // TODO configure mark secure cookie
-          .withRedirect(goTo != null ? goTo : login)
+          .withRedirect(goTo != null ? goTo : uiLogin)
           .commit();
       } else {
         xc
           .withStatus(MxStatus._401)
-          .withRedirect(format("%s?%s=%s&failed=true", login, kGoto, goTo))
+          .withRedirect(format("%s?%s=%s&failed=true", uiLogin, kGoto, goTo))
           .commit();
       }
     } catch (Exception e) {

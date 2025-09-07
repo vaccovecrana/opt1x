@@ -20,8 +20,8 @@ public class OtApiKeyDao extends MtWriteDao<io.vacco.opt1x.schema.OtApiKey, java
   public static final String fld_name = "name";
   public static final String fld_path = "path";
   public static final String fld_hash = "hash";
-  public static final String fld_role = "role";
-  public static final String fld_createdAtUtcMs = "createdAtUtcMs";
+  public static final String fld_createUtcMs = "createUtcMs";
+  public static final String fld_accessUtcMs = "accessUtcMs";
 
   public OtApiKeyDao(String schema, MtCaseFormat fmt, MtJdbc jdbc, MtIdFn<java.lang.Integer> idFn) {
     super(schema, jdbc, new MtDescriptor<>(io.vacco.opt1x.schema.OtApiKey.class, fmt), idFn);
@@ -59,12 +59,12 @@ public class OtApiKeyDao extends MtWriteDao<io.vacco.opt1x.schema.OtApiKey, java
     return loadWhereEq(fld_hash, hash);
   }
 
-  public MtFieldDescriptor fld_role() {
-    return this.dsc.getField(fld_role);
+  public MtFieldDescriptor fld_createUtcMs() {
+    return this.dsc.getField(fld_createUtcMs);
   }
 
-  public MtFieldDescriptor fld_createdAtUtcMs() {
-    return this.dsc.getField(fld_createdAtUtcMs);
+  public MtFieldDescriptor fld_accessUtcMs() {
+    return this.dsc.getField(fld_accessUtcMs);
   }
 
 }

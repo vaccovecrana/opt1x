@@ -2,8 +2,7 @@
   "cfg": {
     "cid": -565195148,
     "nsId": -1291435579,
-    "name": "flooper-dev",
-    "createdAtUtcMs": 1756018379970
+    "name": "flooper-dev"
   },
   "encrypted": true,
   "vars": [
@@ -52,9 +51,7 @@
         "name": "region.us-east-1",
         "value": "us-east-1",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756090273243,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -73,9 +70,7 @@
         "name": "region.us-west-1",
         "value": "us-west-1",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756090286830,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -94,9 +89,7 @@
         "name": "app.sessionTimeoutMs",
         "value": "3600000",
         "type": "Number",
-        "encrypted": false,
-        "createdAtUtcMs": 1756091760444,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -115,9 +108,7 @@
         "name": "app.url",
         "value": "https://dev.flooper.io",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756018367351,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -136,9 +127,7 @@
         "name": "app.conversionFactor",
         "value": "3.1415",
         "type": "Number",
-        "encrypted": false,
-        "createdAtUtcMs": 1756092117198,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -157,9 +146,7 @@
         "name": "app.conversionEnabled",
         "value": "true",
         "type": "Boolean",
-        "encrypted": false,
-        "createdAtUtcMs": 1756092141243,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -198,9 +185,7 @@
         "name": "db.password",
         "value": "PfU8q2xhGWKJzwrgKOrfgw\u003d\u003d",
         "type": "String",
-        "encrypted": true,
-        "createdAtUtcMs": 1756018326150,
-        "deletedAtUtcMs": 0
+        "encrypted": true
       }
     },
     {
@@ -219,9 +204,7 @@
         "name": "db.url",
         "value": "jdbc:postgresql://localhost:5432/flooper",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756018304325,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -240,9 +223,7 @@
         "name": "db.user",
         "value": "admin",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756018312883,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     },
     {
@@ -271,9 +252,7 @@
         "name": "app.profiles",
         "value": "momo,momodev,momodevblue",
         "type": "String",
-        "encrypted": false,
-        "createdAtUtcMs": 1756018348018,
-        "deletedAtUtcMs": 0
+        "encrypted": false
       }
     }
   ],

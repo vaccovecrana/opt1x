@@ -4,6 +4,37 @@ import java.util.*;
 
 public class OtToml {
 
+  private static void appendValue(Object o, StringBuilder sb) {
+    if (o instanceof String) {
+      var s = (String) o;
+      s = s
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+        .replace("\b", "\\b")
+        .replace("\f", "\\f")
+        .replace("\n", "\\n")
+        .replace("\r", "\\r")
+        .replace("\t", "\\t");
+      sb.append("\"").append(s).append("\"");
+    } else if (o instanceof Boolean) {
+      sb.append(((Boolean) o).toString().toLowerCase());
+    } else if (o instanceof Number) {
+      sb.append(o);
+    } else if (o instanceof List<?>) {
+      var list = (List<?>) o;
+      sb.append("[");
+      for (int i = 0; i < list.size(); i++) {
+        appendValue(list.get(i), sb);
+        if (i < list.size() - 1) {
+          sb.append(", ");
+        }
+      }
+      sb.append("]");
+    } else {
+      throw new UnsupportedOperationException("Unsupported value type: " + (o != null ? o.getClass().getName() : "null"));
+    }
+  }
+
   @SuppressWarnings("unchecked")
   private static void render(String currentTable, Map<String, Object> data, StringBuilder sb) {
     boolean hasDirectContent = false;
@@ -47,37 +78,6 @@ public class OtToml {
         var fullKey = currentTable.isEmpty() ? key : currentTable + "." + key;
         render(fullKey, (Map<String, Object>) value, sb);
       }
-    }
-  }
-
-  private static void appendValue(Object o, StringBuilder sb) {
-    if (o instanceof String) {
-      var s = (String) o;
-      s = s
-        .replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\b", "\\b")
-        .replace("\f", "\\f")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t");
-      sb.append("\"").append(s).append("\"");
-    } else if (o instanceof Boolean) {
-      sb.append(((Boolean) o).toString().toLowerCase());
-    } else if (o instanceof Number) {
-      sb.append(o);
-    } else if (o instanceof List<?>) {
-      var list = (List<?>) o;
-      sb.append("[");
-      for (int i = 0; i < list.size(); i++) {
-        appendValue(list.get(i), sb);
-        if (i < list.size() - 1) {
-          sb.append(", ");
-        }
-      }
-      sb.append("]");
-    } else {
-      throw new UnsupportedOperationException("Unsupported value type: " + (o != null ? o.getClass().getName() : "null"));
     }
   }
 

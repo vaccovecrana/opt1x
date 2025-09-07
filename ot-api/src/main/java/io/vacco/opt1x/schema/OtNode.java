@@ -6,7 +6,7 @@ import io.vacco.metolithe.annotations.*;
 
   @MtPk public Integer nid;
 
-  @MtFk(OtConfig.class)
+  @MtFk(OtConfig.class) @MtNotNull
   @MtPk(idx = 0) @MtUnique(idx = 0)
   @MtDao(loadEq = true, deleteEq = true)
   public Integer cid;

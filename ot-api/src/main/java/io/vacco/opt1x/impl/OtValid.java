@@ -71,21 +71,40 @@ public class OtValid {
   private static final Validator<OtNamespace> OtNamespaceVld = ValidatorBuilder.<OtNamespace>of()
     ._string(ns -> ns.name, OtNamespaceDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
     ._string(ns -> ns.path, OtNamespaceDao.fld_path, c -> path(nnNeNb(c)))
-    ._long(ns -> ns.createdAtUtcMs, OtNamespaceDao.fld_createdAtUtcMs, c -> c.greaterThan(0L))
+    ._long(ns -> ns.createUtcMs, OtNamespaceDao.fld_createUtcMs, c -> c.greaterThan(0L))
+    .build();
+
+  private static final Validator<OtGroup> OtGroupVld = ValidatorBuilder.<OtGroup>of()
+    ._string(grp -> grp.name, OtGroupDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
+    ._string(grp -> grp.path, OtGroupDao.fld_path, c -> path(nnNeNb(c)))
+    ._long(grp -> grp.createUtcMs, OtGroupDao.fld_createUtcMs, c -> c.greaterThan(0L))
+    .build();
+
+  private static final Validator<OtGroupNs> OtGroupNsVld = ValidatorBuilder.<OtGroupNs>of()
+    ._integer(gns -> gns.gid, OtGroupNsDao.fld_gid, Constraint::notNull)
+    ._integer(gns -> gns.nsId, OtGroupNsDao.fld_nsId, Constraint::notNull)
+    ._integer(gns -> gns.grantKid, OtGroupNsDao.fld_grantKid, Constraint::notNull)
     .build();
 
   private static final Validator<OtApiKey> OtApiKeyVld = ValidatorBuilder.<OtApiKey>of()
     ._string(k -> k.name, OtApiKeyDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
     ._string(k -> k.path, OtApiKeyDao.fld_path, c -> noNullExpression(path(nnNeNb(c))))
     ._string(k -> k.hash, OtApiKeyDao.fld_hash, c -> sha256Hash(nnNeNb(c)))
-    ._object(k -> k.role, OtApiKeyDao.fld_role, Constraint::notNull)
-    ._long(k -> k.createdAtUtcMs, OtApiKeyDao.fld_createdAtUtcMs, c -> c.greaterThan(0L))
+    ._long(k -> k.createUtcMs, OtApiKeyDao.fld_createUtcMs, c -> c.greaterThan(0L))
+    .build();
+
+  private static final Validator<OtKeyGroup> OtKeyGroupVld = ValidatorBuilder.<OtKeyGroup>of()
+    ._integer(kg -> kg.kid, OtKeyGroupDao.fld_kid, Constraint::notNull)
+    ._integer(kg -> kg.gid, OtKeyGroupDao.fld_gid, Constraint::notNull)
+    ._object(kg -> kg.role, OtKeyGroupDao.fld_role, Constraint::notNull)
+    ._integer(kg -> kg.grantKid, OtKeyGroupDao.fld_grantKid, Constraint::notNull)
+    ._long(kg -> kg.grantUtcMs, OtKeyGroupDao.fld_grantUtcMs, c -> c.greaterThan(0L))
     .build();
 
   private static final Validator<OtValue> OtValueVld = ValidatorBuilder.<OtValue>of()
     ._string(v -> v.name, OtValueDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
     ._string(v -> v.value, OtValueDao.fld_value, OtValid::nnNeNb)
-    ._long(v -> v.createdAtUtcMs, OtValueDao.fld_createdAtUtcMs, c -> c.greaterThan(0L))
+    ._long(v -> v.createUtcMs, OtValueDao.fld_createUtcMs, c -> c.greaterThan(0L))
     ._object(c -> c.type, OtValueDao.fld_type, Constraint::notNull)
     .build();
 
@@ -103,8 +122,11 @@ public class OtValid {
   private static final Map<Class<?>, Validator<?>> validators = new HashMap<>();
 
   static {
+    validators.put(OtGroup.class, OtGroupVld);
+    validators.put(OtGroupNs.class, OtGroupNsVld);
     validators.put(OtNamespace.class, OtNamespaceVld);
     validators.put(OtApiKey.class, OtApiKeyVld);
+    validators.put(OtKeyGroup.class, OtKeyGroupVld);
     validators.put(OtValue.class, OtValueVld);
     validators.put(OtNode.class, OtNodeVld);
     validators.put(OtConfig.class, OtConfigVld);

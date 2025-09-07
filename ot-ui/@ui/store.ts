@@ -2,7 +2,8 @@ import * as React from "preact/compat"
 import { Context, createContext } from "preact"
 import { OtApiKey } from "@ui/rpc"
 
-const Opt1xKey = "X-Opt1x-Key"
+export const Opt1x = "o1x"
+export const Opt1xKey = "X-Opt1x-Key"
 
 export interface UiState {
   uiLocked: boolean
@@ -66,7 +67,7 @@ const loadApiKey = (): OtApiKey => {
     try {
       return JSON.parse(decodeJWT(token)[Opt1xKey]) as OtApiKey
     } catch (error) {
-      console.error('Invalid token', error)
+      console.error('Invalid token - api key', error)
     }
   }
   return undefined

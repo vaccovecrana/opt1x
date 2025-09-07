@@ -11,9 +11,9 @@ public class OtWeb {
 
   @Provides @Singleton
   public OtApi otApi(OtSealService sealService, OtApiKeyService keyService,
-                     OtNamespaceService nsService, OtValueService valService,
+                     OtAdminService admService, OtValueService valService,
                      OtConfigService cfgService, Gson g) {
-    return new OtApi(sealService, keyService, nsService, valService, cfgService, g);
+    return new OtApi(sealService, keyService, admService, valService, cfgService, g);
   }
 
 }

@@ -67,7 +67,7 @@ public class OtApiKeyHdl implements MxHandler {
 
   private void toLogin(MxExchange xc) {
     var requestPath = xc.getPath();
-    var loginPath = format("%s?%s=%s", login, kGoto, requestPath);
+    var loginPath = format("%s?%s=%s", uiLogin, kGoto, requestPath);
     xc.withRedirect(loginPath).commit();
   }
 

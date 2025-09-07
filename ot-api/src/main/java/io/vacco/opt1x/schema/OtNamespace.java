@@ -4,9 +4,11 @@ import io.vacco.metolithe.annotations.*;
 
 @MtEntity public class OtNamespace {
 
-  @MtPk @MtDao public Integer nsId;
+  @MtPk @MtDao(loadIn = true)
+  public Integer nsId;
 
   @MtFk(OtNamespace.class)
+  @MtDao(loadEq = true)
   public Integer pNsId;
 
   @MtVarchar(256) @MtNotNull
@@ -19,18 +21,19 @@ import io.vacco.metolithe.annotations.*;
   public String path;
 
   @MtCol @MtDao
-  public long createdAtUtcMs;
+  public long createUtcMs;
 
-  public OtNamespace createdAt(long utcMs) {
-    this.createdAtUtcMs = utcMs;
-    return this;
-  }
-
-  public static OtNamespace namespace(Integer pNsId, String name, String path) {
+  public static OtNamespace namespace(Integer pNsId, String name) {
     var ns = new OtNamespace();
     ns.pNsId = pNsId;
     ns.name = name;
+    return ns;
+  }
+
+  public static OtNamespace namespace(Integer pNsId, String name, String path, long createUtcMs) {
+    var ns = namespace(pNsId, name);
     ns.path = path;
+    ns.createUtcMs = createUtcMs;
     return ns;
   }
 
@@ -39,6 +42,15 @@ import io.vacco.metolithe.annotations.*;
       "%d, %d, %s, %s",
       nsId, pNsId, name, path
     );
+  }
+
+  @Override public boolean equals(Object obj) {
+    return obj instanceof OtNamespace
+      && ((OtNamespace) obj).nsId.equals(this.nsId);
+  }
+
+  @Override public int hashCode() {
+    return nsId;
   }
 
 }

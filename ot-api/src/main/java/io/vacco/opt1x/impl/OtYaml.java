@@ -45,7 +45,7 @@ public class OtYaml {
     } else if (value instanceof Number) {
       sb.append(value);
     } else if (value instanceof List) {
-      renderList((List<Object>) value, sb, 0); // Inline nested lists
+      renderList((List<Object>) value, sb); // Inline nested lists
     } else if (value instanceof Map) {
       sb.append("{");
       var it = ((Map<String, Object>) value).entrySet().iterator();
@@ -65,7 +65,7 @@ public class OtYaml {
     }
   }
 
-  private static void renderList(List<Object> list, StringBuilder sb, int indent) {
+  private static void renderList(List<Object> list, StringBuilder sb) {
     sb.append("[");
     for (int i = 0; i < list.size(); i++) {
       var item = list.get(i);
@@ -93,7 +93,7 @@ public class OtYaml {
       } else {
         sb.append(" ");
         if (value instanceof List) {
-          renderList((List<Object>) value, sb, indent + 2);
+          renderList((List<Object>) value, sb);
         } else {
           renderValue(value, sb);
         }

@@ -15,7 +15,7 @@ public class OtMain {
       return;
     }
 
-    OtOptions.jdbcUrl = "jdbc:sqlite:http://localhost:4001";
+    OtOptions.jdbcUrl = "jdbc:rqlite:http://localhost:4001";
     OtOptions.logLevel = OtOptions.LogLevel.trace;
     OtOptions.setFrom(args);
 

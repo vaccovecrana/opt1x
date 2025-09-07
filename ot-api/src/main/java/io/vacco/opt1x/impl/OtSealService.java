@@ -1,16 +1,19 @@
 package io.vacco.opt1x.impl;
 
 import com.google.gson.Gson;
+import io.vacco.jwt.JwtKeys;
 import io.vacco.opt1x.shamir.Scheme;
-import io.vacco.jwt.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.schema.*;
 import javax.crypto.*;
 import java.security.*;
 import java.util.*;
 
-import static io.vacco.opt1x.impl.OtOptions.onError;
+import static io.vacco.opt1x.schema.OtValue.value;
+import static io.vacco.opt1x.dto.OtApiKeyOp.keyOp;
+import static io.vacco.opt1x.schema.OtApiKey.rawKey;
 import static io.vacco.opt1x.schema.OtConstants.*;
+import static io.vacco.opt1x.impl.OtOptions.onError;
 import static io.vacco.opt1x.impl.OtDataIO.*;
 
 public class OtSealService {
@@ -59,7 +62,9 @@ public class OtSealService {
       if (masterApiKey != null) {
         return result.withError("Opt1x already initialized");
       }
-      var kr = keyService.createApiKey(OtApiKeyOp.keyCmd(null, Opt1x, OtRole.Admin));
+      var kr = keyService.createApiKey(keyOp().withKey(
+        rawKey(null, Opt1x, false)
+      ));
       var jk = newJwtKey();
 
       this.sealKey = newAesKey();
@@ -73,10 +78,31 @@ public class OtSealService {
       this.masterApiKey.metadata2 = encryptRaw(m2, sealKey);
       this.masterApiKey.metadata3 = encryptRaw(m3, sealKey);
 
-      keyService.update(OtApiKeyOp.updateCmd(this.masterApiKey));
+      var cmd = keyService.update(keyOp().withKey(this.masterApiKey));
+      if (!cmd.ok()) {
+        return result.setFrom(cmd);
+      }
 
       result.rootApiKey = kr.raw;
       result.shares = sealB64();
+
+      var rootGroup = keyService.daos.grd.upsert(OtGroup.group(
+        null, Opt1x, Opt1xRoot, System.currentTimeMillis()
+      )).rec;
+
+      var rootNs = keyService.daos.nsd.upsert(OtNamespace.namespace(
+        null, Opt1x, Opt1xRoot, System.currentTimeMillis()
+      )).rec;
+
+      keyService.daos.gnd.upsert(OtGroupNs.groupNs(
+        rootGroup.gid, rootNs.nsId,
+        masterApiKey.kid, true, true, true
+      ));
+
+      keyService.daos.kgd.upsert(OtKeyGroup.keyGroup(
+        masterApiKey.kid, rootGroup.gid, OtGroupRole.Admin,
+        masterApiKey.kid
+      ));
 
       this.sealKey = null;
       this.masterKey = null;
@@ -157,11 +183,12 @@ public class OtSealService {
     if (!val.encrypted) {
       return val;
     }
-    return OtValue.of(
-      val.nsId, val.type, val.name,
-      decryptRaw(val.value, masterKey),
-      val.notes, false, val.createdAtUtcMs
+    var dec = value(
+      val.nsId, val.name, decryptRaw(val.value, masterKey),
+      val.type, val.notes, false
     );
+    dec.createUtcMs = val.createUtcMs;
+    return dec;
   }
 
   public boolean isEmpty() {

@@ -3,14 +3,23 @@ import * as React from "react"
 import { IcnSave } from "@ui/components/UiIcons"
 import { lockUi, UiContext, UiStore } from "@ui/store"
 import { RenderableProps } from "preact"
-import { apiV1NamespaceIdConfigIdGet, apiV1NamespaceIdConfigIdNodePost, apiV1ValueGet, OtConfigOp, OtNodeType, OtValueOp } from "@ui/rpc"
-import { rpcUiHld } from "@ui/util"
+import { apiV1ConfigCidGet, apiV1ConfigCidPost, apiV1ValueGet, OtConfigOp, OtNodeType, OtValueOp, OtVar } from "@ui/rpc"
 import { NodeAdapter, NodeType, TreeEditor } from "@ui/tree-editor/UiTree"
-import { readTree, OtVarV, capFirst, writeTree, boxError } from "@ui/components/Ui"
 import UiSearch from "@ui/components/UiSearch"
+import { rpcUiHld } from "."
+import { boxResult } from "@ui/components/Ui"
+
+export interface OtVarV extends OtVar {
+  children?: Map<string, OtVarV>
+  open?: boolean
+}
 
 type OtConfigProps = RenderableProps<{ s?: UiStore, nsId?: number, cid?: number }>
-type OtConfigState = { valOp?: OtValueOp, cfgOp?: OtConfigOp, root?: OtVarV }
+type OtConfigState = {
+  valOp?: OtValueOp
+  cfgOp?: OtConfigOp
+  root?: OtVarV
+}
 
 let idCounter = -1
 let maxIdx = -1
@@ -21,16 +30,67 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
     this.loadConfig()
   }
 
+  readTree(op: OtConfigOp): [OtVarV, number] {
+    let maxIdx: number = -1
+    const { vars } = op
+    const nodeIdx: Map<number, OtVarV> = new Map()
+    for (const node of vars) {
+      const nv: OtVarV = node as OtVarV
+      nodeIdx.set(nv.node.nid, nv)
+      if (nv.node.itemIdx && nv.node.itemIdx > maxIdx) {
+        maxIdx = nv.node.itemIdx
+      }
+    }
+    let root: OtVarV
+    for (const v of nodeIdx.values()) {
+      const parent = nodeIdx.get(v.node.pNid)
+      if (parent) {
+        if (!parent.children) {
+          parent.children = new Map()
+        }
+        parent.children.set(v.node.label, v)
+      } else {
+        root = v
+      }
+    }
+    root = root || {
+      children: new Map(),
+      node: {
+        nid: -1, type: OtNodeType.Object,
+        label: "root", itemIdx: -1
+      }
+    }
+    return [root, maxIdx]
+  }
+
+  writeTreeTail(root: OtVarV, idx: Map<number, OtVar>) {
+    idx.set(root.node.nid, root)
+    root.children?.forEach(child => this.writeTreeTail(child, idx))
+  }
+
+  writeTree(root: OtVarV): OtVar[] {
+    var nodes: Map<number, OtVar> = new Map()
+    this.writeTreeTail(root, nodes)
+    return [...nodes.values()]
+  }
+
+  capFirst(str: string): string {
+    if (str.length === 0) {
+      return ""
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
+
   loadConfig() {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
         .then(() => Promise.all([
           apiV1ValueGet(),
-          apiV1NamespaceIdConfigIdGet(this.props.nsId, this.props.cid, true)
+          apiV1ConfigCidGet(this.props.cid, true)
         ]))
         .then(([valOp, cfgOp]) => {
-          const [root, mxIdx] = readTree(cfgOp)
+          const [root, mxIdx] = this.readTree(cfgOp)
           maxIdx = mxIdx
           this.setState({...this.state, valOp, cfgOp, root})
         })
@@ -39,14 +99,14 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
   }
 
   saveConfig() {
-    this.state.cfgOp.vars = writeTree(this.state.root)
+    this.state.cfgOp.vars = this.writeTree(this.state.root)
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespaceIdConfigIdNodePost(this.props.nsId, this.props.cid, this.state.cfgOp))
+        .then(() => apiV1ConfigCidPost(this.props.cid, this.state.cfgOp))
         .then(cfgOp => {
           if (!cfgOp.error) {
-            const [root, mxIdx] = readTree(cfgOp)
+            const [root, mxIdx] = this.readTree(cfgOp)
             maxIdx = mxIdx
             this.setState({...this.state, cfgOp, root})
           } else {
@@ -78,7 +138,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
   }
 
   initialValue(parent: OtVarV, parentType: NodeType, key: string, childType: NodeType) {
-    return this.newVal(capFirst(childType) as OtNodeType, key)
+    return this.newVal(this.capFirst(childType) as OtNodeType, key)
   }
 
   addChild(parent: OtVarV, parentType: NodeType, key: string, child: OtVarV, childType: NodeType) {
@@ -94,6 +154,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
   setChild(parent: OtVarV, parentType: NodeType, key: string, child: OtVarV, childType: NodeType) {
     const out = {...parent}
     out.children.set(key, child)
+    child.node.pNid = parent.node.nid
     return out
   }
 
@@ -147,7 +208,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
 
   renderAddPrimitive(
     onSubmit: (newVal: OtVarV, selectedKey?: string) => void,
-    onCancel?: () => void, suggestedKey?: string
+    onCancel: () => void
   ) {
     if (this.state.valOp) {
       return (
@@ -161,14 +222,15 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
             newVal.node.vid = val.vid
             onSubmit(newVal)
           }}
+          onCancel={onCancel}
         />
       )
     }
     return undefined
   }
 
-  renderEditor(value: OtVarV, onChange: (newValue: OtVarV) => void, type: NodeType) {
-    return this.renderAddPrimitive(onChange)
+  renderEditor(value: OtVarV, onChange: (newValue: OtVarV) => void, onCancel: () => void, type: NodeType) {
+    return this.renderAddPrimitive(onChange, onCancel)
   }
 
   render() {
@@ -184,15 +246,13 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
             </li>
           </ul>
         </nav>
-        {this.state.cfgOp?.error && boxError(this.state.cfgOp.error)}
-        {this.state.cfgOp?.validations?.length > 0 && boxError(
-          this.state.cfgOp.validations.map(v => <div>{v.message}</div>)
-        )}
+        {this.state.cfgOp && boxResult(this.state.cfgOp, "Config updated")}
         <div>
           {this.state.root && (
             <TreeEditor
               adapter={this} value={this.state.root}
-              onChange={root => this.setState({...this.state, root})} />
+              onChange={root => this.setState({...this.state, root})}
+            />
           )}
         </div>
       </div>

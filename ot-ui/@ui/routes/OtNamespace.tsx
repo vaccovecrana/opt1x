@@ -1,135 +1,227 @@
-import { box, boxError, headers, row } from "@ui/components/Ui"
-import { IcnAdd } from "@ui/components/UiIcons"
-import { apiV1KeyGet, apiV1NamespaceIdGet, apiV1NamespaceKeyGet, apiV1NamespaceKeyPost, OtApiKey, OtAssignmentList, OtList, OtNamespace, OtNamespaceOp } from "@ui/rpc"
-import { lockUi, UiContext, UiStore } from "@ui/store"
-import { utcYyyyMmDdHhMm, rpcUiHld } from "@ui/util"
 import { RenderableProps } from "preact"
 import * as React from "preact/compat"
 
-type OtNamespaceVProps = RenderableProps<{ s?: UiStore, nsId?: number }>
-type OtNamespaceVState = {
-  apiKeys?: OtList<OtApiKey, string>
-  nskPage?: OtAssignmentList
-  nsOp?: OtNamespaceOp
-  ns?: OtNamespace
-}
+import { boxResult, flagsOf, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { apiV1NamespaceIdGet, apiV1NamespacePost, OtAdminOp, OtKeyAccess } from "@ui/rpc"
+import { lockUi, UiContext, UiStore } from "@ui/store"
+import { rpcUiHld, uiConfigsNsIdFmt, uiNamespacesIdFmt, uiValuesNsIdFmt } from "@ui/routes"
+import { IcnAdd, IcnBind, IcnBook, IcnTree } from "@ui/components/UiIcons"
 
-const NoKid = -1
+type OtNsProps = RenderableProps<{ s?: UiStore, nsId?: number }>
+type OtNsState = { access?: OtKeyAccess, adminOp?: OtAdminOp }
 
-const BlankOp = (): OtNamespaceOp => ({
-  keyNamespace: { writeAccess: false },
-  namespace: {}
+const NoId = -1
+
+const BlankBindOp = (): OtAdminOp => ({
+  groupNs: {
+    gid: NoId, nsId: undefined,
+    read: false, write: false, manage: false
+  }
 })
 
-class OtNamespaceV extends React.Component<OtNamespaceVProps, OtNamespaceVState> {
+const BlankNsOp = (): OtAdminOp => ({
+  ns: { name: undefined }
+})
+
+class OtNamespace extends React.Component<OtNsProps, OtNsState> {
 
   componentDidMount(): void {
-    this.loadAssignments()
+    this.loadNamespaces()
   }
 
-  loadAssignments() {
+  componentDidUpdate(previousProps: Readonly<OtNsProps>): void {
+    if (previousProps.nsId !== this.props.nsId) {
+      this.setState({...this.state, adminOp: undefined})
+      this.loadNamespaces()
+    }
+  }
+
+  loadNamespaces() {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => Promise.all([
-          apiV1KeyGet(50, this.state.apiKeys?.page?.nx1),
-          apiV1NamespaceKeyGet(50, this.props.nsId, this.state.nskPage?.page?.nx1),
-          apiV1NamespaceIdGet(this.props.nsId)
-        ]))
-        .then(([apiKeys, nskPage, nsPage]) => this.setState({
-          ...this.state, apiKeys, nskPage,
-          ns: nsPage.page.items[0]
-        })),
-        d
+        .then(() => apiV1NamespaceIdGet(this.props.nsId))
+        .then(access => this.setState({...this.state, access}))
+      , d
     )
   }
 
-  saveAssignment() {
+  bindEdit(gid: number, nsId: number, read?: boolean, write?: boolean, manage?: boolean) {
+    const groupNs = {...this.state.adminOp.groupNs}
+    if (gid !== undefined) {
+      groupNs.gid = gid
+    }
+    if (nsId !== undefined) {
+      groupNs.nsId = nsId
+    }
+    if (read !== undefined) {
+      groupNs.read = read
+    }
+    if (write !== undefined) {
+      groupNs.write = write
+    }
+    if (manage !== undefined) {
+      groupNs.manage = manage
+    }
+    this.setState({...this.state, adminOp: {...this.state.adminOp, groupNs}})
+  }
+
+  nsEdit(name: string) {
+    const ns = {...this.state.adminOp.ns}
+    if (name !== undefined) {
+      ns.name = name
+    }
+    this.setState({...this.state, adminOp: {...this.state.adminOp, ns}})
+  }
+
+  saveOp() {
     const { dispatch: d } = this.props.s
-    this.state.nsOp.namespace.nsId = this.props.nsId
+    if (this.state.adminOp.ns) {
+      this.state.adminOp.ns.pNsId = this.props.nsId
+    } else if (this.state.adminOp.groupNs.gid) {
+      const grp = this.state.access.groupTree.find(grp => grp.gid === this.state.adminOp.groupNs.gid)
+      const ns = this.state.access.namespaces.find(ns0 => ns0.nsId === this.state.adminOp.groupNs.nsId)
+      this.state.adminOp.group = grp
+      this.state.adminOp.ns = ns
+    }
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespaceKeyPost(this.state.nsOp))
-        .then(nsOp => {
-          if (nsOp.error) {
-            throw nsOp
-          } else if (nsOp.keyNamespace.id) {
-            this.setState({...this.state, nsOp}, () => this.withEdit(NoKid, false))
-            return this.loadAssignments()
-          } else {
-            this.setState({...this.state, nsOp})
+        .then(() => apiV1NamespacePost(this.state.adminOp))
+        .then(adminOp => {
+          if (adminOp.groupNs?.id) {
+            adminOp.ns = undefined
+            adminOp.groupNs.gid = NoId
+            adminOp.groupNs.nsId = NoId
+            adminOp.groupNs.read = false
+            adminOp.groupNs.write = false
+            adminOp.groupNs.manage = false
+            this.setState({...this.state, adminOp})
+            return this.loadNamespaces()
           }
-        }),
-      d
+          if (adminOp.ns?.nsId) {
+            adminOp.ns.name = ""
+            this.setState({...this.state, adminOp})
+            return this.loadNamespaces()
+          }
+          this.setState({...this.state, adminOp})
+        })
+      , d
     )
-  }
-
-  withEdit(kid: number, writeAccess: boolean) {
-    var nsOp = {...this.state.nsOp}
-    if (kid !== undefined) {
-      nsOp.keyNamespace.kid = kid
-    }
-    if (writeAccess !== undefined) {
-      nsOp.keyNamespace.writeAccess = writeAccess
-    }
-    this.setState({...this.state, nsOp})
   }
 
   render() {
     return (
       <div>
         <nav>
-          <ul><li><h1>{this.state.ns?.name}</h1></li></ul>
+          <ul><li><h1>{this.state.access?.namespace?.path}</h1></li></ul>
           <ul>
             <li>
-              <a class="ptr" onClick={() => this.setState({...this.state, nsOp: BlankOp()})}>
+              {this.state.access?.namespaces?.length > 0 && (
+                <a class="ptr" onClick={() => this.setState({...this.state, adminOp: BlankBindOp()})}>
+                  <IcnBind height={32} />
+                </a>
+              )}
+              <a class="ptr ml8" onClick={() => this.setState({...this.state, adminOp: BlankNsOp()})}>
                 <IcnAdd height={32} />
               </a>
             </li>
           </ul>
         </nav>
-        {this.state.nsOp?.error && boxError(this.state.nsOp.error)}
-        {this.state.nsOp?.validations?.length > 0 && boxError(
-          this.state.nsOp.validations.map(v => <div>{v.message}</div>)
+        {this.state.adminOp && boxResult(
+          this.state.adminOp,
+          this.state.adminOp.groupNs?.id
+            ? <div>Namespace bound</div>
+            : <div>Namespace created</div>
         )}
-        {this.state.nsOp?.keyNamespace?.id && box("API key assigned")}
-        {this.state.nsOp && this.state.apiKeys && (
+        {this.state.adminOp?.groupNs && this.state.access && (
           <div class="grid">
+            <select
+              required value={this.state.adminOp.groupNs.gid}
+              onChange={e => this.bindEdit(parseInt((e.target as any).value), undefined)}>
+              <option selected disabled value={NoId}>Group</option>
+              {options(this.state.access.groupTree, g => g.name, g => g.gid)}
+            </select>
+            <select
+              required value={this.state.adminOp.groupNs.nsId}
+              onChange={e => this.bindEdit(undefined, parseInt((e.target as any).value))}>
+              <option selected disabled value={NoId}>Namespace</option>
+              {options(this.state.access.namespaces, ns => ns.name, ns => ns.nsId)}
+            </select>
             <fieldset>
-              <select required value={this.state.nsOp?.keyNamespace?.kid || NoKid}
-                onChange={e => this.withEdit(parseInt((e.target as any).value), undefined)}>
-                <option disabled value={NoKid}>Key Assignment</option>
-                {this.state.apiKeys.page.items.map(key => (
-                  <option value={key.kid}>{key.name}</option>
-                ))}
-              </select>
-              <input type="checkbox" id="wa"
-                checked={this.state.nsOp?.keyNamespace?.writeAccess}
-                onChange={e => this.withEdit(undefined, (e.target as any).checked)}
-              />
-              <label htmlFor="wa">Write access</label>
+              <input type="checkbox" id="read"
+                checked={this.state.adminOp.groupNs.read}
+                onChange={e => this.bindEdit(undefined, undefined, (e.target as any).checked, undefined, undefined)} />
+              <label htmlFor="read">R</label>
+              <input type="checkbox" id="write"
+                checked={this.state.adminOp.groupNs.write}
+                onChange={e => this.bindEdit(undefined, undefined, undefined, (e.target as any).checked, undefined)} />
+              <label htmlFor="write">W</label>
+              <input type="checkbox" id="manage"
+                checked={this.state.adminOp.groupNs.manage}
+                onChange={e => this.bindEdit(undefined, undefined, undefined, undefined, (e.target as any).checked)} />
+              <label htmlFor="manage">M</label>
             </fieldset>
-            <input type="submit" value="Save"
-              disabled={this.state.nsOp?.keyNamespace?.kid === undefined || this.state.nsOp?.keyNamespace?.kid === NoKid}
-              onClick={() => this.saveAssignment()}
-            />
+            <input type="submit" value="Bind"
+              disabled={!this.state.adminOp.groupNs.gid || !this.state.adminOp.groupNs.nsId}
+              onClick={() => this.saveOp()} />
           </div>
         )}
-        {this.state.nskPage && (
+        {this.state.adminOp?.ns && (
+          <div class="grid">
+            <input placeholder="Namespace Name" value={this.state.adminOp.ns.name || ""}
+              onChange={e => this.nsEdit((e.target as any).value)} />
+            <input type="submit" value="Save"
+              disabled={!this.state.adminOp.ns.name}
+              onClick={() => this.saveOp()} />
+          </div>
+        )}
+        {this.state.access?.namespaces?.length > 0 && (
           <table class="striped">
-            {headers(["Key", "Write access", "Date"])}
+            {headers(["Name", "Created", "Actions"])}
             <tbody>
-              {this.state.nskPage.page.items.map(kns => row([
-                this.state.nskPage.apiKeys.find(ak => ak.kid === kns.kid).name,
-                kns.writeAccess ? "Yes" : "No",
-                utcYyyyMmDdHhMm(kns.grantUtcMs)
-              ]))}
+              {this.state.access.namespaces.map(ns => {
+                const rwg = this.state.access.groupNamespaces.find(gns => gns.read || gns.write)
+                return row([
+                  <a href={uiNamespacesIdFmt(ns.nsId)}>{ns.name}</a>,
+                  utcYyyyMmDdHhMm(ns.createUtcMs),
+                  rwg && (
+                    <div class="row justify-center">
+                      <div class="col auto">
+                        <a href={uiValuesNsIdFmt(ns.nsId)}>
+                          <IcnBook height={32} />
+                        </a>
+                      </div>
+                      <div class="col auto">
+                        <a href={uiConfigsNsIdFmt(ns.nsId)}>
+                          <IcnTree height={32} />
+                        </a>
+                      </div>
+                    </div>
+                  )
+                ])
+              })}
             </tbody>
           </table>
         )}
+        {this.state.access?.groupNamespaces?.length > 0 && [
+          <h3>Group Access</h3>,
+          <table class="striped">
+            {headers(["Group", "Permissions", "Granted"])}
+            <tbody>
+              {this.state.access.groupNamespaces.map(gns => {
+                const grp = this.state.access.groups.find(grp => grp.gid === gns.gid)
+                return row([
+                  grp?.name,
+                  <code>{flagsOf(gns)}</code>,
+                  utcYyyyMmDdHhMm(gns.grantUtcMs)
+                ])
+              })}
+            </tbody>
+          </table>
+        ]}
       </div>
     )
   }
 }
 
-export default (props: OtNamespaceVProps) => <OtNamespaceV {...props} s={React.useContext(UiContext)} />
+export default (props: OtNsProps) => <OtNamespace {...props} s={React.useContext(UiContext)} />

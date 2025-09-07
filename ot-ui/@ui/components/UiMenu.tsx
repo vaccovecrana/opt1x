@@ -1,14 +1,15 @@
 import * as React from "preact/compat"
 
-import { uiApiKeys, uiNamespaces, uiRoot } from "@ui/util"
-import { IcnCode, IcnDatabase, IcnLogo } from "@ui/components/UiIcons"
+import { IcnCode, IcnDatabase, IcnGroup, IcnLogo, IcnLogout } from "@ui/components/UiIcons"
 import { UiContext } from "@ui/store"
-import { avatar } from "./Ui"
+import { avatar } from "@ui/components/Ui"
+import { logout, uiApiKeys, uiGroups, uiNamespaces, uiRoot } from "@ui/routes"
 
 const UiMenu = () => {
   const s = React.useContext(UiContext)
+  const {apiKey} = s.state
   return (
-    <div class="col xs-12 col md-3 col lg-2">
+    <div class="col xs-12 sm-12 md-3 lg-2">
       <div class="row sm-down-hide">
         <div class="col auto">
           <div class="sm-down-hide pt16" />
@@ -20,15 +21,29 @@ const UiMenu = () => {
                     <IcnLogo height={64} /><code class="ml8">Opt1x</code>
                   </a>
                 </li>
+                {apiKey && !apiKey.leaf && (
+                  <li>
+                    <a href={uiApiKeys} class="secondary mt16">
+                      <IcnDatabase height={32} /><small class="ml8">API Keys</small>
+                    </a>
+                  </li>
+                )}
                 <li>
-                  <a href={uiApiKeys} class="secondary mt16">
-                    <IcnDatabase height={32} /><small class="ml8">API Keys</small>
+                  <a href={uiGroups} class="secondary">
+                    <IcnGroup height={32} /><small class="ml8">Key Groups</small>
                   </a>
                 </li>
                 <li>
                   <a href={uiNamespaces} class="secondary">
                     <IcnCode height={32} /><small class="ml8">Namespaces</small>
                   </a>
+                </li>
+                <li>
+                  <div class="col auto">
+                    <a class="ptr secondary" onClick={() => logout()}>
+                      <IcnLogout height={32} /><small class="ml8">Logout</small>
+                    </a>
+                  </div>
                 </li>
                 {s.state.apiKey && avatar(s.state.apiKey, true)}
               </ul>
@@ -43,8 +58,10 @@ const UiMenu = () => {
               <li><a href={uiRoot}><IcnLogo height={48} /></a></li>
             </ul>
             <ul>
-              <li><a href={uiApiKeys}><IcnDatabase height={32} /></a></li>
+              {apiKey && !apiKey.leaf && (<li><a href={uiApiKeys}><IcnDatabase height={32} /></a></li>)}
+              <li><a href={uiGroups}><IcnGroup height={32} /></a></li>
               <li><a href={uiNamespaces}><IcnCode height={32} /></a></li>
+              <li><a class="ptr" onClick={() => logout()}><IcnLogout height={32} /></a></li>
               {s.state.apiKey && avatar(s.state.apiKey, false)}
             </ul>
           </nav>

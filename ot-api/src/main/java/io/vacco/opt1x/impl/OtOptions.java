@@ -9,17 +9,24 @@ public class OtOptions {
 
   public static Logger log;
 
-  public static final String Sqlite = "sqlite", Hsqldb = "hsqldb";
-  public static final String Main = "main", Public = "public";
+  public static final String Main = "main";
 
   public enum LogLevel  { error, warning, info, debug, trace }
   public enum LogFormat { text, json }
 
   public static final String
-    kJdbcUrl    = "--jdbc-url",   kDbSeed = "--db-seed",
-    kApiHost    = "--api-host",   kApiPort = "--api-port",
+    kJdbcUrl    = "--jdbc-url",   kDbSeed    = "--db-seed",
+    kApiHost    = "--api-host",   kApiPort   = "--api-port",
     kShares     = "--shares",     kThreshold = "--threshold",
-    kLogFormat  = "--log-format", kLogLevel = "--log-level";
+    kLogFormat  = "--log-format", kLogLevel  = "--log-level",
+
+    // Optional features
+    kOidcIssuer       = "--oidc-issuer",
+    kOidcClientId     = "--oidc-client-id",
+    kOidcClientSecret = "--oidc-client-secret",
+    kOidcRedirectUri  = "--oidc-redirect-uri",
+    kOidcScopes       = "--oidc-scopes",
+    kAuditWebhookUrl  = "--audit-webhook-url";
 
   public static LogFormat logFormat = LogFormat.text;
   public static LogLevel  logLevel  = LogLevel.info;
@@ -29,19 +36,33 @@ public class OtOptions {
   public static long      dbSeed = 1984;
   public static int       shares = 3, threshold = 2;
 
+  public static String    oidcIssuer;
+  public static String    oidcClientId;
+  public static String    oidcClientSecret;
+  public static String    oidcRedirectUri = "http://localhost:7070/oidc/callback"; // Default, overridable
+  public static String    oidcScopes = "openid profile email groups"; // Default, space-separated
+
+  public static String    auditWebhookUrl; // If set, enables auditing
+
   public static String usage() {
     return String.join("\n",
       "Usage:",
       "  opt1x [options]",
       "Options:",
-      "  --jdbc-url=string    JDBC connection string. Required. Supports hsqldb (local file), rqlite (external cluster)",
-      "  --db-seed=number     Database seed. Default: " + dbSeed,
-      "  --api-host=string    API/UI IP address. Default: " + host,
-      "  --api-port=number    API/UI port. Default: " + port,
-      "  --shares=number      Number of shares. Default: " + shares,
-      "  --threshold=number   Number of shares to unseal. Default: " + threshold,
-      "  --log-format=string  Log output format ('text' or 'json'). Default: " + logFormat,
-      "  --log-level=string   Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel
+      "  --jdbc-url           [string] JDBC connection string. Required. Supports sqlite (local file), rqlite (external cluster)",
+      "  --db-seed            [number] Database seed. Default: " + dbSeed,
+      "  --api-host           [string] API/UI IP address. Default: " + host,
+      "  --api-port           [number] API/UI port. Default: " + port,
+      "  --shares             [number] Number of shares. Default: " + shares,
+      "  --threshold          [number] Number of shares to unseal. Default: " + threshold,
+      "  --log-format         [string] Log output format ('text' or 'json'). Default: " + logFormat,
+      "  --log-level          [string] Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel,
+      "  --oidc-issuer        [string] OIDC issuer URL (autodiscovery endpoint). Enables OIDC if provided",
+      "  --oidc-client-id     [string] OIDC client ID. Required if OIDC enabled",
+      "  --oidc-client-secret [string] OIDC client secret. Required if OIDC enabled",
+      "  --oidc-redirect-uri  [string] OIDC redirect URI. Default: " + oidcRedirectUri,
+      "  --oidc-scopes        [string] OIDC scopes (space-separated). Default: '" + oidcScopes + "'",
+      "  --audit-webhook-url  [string] Webhook URL for audit events. Enables auditing if provided"
     );
   }
 
@@ -50,7 +71,6 @@ public class OtOptions {
       .filter(arg -> arg.startsWith("--"))
       .map(arg -> arg.split("="))
       .filter(pair -> pair.length == 2)
-      .filter(pair -> pair[0] != null && pair[1] != null)
       .collect(Collectors.toMap(pair -> pair[0], pair -> pair[1]));
 
     var vDbUrl = argIdx.get(kJdbcUrl);
@@ -61,15 +81,34 @@ public class OtOptions {
     var vThreshold = argIdx.get(kThreshold);
     var vLogFormat = argIdx.get(kLogFormat);
     var vLogLevel = argIdx.get(kLogLevel);
+    var vOidcIssuer = argIdx.get(kOidcIssuer);
+    var vOidcClientId = argIdx.get(kOidcClientId);
+    var vOidcClientSecret = argIdx.get(kOidcClientSecret);
+    var vOidcRedirectUri = argIdx.get(kOidcRedirectUri);
+    var vOidcScopes = argIdx.get(kOidcScopes);
+    var vAuditWebhookUrl = argIdx.get(kAuditWebhookUrl);
 
     jdbcUrl = vDbUrl != null ? vDbUrl : jdbcUrl;
-    dbSeed = vDbSeed != null ? Integer.parseInt(vDbSeed) : dbSeed;
+    dbSeed = vDbSeed != null ? Long.parseLong(vDbSeed) : dbSeed;
     host = vHost != null ? vHost : host;
     port = vPort != null ? Integer.parseInt(vPort) : port;
     shares = vShares != null ? Integer.parseInt(vShares) : shares;
     threshold = vThreshold != null ? Integer.parseInt(vThreshold) : threshold;
     logFormat = vLogFormat != null ? LogFormat.valueOf(vLogFormat) : logFormat;
     logLevel = vLogLevel != null ? LogLevel.valueOf(vLogLevel) : logLevel;
+
+    oidcIssuer = vOidcIssuer != null ? vOidcIssuer : oidcIssuer;
+    oidcClientId = vOidcClientId != null ? vOidcClientId : oidcClientId;
+    oidcClientSecret = vOidcClientSecret != null ? vOidcClientSecret : oidcClientSecret;
+    oidcRedirectUri = vOidcRedirectUri != null ? vOidcRedirectUri : oidcRedirectUri;
+    oidcScopes = vOidcScopes != null ? vOidcScopes : oidcScopes;
+    auditWebhookUrl = vAuditWebhookUrl != null ? vAuditWebhookUrl : auditWebhookUrl;
+
+    if (oidcIssuer != null) {
+      if (oidcClientId == null || oidcClientSecret == null) {
+        throw new IllegalArgumentException("OIDC enabled but missing required params: issuer, client-id, client-secret");
+      }
+    }
 
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_DEVMODE, logFormat == LogFormat.text ? "true" : "false");
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_LOGLEVEL, logLevel.toString());
@@ -104,7 +143,11 @@ public class OtOptions {
   }
 
   public static String getSchema() {
-    return jdbcUrl.contains(Sqlite) ? Main : Public;
+    return Main;
+  }
+
+  public static boolean isRqLite() {
+    return jdbcUrl.contains("rqlite");
   }
 
 }

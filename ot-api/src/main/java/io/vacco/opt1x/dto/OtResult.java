@@ -7,6 +7,7 @@ import java.util.function.Function;
 public class OtResult {
 
   public String error;
+
   public final List<OtValidation> validations = new ArrayList<>();
 
   @SuppressWarnings("unchecked")
@@ -41,6 +42,19 @@ public class OtResult {
     if (ok()) {
       return validator.apply((T) this);
     }
+    return (T) this;
+  }
+
+  public void clear() {
+    this.error = null;
+    this.validations.clear();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T extends OtResult> T setFrom(OtResult r0) {
+    clear();
+    this.error = r0.error;
+    this.validations.addAll(r0.validations);
     return (T) this;
   }
 

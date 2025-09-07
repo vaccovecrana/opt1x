@@ -1,14 +1,12 @@
 package io.vacco.opt1x.impl;
 
 import io.vacco.jwt.*;
-import io.vacco.opt1x.schema.OtApiKey;
 import javax.crypto.*;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Base64;
 
 import static io.vacco.opt1x.schema.OtConstants.*;
-import static java.lang.String.format;
 
 public class OtDataIO {
 
@@ -61,10 +59,6 @@ public class OtDataIO {
 
   public static JwtKey newJwtKey() {
     return JwtKeys.generateKey(Alg, JwtKeySize);
-  }
-
-  public static boolean isActiveKey(OtApiKey key) {
-    return key != null && key.deletedAtUtcMs == 0;
   }
 
 }

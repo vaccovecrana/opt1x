@@ -19,7 +19,20 @@ public class OtService {
 
   @Provides @Singleton
   public HikariDataSource dataSource() {
-    L4Log.traceFn = log::trace;
+    MtLog.setInfoLogger(log::info);
+    MtLog.setDebugLogger(log::debug);
+    MtLog.setWarnLogger(log::warn);
+
+    MxLog.setInfoLogger(log::info);
+    MxLog.setDebugLogger(log::debug);
+    MxLog.setWarnLogger(log::warn);
+    MxLog.setErrorLogger(log::error);
+
+    L4Log.setInfoLogger(log::info);
+    L4Log.setDebugLogger(log::debug);
+    L4Log.setWarnLogger(log::warn);
+    L4Log.setTraceLogger(log::info); // TODO revert this: log::trace
+
     var hkConfig = new HikariConfig();
     hkConfig.setJdbcUrl(OtOptions.jdbcUrl);
     return new HikariDataSource(hkConfig);
@@ -27,21 +40,12 @@ public class OtService {
 
   @Provides @Singleton
   public MtJdbc mtJdbc(HikariDataSource hkDs, Gson g) throws Exception {
-    MtLog.setInfoLogger(log::info);
-    MtLog.setDebugLogger(log::debug);
-    MtLog.setWarnLogger(log::warn);
-    MxLog.setDebugLogger(log::debug);
-    MxLog.setInfoLogger(log::info);
-    MxLog.setWarnLogger(log::warn);
-    MxLog.setErrorLogger(log::error);
-    L4Log.debugFn = log::debug;
-    L4Log.traceFn = log::info;
     try (var conn = hkDs.getConnection()) {
       var logUrl = Objects.requireNonNull(OtService.class.getResource("/ot-schema.json"));
       try (var ir = new InputStreamReader(logUrl.openStream())) {
         var chgSet = g.fromJson(ir, MtChangeSet.class);
-        new MtApply(conn, null)
-          .withAutoCommit(true)
+        new MtApply(conn, OtOptions.getSchema())
+          .withTransactions(!OtOptions.isRqLite())
           .applyChanges(chgSet.changes, null);
       }
     }
@@ -54,13 +58,13 @@ public class OtService {
   }
 
   @Provides @Singleton
-  public OtApiKeyService otKeyService(OtDaos daos) {
+  public OtApiKeyService keyService(OtDaos daos) {
     return new OtApiKeyService(daos);
   }
 
   @Provides @Singleton
-  public OtNamespaceService otNamespaceService(OtDaos daos) {
-    return new OtNamespaceService(daos);
+  public OtAdminService adminService(OtDaos daos, OtApiKeyService keyService) {
+    return new OtAdminService(daos, keyService);
   }
 
   @Provides @Singleton
@@ -69,15 +73,15 @@ public class OtService {
   }
 
   @Provides @Singleton
-  public OtValueService otValueService(OtDaos daos, OtNamespaceService nss, OtSealService ss) {
-    return new OtValueService(daos, nss, ss);
+  public OtValueService otValueService(OtDaos daos, OtAdminService as, OtSealService ss) {
+    return new OtValueService(daos, as, ss);
   }
 
   @Provides @Singleton
   public OtConfigService configService(OtDaos daos, OtValueService valService,
-                                       OtNamespaceService nsService, OtSealService sealService,
+                                       OtAdminService admService, OtSealService sealService,
                                        Gson g) {
-    return new OtConfigService(daos, valService, nsService, sealService, g);
+    return new OtConfigService(daos, valService, admService, sealService, g);
   }
 
 }

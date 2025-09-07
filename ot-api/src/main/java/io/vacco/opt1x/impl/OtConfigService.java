@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static io.vacco.opt1x.dto.OtConfigOp.configOp;
+import static io.vacco.opt1x.schema.OtConstants.*;
 import static io.vacco.opt1x.impl.OtOptions.onError;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
@@ -18,17 +20,17 @@ public class OtConfigService {
 
   public final OtDaos daos;
   public final OtValueService valService;
-  public final OtNamespaceService nsService;
+  public final OtAdminService admService;
   public final OtSealService sealService;
   public final Gson json;
 
   public OtConfigService(OtDaos daos,
                          OtValueService valService,
-                         OtNamespaceService nsService,
+                         OtAdminService admService,
                          OtSealService sealService, Gson json) {
     this.daos = requireNonNull(daos);
     this.valService = requireNonNull(valService);
-    this.nsService = requireNonNull(nsService);
+    this.admService = requireNonNull(admService);
     this.sealService = requireNonNull(sealService);
     this.json = requireNonNull(json);
   }
@@ -48,12 +50,19 @@ public class OtConfigService {
 
   public OtConfigOp createConfig(OtConfigOp cmd) {
     try {
+      cmd.clear();
+      cmd = requireNonNull(cmd).validate(cmd0 -> {
+        var kg = admService.canAccessNs(cmd0.key.kid, cmd0.cfg.nsId, false, true, false);
+        if (kg.isEmpty()) {
+          return admService.noNsAccess(cmd0, cmd0.key.kid, cmd0.cfg.nsId, write);
+        }
+        return cmd0;
+      });
+      cmd.cfg.createUtcMs = System.currentTimeMillis();
       cmd = OtValid
-        .validate(requireNonNull(cmd).cfg, cmd)
-        .validate(this::duplicateConfig)
-        .validate(cmd0 -> nsService.nsAccess(cmd0, cmd0.key.kid, cmd0.cfg.nsId, true));
+        .validate(cmd.cfg, cmd)
+        .validate(this::duplicateConfig);
       if (cmd.ok()) {
-        cmd.cfg.createdAtUtcMs = System.currentTimeMillis();
         daos.cfd.save(cmd.cfg);
       }
       return cmd;
@@ -96,9 +105,12 @@ public class OtConfigService {
         dbIdx.put(v.node.nid, v);
       }
       for (var v : cmd.vars) {
-        if (v.node.pNid == null && root.get().node.nid != null && !root.get().node.nid.equals(v.node.nid)) {
-          cmd.withError("Config tree must have only one root node");
-          return Collections.emptyMap();
+        if (v.node.pNid == null) {
+          var rnId = root.get().node.nid;
+          if (rnId != null && !rnId.equals(v.node.nid)) {
+            cmd.withError("Config tree must have only one root node");
+            return Collections.emptyMap();
+          }
         }
         var path = new ArrayList<Integer>();
         var pv = v;
@@ -135,22 +147,7 @@ public class OtConfigService {
         for (var e : treeIdx.entrySet()) {
           daos.ndd.save(e.getValue().node);
         }
-      }, conn -> {
-        try {
-          var warn = conn.getWarnings();
-          var sb = new StringBuilder();
-          while (warn != null) {
-            sb.append(warn.getMessage());
-            warn = warn.getNextWarning();
-          }
-          if (!sb.toString().isEmpty()) {
-            cmd.withError(sb.toString());
-          }
-        } catch (Exception e) {
-          onError("Config tree check error", e);
-          cmd.withError(e);
-        }
-      });
+      }, conn -> cmd.withError(daos.txWarningsOf(conn)));
       return cmd;
     } catch (Exception e) {
       onError("Config tree write error", e);
@@ -160,10 +157,11 @@ public class OtConfigService {
 
   public OtConfigOp update(OtConfigOp cmd) {
     try {
-      final var key = cmd.key;
-      final var nsId = cmd.cfg.nsId;
-      if (!cmd.validate(cmd0 -> nsService.nsAccess(cmd0, key.kid, nsId, true)).ok()) {
-        return cmd;
+      cmd.clear();
+      cmd.cfg = daos.cfd.loadExisting(cmd.cfg.cid);
+      var kg = admService.canAccessNs(cmd.key.kid, cmd.cfg.nsId, false, true, false);
+      if (kg.isEmpty()) {
+        return admService.noNsAccess(cmd, cmd.key.kid, cmd.cfg.nsId, write);
       }
       for (var otv : requireNonNull(requireNonNull(cmd).vars)) {
         if (!OtValid.validate(otv.node, cmd).ok()) {
@@ -189,8 +187,11 @@ public class OtConfigService {
 
   public OtConfigOp load(OtConfigOp cmd) {
     try {
-      var encrypted = cmd.encrypted;
-      cmd = cmd.validate(cmd0 -> nsService.nsAccess(cmd0, cmd0.key.kid, cmd0.cfg.nsId, false));
+      cmd.cfg = daos.cfd.loadExisting(cmd.cfg.cid);
+      var kg = admService.canAccessNs(cmd.key.kid, cmd.cfg.nsId, true, false, false);
+      if (kg.isEmpty()) {
+        return admService.noNsAccess(cmd, cmd.key.kid, cmd.cfg.nsId, read);
+      }
       if (cmd.ok()) {
         var nodes = daos.ndd.loadWhereCidEq(cmd.cfg.cid);
         var valIds = nodes.stream().map(node -> node.vid).filter(Objects::nonNull).toArray(Integer[]::new);
@@ -201,7 +202,7 @@ public class OtConfigService {
           var vl = values.get(node.vid);
           if (vl != null) {
             value = vl.getFirst();
-            if (value.encrypted && !encrypted) {
+            if (value.encrypted && !cmd.encrypted) {
               value = sealService.decrypt(value);
             }
           }
@@ -218,13 +219,12 @@ public class OtConfigService {
   public OtList<OtConfig, String> configsOf(Integer kid, Integer nsId, int pageSize, String next) {
     var out = new OtList<OtConfig, String>();
     try {
-      out = nsService.nsAccess(out, kid, nsId, false);
-      if (!out.ok()) {
-        return out;
+      var kg = admService.canAccessNs(kid, nsId, true, false, false);
+      if (kg.isEmpty()) {
+        return admService.noNsAccess(out, kid, nsId, read);
       }
       out.page = daos.cfd.loadPage1(
-        pageSize, false,
-        daos.cfd.query().eq(daos.cfd.fld_nsId(), nsId),
+        daos.cfd.query().eq(daos.cfd.fld_nsId(), nsId).limit(pageSize),
         OtConfigDao.fld_name, next
       );
       return out;
@@ -248,17 +248,18 @@ public class OtConfigService {
       .withBody(body);
   }
 
-  public RvResponse<Object> render(OtApiKey key, Integer nsId, Integer cid, String otFormat, boolean encrypted) {
+  public RvResponse<Object> render(OtApiKey key, Integer cid, String otFormat, boolean encrypted) {
     var out = new RvResponse<>();
     try {
-      var cmd = new OtConfigOp();
+      var cmd = configOp();
       var fmt = OtNodeFormat.valueOf(otFormat);
-      if (!nsService.nsAccess(cmd, key.kid, nsId, false).ok()) {
+      var cfg = daos.cfd.loadExisting(cid);
+      var kg = admService.canAccessNs(key.kid, cfg.nsId, true, false, false);
+      if (kg.isEmpty()) {
+        cmd = admService.noNsAccess(cmd, key.kid, cfg.nsId, read);
         return error(out, Response.Status.UNAUTHORIZED, cmd.error);
       }
-      cmd.cfg = new OtConfig();
-      cmd.cfg.cid = requireNonNull(cid);
-      cmd.cfg.nsId = nsId;
+      cmd.cfg = cfg;
       cmd.encrypted = encrypted;
       cmd.key = key;
       if (!load(cmd).ok()) {

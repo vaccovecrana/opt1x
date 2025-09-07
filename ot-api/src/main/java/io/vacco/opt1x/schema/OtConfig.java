@@ -17,6 +17,6 @@ import io.vacco.metolithe.annotations.*;
   public String name;
 
   @MtCol
-  public long createdAtUtcMs;
+  public long createUtcMs;
 
 }

@@ -107,7 +107,7 @@ export class ObjAdapter implements NodeAdapter<any> {
     node._open = open
   }
 
-  renderEditor(value: any, onChange: (newValue: any) => void, type: NodeType) {
+  renderEditor(value: any, onChange: (newValue: any) => void, onCancel: () => void, type: NodeType) {
     switch (type) {
       case NodeType.Str: return <input type="text" value={value} onBlur={(e) => onChange((e.target as any).value)} />
       case NodeType.Num: return <input type="number" value={value} onBlur={(e) => onChange(Number((e.target as any).value))} />

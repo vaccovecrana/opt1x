@@ -22,7 +22,7 @@ public class OtValueDao extends MtWriteDao<io.vacco.opt1x.schema.OtValue, java.l
   public static final String fld_value = "value";
   public static final String fld_type = "type";
   public static final String fld_encrypted = "encrypted";
-  public static final String fld_createdAtUtcMs = "createdAtUtcMs";
+  public static final String fld_createUtcMs = "createUtcMs";
 
   public OtValueDao(String schema, MtCaseFormat fmt, MtJdbc jdbc, MtIdFn<java.lang.Integer> idFn) {
     super(schema, jdbc, new MtDescriptor<>(io.vacco.opt1x.schema.OtValue.class, fmt), idFn);
@@ -42,6 +42,10 @@ public class OtValueDao extends MtWriteDao<io.vacco.opt1x.schema.OtValue, java.l
 
   public List<io.vacco.opt1x.schema.OtValue> loadWhereNsIdEq(java.lang.Integer nsId) {
     return loadWhereEq(fld_nsId, nsId);
+  }
+
+  public final List<io.vacco.opt1x.schema.OtValue> listWhereNsIdIn(java.lang.Integer ... values) {
+    return listWhereIn(fld_nsId, values);
   }
 
   public MtFieldDescriptor fld_name() {
@@ -64,8 +68,8 @@ public class OtValueDao extends MtWriteDao<io.vacco.opt1x.schema.OtValue, java.l
     return this.dsc.getField(fld_encrypted);
   }
 
-  public MtFieldDescriptor fld_createdAtUtcMs() {
-    return this.dsc.getField(fld_createdAtUtcMs);
+  public MtFieldDescriptor fld_createUtcMs() {
+    return this.dsc.getField(fld_createUtcMs);
   }
 
 }

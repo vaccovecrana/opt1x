@@ -17,9 +17,9 @@ public class OtRootHdl extends MxRouter {
       if (ss.isEmpty()) {
         next.handle(xc);
       } else if (ss.isSealed()) {
-        xc.withRedirect(unseal).commit();
+        xc.withRedirect(uiUnseal).commit();
       } else {
-        xc.withRedirect(root).commit();
+        xc.withRedirect(uiRoot).commit();
       }
     };
   }
@@ -27,22 +27,22 @@ public class OtRootHdl extends MxRouter {
   public static MxHandler unsealOr(OtSealService ss, MxHandler next) {
     return xc -> {
       if (ss.isEmpty()) {
-        xc.withRedirect(init).commit();
+        xc.withRedirect(uiInit).commit();
       } else if (ss.isSealed()) {
         next.handle(xc);
       } else {
-        xc.withRedirect(root).commit();
+        xc.withRedirect(uiRoot).commit();
       }
     };
   }
 
-  // TODO fix: go to this URL after colb boot (sealed): http://127.0.0.1:7070/login?goto=/namespaces/835482165/config/-1451385404
+  // TODO fix: go to this URL after cold boot (sealed): http://127.0.0.1:7070/login?goto=/namespaces/835482165/config/-1451385404
   public static MxHandler sysCheckOr(OtSealService ss, OtApiKeyHdl keyApiHdl, boolean goToRoot, MxHandler next) {
     return xc -> {
       if (ss.isEmpty()) {
-        xc.withRedirect(init).commit();
+        xc.withRedirect(uiInit).commit();
       } else if (ss.isSealed()) {
-        xc.withRedirect(unseal).commit();
+        xc.withRedirect(uiUnseal).commit();
       } else {
         var cookieOk = keyApiHdl
           .cookieOf(xc)
@@ -50,7 +50,7 @@ public class OtRootHdl extends MxRouter {
           .isPresent();
         if (cookieOk) {
           if (goToRoot) {
-            xc.withRedirect(root).commit();
+            xc.withRedirect(uiRoot).commit();
           } else {
             next.handle(xc);
           }
@@ -62,7 +62,8 @@ public class OtRootHdl extends MxRouter {
   }
 
   @SuppressWarnings("this-escape")
-  public OtRootHdl(OtSealService ss, OtApiKeyService ks, OtUiHdl uiHdl, OtApiHdl apiHdl, Gson g) {
+  public OtRootHdl(OtSealService ss, OtAdminService as,
+                   OtApiKeyService ks, OtUiHdl uiHdl, OtApiHdl apiHdl, Gson g) {
     var errorHdl = (BiConsumer<MxExchange, Exception>) (xc, e) -> {
       xc.putAttachment(e);
       onError("Unhandled exception: {}", e, xc.io.getRequestURI());
@@ -70,7 +71,7 @@ public class OtRootHdl extends MxRouter {
     var apiAdpHdl = new RvMxAdapter<>(apiHdl, errorHdl, g::fromJson, g::toJson).build();
     var keyApiHdl = new OtApiKeyHdl(ss, ks, apiAdpHdl, g);
     var keyUiHdl = new OtApiKeyHdl(ss, ks, uiHdl, g);
-    var loginHdl = new OtUiLoginHdl(ks, ss, g);
+    var loginHdl = new OtUiLoginHdl(as, ks, ss, g);
 
     // UI static resources
     get(indexCss, uiHdl);
@@ -81,12 +82,12 @@ public class OtRootHdl extends MxRouter {
     prefix(ui, uiHdl);
 
     // Login actions
-    get(login, sysCheckOr(ss, keyApiHdl, true, uiHdl));
-    post(login, loginHdl);
+    get(uiLogin, sysCheckOr(ss, keyApiHdl, true, uiHdl));
+    post(uiLogin, loginHdl);
 
     // Init/Unseal action
-    get(init, initOr(ss, uiHdl));
-    get(unseal, unsealOr(ss, uiHdl));
+    get(uiInit, initOr(ss, uiHdl));
+    get(uiUnseal, unsealOr(ss, uiHdl));
 
     // API actions
     any(apiV1Init, apiAdpHdl);

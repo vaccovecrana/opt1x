@@ -1,17 +1,19 @@
 import * as React from "preact/compat"
 
-import { box, boxError, headers, options, row } from "@ui/components/Ui"
+import { appendPage, boxResult, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd } from "@ui/components/UiIcons"
-import { apiV1KeyGet, apiV1KeyPost, OtApiKey, OtApiKeyOp, OtList, OtRole } from "@ui/rpc"
+import { apiV1KeyGet, apiV1KeyPost, OtApiKey, OtApiKeyOp, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { utcYyyyMmDdHhMm, rpcUiHld } from "@ui/util"
 import { RenderableProps } from "preact"
+import { rpcUiHld } from "@ui/routes"
 
 type OtApiKeysProps = RenderableProps<{ s?: UiStore }>
 type OtApiKeysState = {
   keys: OtList<OtApiKey, string>
-  keyEdit?: OtApiKeyOp
+  keyOp?: OtApiKeyOp
 }
+
+const BlankOp = (): OtApiKeyOp => ({ key: { leaf: true } })
 
 class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
 
@@ -23,8 +25,15 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-      .then(() => apiV1KeyGet(25, this.state.keys?.page?.nx1))
-      .then(keys => this.setState({ keys })), d
+      .then(() => apiV1KeyGet(2, this.state.keys?.page?.nx1))
+      .then(keys => {
+        if (keys.error) {
+          throw keys
+        } else {
+          keys = this.state.keys ? appendPage(this.state.keys, keys) : keys
+          this.setState({...this.state, keys})
+        }
+      }), d
     )
   }
 
@@ -32,27 +41,30 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1KeyPost(this.state.keyEdit))
-        .then(keyEdit => {
-          if (keyEdit.error) {
-            throw keyEdit
-          } else {
-            this.setState({ keyEdit: {...keyEdit, name: "", role: undefined} })
+        .then(() => apiV1KeyPost(this.state.keyOp))
+        .then(keyOp => {
+          if (keyOp.key.kid) {
+            keyOp.key.name = ""
+            this.setState({...this.state, keyOp})
             return this.loadKeys()
+          } else {
+            this.setState({...this.state, keyOp})
           }
         }), d
     )
   }
 
-  withEdit(name: string, role: string) {
-    const keyEdit = {...this.state.keyEdit}
-    if (name !== undefined) {
-      keyEdit.name = name
+  withEdit(name: string, management: boolean) {
+    const key = {...this.state.keyOp?.key}
+    if (key) {
+      if (name !== undefined) {
+        key.name = name
+      }
+      if (management !== undefined) {
+        key.leaf = !management
+      }
+      this.setState({...this.state, keyOp: {...this.state.keyOp, key}})
     }
-    if (role !== undefined) {
-      keyEdit.role = role as OtRole
-    }
-    this.setState({...this.state, keyEdit})
   }
 
   render() {
@@ -62,45 +74,49 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
           <ul><li><h1>API keys</h1></li></ul>
           <ul>
             <li>
-              <a class="ptr" onClick={() => this.setState({...this.state, keyEdit: {}})}>
+              <a class="ptr" onClick={() => this.setState({...this.state, keyOp: BlankOp()})}>
                 <IcnAdd height={32} />
               </a>
             </li>
           </ul>
         </nav>
-        {this.state.keyEdit?.error && boxError(this.state.keyEdit.error)}
-        {this.state.keyEdit?.validations?.length > 0 && boxError(
-          this.state.keyEdit.validations.map(v => <div>{v.message}</div>)
+        {this.state.keyOp && boxResult(
+          this.state.keyOp,
+          <div>Key created: <code>{this.state.keyOp.raw}</code></div>
         )}
-        {this.state.keyEdit?.key?.kid && box(
-          <div>Key created: <code>{this.state.keyEdit.raw}</code></div>
-        )}
-        {this.state.keyEdit && (
+        {this.state.keyOp && (
           <div class="grid">
-            <input placeholder="Key Name" value={this.state.keyEdit?.name || ""}
-              onChange={e => this.withEdit((e.target as any).value, undefined)}
-            />
-            <select
-              required value={this.state.keyEdit?.role || ""}
-              onChange={e => this.withEdit(undefined, (e.target as any).value)}>
-              <option selected disabled value="">Select</option>
-              {options([OtRole.Admin, OtRole.Application, OtRole.Auditor])}
-            </select>
+            <input placeholder="Key Name" value={this.state.keyOp?.key.name || ""}
+              onChange={e => this.withEdit((e.target as any).value, undefined)} />
+            <fieldset>
+              <input type="checkbox" id="manage"
+                checked={!this.state.keyOp?.key?.leaf}
+                onChange={e => this.withEdit(undefined, (e.target as any).checked)} />
+              <label htmlFor="enc">Management key</label>
+            </fieldset>
             <input type="submit" value="Save"
-              disabled={!this.state.keyEdit?.name || !this.state.keyEdit?.role}
-              onClick={() => this.saveKey()}
-            />
+              disabled={!this.state.keyOp?.key?.name}
+              onClick={() => this.saveKey()} />
           </div>
         )}
         {this.state.keys && (
-          <table class="striped">
-            {headers(["Name", "Role", "Created"])}
-            <tbody>
-              {this.state.keys.page.items.map(k => row([
-                k.name, k.role, utcYyyyMmDdHhMm(k.createdAtUtcMs)
-              ]))}
-            </tbody>
-          </table>
+          <div>
+            <table class="striped">
+              {headers(["Name", "Created", "Management"])}
+              <tbody>
+                {this.state.keys.page.items.map(k => row([
+                  k.name,
+                  utcYyyyMmDdHhMm(k.createUtcMs),
+                  k.leaf ? "no" : "yes"
+                ]))}
+              </tbody>
+            </table>
+            {this.state.keys.page.nx1 && (
+              <div class="grid">
+                <button onClick={() => this.loadKeys()}>Load more</button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     )

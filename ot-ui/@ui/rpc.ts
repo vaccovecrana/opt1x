@@ -29,38 +29,42 @@ export interface MtPage1<T, K1> {
   nx1?: K1;
 }
 
+export interface OtAdminOp extends OtResult {
+  key?: OtApiKey;
+  keyGroup?: OtKeyGroup;
+  keyGroupBind?: OtKeyGroup;
+  ns?: OtNamespace;
+  group?: OtGroup;
+  groupNs?: OtGroupNs;
+}
+
 export interface OtApiKey {
   kid?: number;
   pKid?: number;
   name?: string;
   path?: string;
   hash?: string;
-  role?: OtRole;
+  leaf?: boolean;
+  createUtcMs?: number;
+  accessUtcMs?: number;
   metadata0?: string;
   metadata1?: string;
   metadata2?: string;
   metadata3?: string;
-  createdAtUtcMs?: number;
-  deletedAtUtcMs?: number;
+  oidcSub?: string;
+  oidcEmail?: string;
 }
 
 export interface OtApiKeyOp extends OtResult {
-  parentKid?: number;
-  name?: string;
-  role?: OtRole;
   key?: OtApiKey;
   raw?: string;
-}
-
-export interface OtAssignmentList extends OtList<OtKeyNamespace, number> {
-  apiKeys?: OtApiKey[];
 }
 
 export interface OtConfig {
   cid?: number;
   nsId?: number;
   name?: string;
-  createdAtUtcMs?: number;
+  createUtcMs?: number;
 }
 
 export interface OtConfigOp extends OtResult {
@@ -70,17 +74,54 @@ export interface OtConfigOp extends OtResult {
   key?: OtApiKey;
 }
 
+export interface OtGroup {
+  gid?: number;
+  pGid?: number;
+  name?: string;
+  path?: string;
+  createUtcMs?: number;
+}
+
+export interface OtGroupNs {
+  id?: number;
+  gid?: number;
+  nsId?: number;
+  grantKid?: number;
+  grantUtcMs?: number;
+  read?: boolean;
+  write?: boolean;
+  manage?: boolean;
+}
+
+export const enum OtGroupRole {
+  Member = "Member",
+  Admin = "Admin",
+}
+
 export interface OtInitOp extends OtResult {
   rootApiKey?: string;
   shares?: string[];
 }
 
-export interface OtKeyNamespace {
+export interface OtKeyAccess {
+  group?: OtGroup;
+  groups?: OtGroup[];
+  groupTree?: OtGroup[];
+  keys?: OtApiKey[];
+  keyGroups?: OtKeyGroup[];
+  keyGroupGrantKeys?: OtApiKey[];
+  namespace?: OtNamespace;
+  namespaces?: OtNamespace[];
+  groupNamespaces?: OtGroupNs[];
+  groupNamespaceGrantKeys?: OtApiKey[];
+}
+
+export interface OtKeyGroup {
   id?: number;
   kid?: number;
-  nsId?: number;
+  gid?: number;
+  role?: OtGroupRole;
   grantKid?: number;
-  writeAccess?: boolean;
   grantUtcMs?: number;
 }
 
@@ -93,12 +134,7 @@ export interface OtNamespace {
   pNsId?: number;
   name?: string;
   path?: string;
-  createdAtUtcMs?: number;
-}
-
-export interface OtNamespaceOp extends OtResult {
-  namespace?: OtNamespace;
-  keyNamespace?: OtKeyNamespace;
+  createUtcMs?: number;
 }
 
 export interface OtNode {
@@ -122,12 +158,6 @@ export interface OtResult {
   validations?: OtValidation[];
 }
 
-export const enum OtRole {
-  Application = "Application",
-  Auditor = "Auditor",
-  Admin = "Admin",
-}
-
 export interface OtUnsealOp extends OtResult {
   loadedKeys?: number;
   ready?: boolean;
@@ -148,13 +178,14 @@ export interface OtValue {
   type?: OtValueType;
   notes?: string;
   encrypted?: boolean;
-  createdAtUtcMs?: number;
-  deletedAtUtcMs?: number;
+  createUtcMs?: number;
 }
 
 export interface OtValueOp extends OtResult {
   key?: OtApiKey;
   val?: OtValue;
+  valPage?: MtPage1<OtValue, string>;
+  namespace?: OtNamespace;
   values?: OtValue[];
   namespaces?: OtNamespace[];
 }
@@ -181,6 +212,92 @@ Source controllers:
 - io.vacco.opt1x.web.OtApiHdl
 
  */
+
+export const apiV1GroupIdDelete = (gid: number): Promise<OtAdminOp> => {
+  let path = "/api/v1/group/{gid}"
+  path = path.replace("{ gid }".replace(/\s+/g, ""), gid.toString())
+  return doJsonIo(path, "DELETE",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ConfigGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtConfig, string>> => {
+  let path = "/api/v1/config"
+  const qParams = new URLSearchParams()
+  if (nsId) {
+    qParams.append("nsId", nsId.toString())
+  }
+  if (pageSize) {
+    qParams.append("pageSize", pageSize.toString())
+  }
+  if (next) {
+    qParams.append("next", next.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ConfigCidGet = (cid: number, encrypted: boolean): Promise<OtConfigOp> => {
+  let path = "/api/v1/config/{cid}"
+  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
+  const qParams = new URLSearchParams()
+  if (encrypted) {
+    qParams.append("encrypted", encrypted.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ConfigIdFmtGet = (cid: number, fmt: string, encrypted: boolean): Promise<Object> => {
+  let path = "/api/v1/config/{cid}/{fmt}"
+  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
+  path = path.replace("{ fmt }".replace(/\s+/g, ""), fmt.toString())
+  const qParams = new URLSearchParams()
+  if (encrypted) {
+    qParams.append("encrypted", encrypted.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1GroupGet = (): Promise<OtKeyAccess> => {
+  let path = "/api/v1/group"
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1GroupIdGet = (gid: number): Promise<OtKeyAccess> => {
+  let path = "/api/v1/group/{gid}"
+  path = path.replace("{ gid }".replace(/\s+/g, ""), gid.toString())
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
 
 export const apiV1InitGet = (): Promise<OtInitOp> => {
   let path = "/api/v1/init"
@@ -210,16 +327,8 @@ export const apiV1KeyGet = (pageSize: number, next: string): Promise<OtList<OtAp
   )
 }
 
-export const apiV1NamespaceGet = (pageSize: number, next: string): Promise<OtList<OtNamespace, string>> => {
+export const apiV1NamespaceGet = (): Promise<OtKeyAccess> => {
   let path = "/api/v1/namespace"
-  const qParams = new URLSearchParams()
-  if (pageSize) {
-    qParams.append("pageSize", pageSize.toString())
-  }
-  if (next) {
-    qParams.append("next", next.toString())
-  }
-  path = `${path}?${qParams.toString()}`
   return doJsonIo(path, "GET",
       undefined
     ,
@@ -228,103 +337,9 @@ export const apiV1NamespaceGet = (pageSize: number, next: string): Promise<OtLis
   )
 }
 
-export const apiV1NamespaceKeyGet = (pageSize: number, nsId: number, next: number): Promise<OtAssignmentList> => {
-  let path = "/api/v1/namespace/key"
-  const qParams = new URLSearchParams()
-  if (pageSize) {
-    qParams.append("pageSize", pageSize.toString())
-  }
-  if (nsId) {
-    qParams.append("nsId", nsId.toString())
-  }
-  if (next) {
-    qParams.append("next", next.toString())
-  }
-  path = `${path}?${qParams.toString()}`
-  return doJsonIo(path, "GET",
-      undefined
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdGet = (nsId: number): Promise<OtList<OtNamespace, string>> => {
+export const apiV1NamespaceIdGet = (nsId: number): Promise<OtKeyAccess> => {
   let path = "/api/v1/namespace/{nsId}"
   path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  return doJsonIo(path, "GET",
-      undefined
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdConfigGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtConfig, string>> => {
-  let path = "/api/v1/namespace/{nsId}/config"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  const qParams = new URLSearchParams()
-  if (pageSize) {
-    qParams.append("pageSize", pageSize.toString())
-  }
-  if (next) {
-    qParams.append("next", next.toString())
-  }
-  path = `${path}?${qParams.toString()}`
-  return doJsonIo(path, "GET",
-      undefined
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdConfigIdGet = (nsId: number, cid: number, encrypted: boolean): Promise<OtConfigOp> => {
-  let path = "/api/v1/namespace/{nsId}/config/{cid}"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
-  const qParams = new URLSearchParams()
-  if (encrypted) {
-    qParams.append("encrypted", encrypted.toString())
-  }
-  path = `${path}?${qParams.toString()}`
-  return doJsonIo(path, "GET",
-      undefined
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdConfigIdFmtGet = (nsId: number, cid: number, fmt: string, encrypted: boolean): Promise<Object> => {
-  let path = "/api/v1/namespace/{nsId}/config/{cid}/{fmt}"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
-  path = path.replace("{ fmt }".replace(/\s+/g, ""), fmt.toString())
-  const qParams = new URLSearchParams()
-  if (encrypted) {
-    qParams.append("encrypted", encrypted.toString())
-  }
-  path = `${path}?${qParams.toString()}`
-  return doJsonIo(path, "GET",
-      undefined
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdValueGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtValue, string>> => {
-  let path = "/api/v1/namespace/{nsId}/value"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  const qParams = new URLSearchParams()
-  if (pageSize) {
-    qParams.append("pageSize", pageSize.toString())
-  }
-  if (next) {
-    qParams.append("next", next.toString())
-  }
-  path = `${path}?${qParams.toString()}`
   return doJsonIo(path, "GET",
       undefined
     ,
@@ -343,6 +358,61 @@ export const apiV1ValueGet = (): Promise<OtValueOp> => {
   )
 }
 
+export const apiV1ValueNsIdGet = (nsId: number, pageSize: number, next: string): Promise<OtValueOp> => {
+  let path = "/api/v1/value/{nsId}"
+  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  const qParams = new URLSearchParams()
+  if (pageSize) {
+    qParams.append("pageSize", pageSize.toString())
+  }
+  if (next) {
+    qParams.append("next", next.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ConfigPost = (nsId: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
+  let path = "/api/v1/config"
+  const qParams = new URLSearchParams()
+  if (nsId) {
+    qParams.append("nsId", nsId.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "POST",
+      JSON.stringify(arg2)
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ConfigCidPost = (cid: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
+  let path = "/api/v1/config/{cid}"
+  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
+  return doJsonIo(path, "POST",
+      JSON.stringify(arg2)
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1GroupPost = (arg1: OtAdminOp): Promise<OtAdminOp> => {
+  let path = "/api/v1/group"
+  return doJsonIo(path, "POST",
+      JSON.stringify(arg1)
+    ,
+    new Map(),
+    undefined
+  )
+}
+
 export const apiV1KeyPost = (arg1: OtApiKeyOp): Promise<OtApiKeyOp> => {
   let path = "/api/v1/key"
   return doJsonIo(path, "POST",
@@ -353,54 +423,10 @@ export const apiV1KeyPost = (arg1: OtApiKeyOp): Promise<OtApiKeyOp> => {
   )
 }
 
-export const apiV1NamespacePost = (arg1: OtNamespaceOp): Promise<OtNamespaceOp> => {
+export const apiV1NamespacePost = (arg1: OtAdminOp): Promise<OtAdminOp> => {
   let path = "/api/v1/namespace"
   return doJsonIo(path, "POST",
       JSON.stringify(arg1)
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceKeyPost = (arg1: OtNamespaceOp): Promise<OtNamespaceOp> => {
-  let path = "/api/v1/namespace/key"
-  return doJsonIo(path, "POST",
-      JSON.stringify(arg1)
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdConfigPost = (nsId: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
-  let path = "/api/v1/namespace/{nsId}/config"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  return doJsonIo(path, "POST",
-      JSON.stringify(arg2)
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdConfigIdNodePost = (nsId: number, cid: number, arg3: OtConfigOp): Promise<OtConfigOp> => {
-  let path = "/api/v1/namespace/{nsId}/config/{cid}/node"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
-  return doJsonIo(path, "POST",
-      JSON.stringify(arg3)
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1NamespaceIdValuePost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
-  let path = "/api/v1/namespace/{nsId}/value"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  return doJsonIo(path, "POST",
-      JSON.stringify(arg2)
     ,
     new Map(),
     undefined
@@ -411,6 +437,17 @@ export const apiV1UnsealPost = (arg0: string): Promise<OtUnsealOp> => {
   let path = "/api/v1/unseal"
   return doJsonIo(path, "POST",
       JSON.stringify(arg0)
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ValueNsIdPost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
+  let path = "/api/v1/value/{nsId}"
+  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  return doJsonIo(path, "POST",
+      JSON.stringify(arg2)
     ,
     new Map(),
     undefined

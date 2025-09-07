@@ -19,7 +19,7 @@ h1, h2, h3, h4, h5 { margin: 0px; }
 .txl { text-align: left;   }
 .txr { text-align: right;  }
 
-.ml8  { margin-left: 8px;  }
+.ml8 { margin-left: 8px; }
 
 .mt16 { margin-top:    16px; }
 .mb16 { margin-bottom: 16px; }
@@ -43,3 +43,7 @@ h1, h2, h3, h4, h5 { margin: 0px; }
 .pill-orange { background-color: var(--nord12); }
 
 .ptr { cursor: pointer; }
+
+.error ul, .error li {
+  margin-bottom: 0px;
+}
