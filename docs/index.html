@@ -22,7 +22,7 @@
   const REPO_OWNER = 'vaccovecrana';
   const REPO_NAME = 'opt1x';
   const MD_DIR = 'docs';
-  const CONFIG_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/docs/config.json`;
+  const CONFIG_URL = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/master/docs/config.json`;
 
   const sidebar = document.getElementById('sidebar');
   const navList = document.getElementById('nav-list');
@@ -91,7 +91,7 @@
   function handleHash() {
     const hash = window.location.hash.slice(1);
     if (hash) {
-      const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${MD_DIR}/${hash}`;
+      const rawUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/master/${MD_DIR}/${hash}`;
       loadMarkdown(rawUrl);
     }
   }
