@@ -52,10 +52,6 @@ function UiSearch<K>({ items, getLabel, getSearchKey, onSelect, onCancel, getCat
     <div class="uiSearch">
       <input type="text" value={query}
         onChange={(e) => setQuery((e.target as any).value)}
-        onBlur={() => {
-          setQuery("")
-          onCancel()
-        }}
         onKeyDown={(e) => {
           if (e.key === "ArrowDown") {
             e.preventDefault()
@@ -74,7 +70,12 @@ function UiSearch<K>({ items, getLabel, getSearchKey, onSelect, onCancel, getCat
         placeholder="Search..."
       />
       {Object.keys(grouped).length > 0 && (
-        <div class="dropDown">
+        <div
+          class="dropDown"
+          onBlur={() => {
+            setQuery("")
+            onCancel()
+          }}>
           {Object.entries(grouped).map(([cat, groupItems]) => (
             <div key={cat}>
               {cat && <h3 class="category">{cat}</h3>}
@@ -82,11 +83,13 @@ function UiSearch<K>({ items, getLabel, getSearchKey, onSelect, onCancel, getCat
                 const idx = itemToIndex.get(item)!
                 return (
                   <div
-                    class={`result ${idx === highlightedIndex ? "highlighted" : ""}`}
                     key={localIdx}
-                    onClick={() => onSelect(item)}
-                    onMouseEnter={() => setHighlightedIndex(idx)}
-                  >
+                    class={`result ${idx === highlightedIndex ? "highlighted" : ""}`}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      onSelect(item)
+                    }}
+                    onMouseEnter={() => setHighlightedIndex(idx)}>
                     {getLabel(item)}
                   </div>
                 )

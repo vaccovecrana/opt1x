@@ -7,6 +7,7 @@ public class OtConfigOp extends OtResult {
 
   /** input parameter, the target configuration */
   public OtConfig cfg;
+  public boolean  cfgClone;
 
   /** input parameter: decrypt config values when loading the configuration */
   public boolean  encrypted;
@@ -26,6 +27,11 @@ public class OtConfigOp extends OtResult {
 
   public OtConfigOp withConfig(OtConfig cfg) {
     this.cfg = Objects.requireNonNull(cfg);
+    return this;
+  }
+
+  public OtConfigOp withEncrypted(boolean encrypted) {
+    this.encrypted = encrypted;
     return this;
   }
 

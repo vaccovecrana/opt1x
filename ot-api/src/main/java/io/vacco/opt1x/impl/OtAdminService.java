@@ -1,5 +1,6 @@
 package io.vacco.opt1x.impl;
 
+import io.vacco.opt1x.dao.OtDaos;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.schema.*;
 import java.util.*;
@@ -19,14 +20,6 @@ public class OtAdminService {
   public OtAdminService(OtDaos daos, OtApiKeyService keyService) {
     this.daos = Objects.requireNonNull(daos);
     this.keyService = Objects.requireNonNull(keyService);
-  }
-
-  public OtNamespace loadRootNs() {
-    return daos.nsd.loadWhereNameEq(OtConstants.Opt1x).getFirst();
-  }
-
-  public OtGroup loadRootGroup() {
-    return daos.grd.loadWhereNameEq(OtConstants.Opt1x).getFirst();
   }
 
   private List<OtNamespace> pathOfNs(Integer nsId) {
@@ -103,11 +96,6 @@ public class OtAdminService {
         .innerJoin(daos.kgd.dsc, daos.akd.dsc)
         .eq(daos.akd.fld_kid(), kid)
     );
-    out.keyGroupGrantKeys = keysOf(
-      out.keyGroups.stream()
-        .map(kg -> kg.grantKid)
-        .collect(toList())
-    );
     out.groups = daos.grd.loadPageItems(
       daos.grd.query()
         .from(daos.akd.dsc)
@@ -115,8 +103,7 @@ public class OtAdminService {
         .innerJoin(daos.grd.dsc, daos.kgd.dsc)
         .eq(daos.akd.fld_kid(), kid)
     );
-    // TODO find a way to improve this group expansion logic
-    var tree = new TreeMap<String, OtGroup>();
+    var tree = new TreeMap<String, OtGroup>();  // TODO find a way to improve this group expansion logic
     for (var grp : out.groups) {
       tree.putIfAbsent(grp.path, grp);
       var branch = daos.grd.loadPageItems(
@@ -156,11 +143,6 @@ public class OtAdminService {
         .innerJoin(daos.gnd.dsc, daos.grd.dsc)
         .eq(daos.kgd.fld_kid(), kid)
     );
-    out.groupNamespaceGrantKeys = keysOf(
-      out.keyGroups.stream()
-        .map(kg -> kg.grantKid)
-        .collect(toList())
-    );
     out.namespaces = daos.nsd.loadPageItems(
       daos.nsd.query()
         .from(daos.akd.dsc)
@@ -170,6 +152,20 @@ public class OtAdminService {
         .innerJoin(daos.nsd.dsc, daos.gnd.dsc)
         .eq(daos.akd.fld_kid(), kid)
     );
+    var tree = new TreeMap<String, OtNamespace>();
+    for (var ns : out.namespaces) {
+      tree.putIfAbsent(ns.path, ns);
+      var branch = daos.nsd.loadPageItems(
+        daos.nsd.query()
+          .like(daos.nsd.fld_path(), daos.likeFmt(ns.path))
+          .and()
+          .neq(daos.nsd.fld_path(), ns.path)
+      );
+      for (var ns0 : branch) {
+        tree.putIfAbsent(ns0.path, ns0);
+      }
+      out.namespaceTree = new ArrayList<>(tree.values());
+    }
     return out;
   }
 
@@ -190,28 +186,6 @@ public class OtAdminService {
       }
     }
     return out;
-  }
-
-  // TODO
-  //  some of these methods are only used in test cases.
-  //  So we need to remove them and replace them with the
-  //  equivalent methods that the api handler uses instead.
-  public Optional<OtGroupNs> accessToNamespace(Integer gid, Integer nsId, boolean r, boolean w, boolean m) {
-    var nsPath = pathOfNs(nsId);
-    var assignments = daos.gnd.loadWhereGidEq(gid)
-      .stream()
-      .filter(gns -> !r || gns.read)
-      .filter(gns -> !w || gns.write)
-      .filter(gns -> !m || gns.manage)
-      .collect(toList());
-    for (var ns : nsPath) {
-      for (var gns : assignments) {
-        if (gns.nsId.equals(ns.nsId)) {
-          return Optional.of(gns);
-        }
-      }
-    }
-    return Optional.empty();
   }
 
   public Optional<OtKeyGroup> canAccessNs(Integer kid, Integer nsId, boolean r, boolean w, boolean m) {
@@ -364,14 +338,13 @@ public class OtAdminService {
         );
         groups.sort(Comparator.comparing(grp -> grp.path));
         Collections.reverse(groups);
-        var fmd = cmd;
-        daos.grd.sql().tx((tx, conn) -> {
+        daos.onTxResult(cmd, daos.grd.sql().tx((tx, conn) -> {
           for (var grp : groups) {
             daos.kgd.deleteWhereGidEq(grp.gid);
             daos.gnd.deleteWhereGidEq(grp.gid);
             daos.grd.deleteWhereGidEq(grp.gid);
           }
-        }, conn -> fmd.withError(daos.txWarningsOf(conn)));
+        }));
         cmd.withGroup(group);
       }
       return cmd;

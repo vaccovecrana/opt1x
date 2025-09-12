@@ -17,7 +17,7 @@ configure<io.vacco.ronove.plugin.RvPluginExtension> {
 }
 
 val api by configurations
-val mtVer = "3.8.2"
+val mtVer = "3.9.0"
 
 dependencies {
   api("com.google.code.gson:gson:2.11.0")
@@ -27,7 +27,7 @@ dependencies {
   api("org.codejargon.feather:feather:1.0")
   api("io.vacco.metolithe:mt-core:${mtVer}")
   api("io.vacco.jwt:jwt:0.8.0")
-  api("org.xerial:sqlite-jdbc:3.50.3.0")
+  api("com.h2database:h2:2.3.232")
   api("io.rqlite:rqlite-jdbc:8.42.0.3")
   api("com.zaxxer:HikariCP:5.0.1")
 

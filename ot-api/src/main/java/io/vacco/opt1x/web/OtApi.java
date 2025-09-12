@@ -3,6 +3,7 @@ package io.vacco.opt1x.web;
 import com.google.gson.Gson;
 import io.vacco.murmux.Murmux;
 import io.vacco.opt1x.impl.*;
+import io.vacco.opt1x.spring.OtSpringHdl;
 import java.util.concurrent.Executors;
 
 import static io.vacco.opt1x.impl.OtOptions.log;
@@ -19,7 +20,8 @@ public class OtApi {
     this.mx = new Murmux(OtOptions.host, x);
     var uiHdl = new OtUiHdl();
     var apiHdl = new OtApiHdl(ss, ks, as, vs, cs);
-    var rootHdl = new OtRootHdl(ss, as, ks, uiHdl, apiHdl, g);
+    var springHdl = new OtSpringHdl(ss, ks, cs, g);
+    var rootHdl = new OtRootHdl(ss, as, ks, uiHdl, apiHdl, springHdl, g);
     mx.rootHandler(rootHdl);
   }
 

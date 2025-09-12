@@ -15,8 +15,8 @@ public class OtValid {
     return c.notNull().notBlank().notEmpty();
   }
 
-  public static <T> CharSequenceConstraint<T, String> min3(CharSequenceConstraint<T, String> c) {
-    return c.greaterThanOrEqual(3);
+  public static <T> CharSequenceConstraint<T, String> minLen(CharSequenceConstraint<T, String> c, int min) {
+    return c.greaterThanOrEqual(min);
   }
 
   private static final Pattern keyNamePattern = Pattern.compile("^[a-zA-Z_$][a-zA-Z0-9_$\\-.]*$");
@@ -69,13 +69,13 @@ public class OtValid {
   }
 
   private static final Validator<OtNamespace> OtNamespaceVld = ValidatorBuilder.<OtNamespace>of()
-    ._string(ns -> ns.name, OtNamespaceDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
+    ._string(ns -> ns.name, OtNamespaceDao.fld_name, c -> noNullExpression(keyName(minLen(nnNeNb(c), 3))))
     ._string(ns -> ns.path, OtNamespaceDao.fld_path, c -> path(nnNeNb(c)))
     ._long(ns -> ns.createUtcMs, OtNamespaceDao.fld_createUtcMs, c -> c.greaterThan(0L))
     .build();
 
   private static final Validator<OtGroup> OtGroupVld = ValidatorBuilder.<OtGroup>of()
-    ._string(grp -> grp.name, OtGroupDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
+    ._string(grp -> grp.name, OtGroupDao.fld_name, c -> noNullExpression(keyName(minLen(nnNeNb(c), 3))))
     ._string(grp -> grp.path, OtGroupDao.fld_path, c -> path(nnNeNb(c)))
     ._long(grp -> grp.createUtcMs, OtGroupDao.fld_createUtcMs, c -> c.greaterThan(0L))
     .build();
@@ -87,7 +87,7 @@ public class OtValid {
     .build();
 
   private static final Validator<OtApiKey> OtApiKeyVld = ValidatorBuilder.<OtApiKey>of()
-    ._string(k -> k.name, OtApiKeyDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
+    ._string(k -> k.name, OtApiKeyDao.fld_name, c -> noNullExpression(keyName(minLen(nnNeNb(c), 3))))
     ._string(k -> k.path, OtApiKeyDao.fld_path, c -> noNullExpression(path(nnNeNb(c))))
     ._string(k -> k.hash, OtApiKeyDao.fld_hash, c -> sha256Hash(nnNeNb(c)))
     ._long(k -> k.createUtcMs, OtApiKeyDao.fld_createUtcMs, c -> c.greaterThan(0L))
@@ -102,21 +102,21 @@ public class OtValid {
     .build();
 
   private static final Validator<OtValue> OtValueVld = ValidatorBuilder.<OtValue>of()
-    ._string(v -> v.name, OtValueDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
-    ._string(v -> v.value, OtValueDao.fld_value, OtValid::nnNeNb)
+    ._string(v -> v.name, OtValueDao.fld_name, c -> noNullExpression(keyName(minLen(nnNeNb(c), 3))))
+    ._string(v -> v.val, OtValueDao.fld_val, OtValid::nnNeNb)
     ._long(v -> v.createUtcMs, OtValueDao.fld_createUtcMs, c -> c.greaterThan(0L))
     ._object(c -> c.type, OtValueDao.fld_type, Constraint::notNull)
     .build();
 
   private static final Validator<OtNode> OtNodeVld = ValidatorBuilder.<OtNode>of()
     ._integer(c -> c.cid, OtNodeDao.fld_cid, Constraint::notNull)
-    ._string(c -> c.label, OtNodeDao.fld_label, c -> noNullExpression(min3(nnNeNb(c))))
+    ._string(c -> c.label, OtNodeDao.fld_label, c -> noNullExpression(minLen(nnNeNb(c), 1)))
     ._object(c -> c.type, OtNodeDao.fld_type, Constraint::notNull)
     .build();
 
   private static final Validator<OtConfig> OtConfigVld = ValidatorBuilder.<OtConfig>of()
     ._integer(c -> c.nsId, OtConfigDao.fld_nsId, Constraint::notNull)
-    ._string(c -> c.name, OtConfigDao.fld_name, c -> noNullExpression(keyName(min3(nnNeNb(c)))))
+    ._string(c -> c.name, OtConfigDao.fld_name, c -> noNullExpression(keyName(minLen(nnNeNb(c), 3))))
     .build();
 
   private static final Map<Class<?>, Validator<?>> validators = new HashMap<>();
@@ -141,7 +141,7 @@ public class OtValid {
     var out = new ArrayList<OtValidation>();
     var validations = validator.validate(t);
     validations.forEach(cv ->
-      out.add(OtValidation.of(
+      out.add(OtValidation.vld(
         cv.name(), cv.message(), cv.messageKey(),
         cv.defaultMessageFormat()
       ))

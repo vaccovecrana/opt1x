@@ -1,11 +1,12 @@
-package io.vacco.opt1x.impl;
+package io.vacco.opt1x.dao;
 
 import io.vacco.metolithe.id.MtMurmur3IFn;
-import io.vacco.metolithe.query.MtJdbc;
-import io.vacco.opt1x.dao.*;
-import java.sql.Connection;
+import io.vacco.metolithe.query.*;
+import io.vacco.opt1x.dto.OtResult;
+import io.vacco.opt1x.impl.OtOptions;
 
-import static io.vacco.opt1x.impl.OtOptions.onError;
+import static java.util.stream.Collectors.toList;
+import static io.vacco.opt1x.dto.OtValidation.vld;
 import static io.vacco.opt1x.schema.OtSchema.*;
 
 public class OtDaos {
@@ -18,6 +19,7 @@ public class OtDaos {
   public final OtNamespaceDao nsd;
   public final OtNodeDao      ndd;
   public final OtValueDao     vld;
+  public final OtValueVerDao  vvd;
 
   public OtDaos(MtJdbc db, String schema) {
     var idFn = new MtMurmur3IFn((int) OtOptions.dbSeed);
@@ -29,27 +31,18 @@ public class OtDaos {
     this.nsd = new OtNamespaceDao(schema, Fmt, db, idFn);
     this.vld = new OtValueDao(schema, Fmt, db, idFn);
     this.ndd = new OtNodeDao(schema, Fmt, db, idFn);
+    this.vvd = new OtValueVerDao(schema, Fmt, db, idFn);
   }
 
-  public String txWarningsOf(Connection conn) {
-    try {
-      var warn = conn.getWarnings();
-      var sb = new StringBuilder();
-      while (warn != null) {
-        sb.append(warn.getMessage()).append("\n");
-        warn = warn.getNextWarning();
-      }
-      if (!sb.toString().isEmpty()) {
-        return sb.toString();
-      }
-      if (conn.getWarnings() != null) {
-        conn.clearWarnings();
-      }
-    } catch (Exception e) {
-      onError("TX warning read error", e);
-      return e.getMessage();
+  public void onTxResult(OtResult result, MtTx tx) {
+    if (tx.error != null) {
+      result.withError(tx.error);
     }
-    return null;
+    result.validations.addAll(
+      tx.warnings.stream()
+        .map(w -> vld(null, w.getMessage(), null, null))
+        .collect(toList())
+    );
   }
 
   public String likeFmt(String in) {

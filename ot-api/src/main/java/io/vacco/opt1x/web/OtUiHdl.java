@@ -40,6 +40,7 @@ public class OtUiHdl extends MxStatic {
       case indexJs:
       case indexJsMap:
       case favicon:
+      case version:
         super.handle(xc);
         break;
       default: // any other Preact router path

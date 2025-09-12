@@ -69,6 +69,7 @@ export interface OtConfig {
 
 export interface OtConfigOp extends OtResult {
   cfg?: OtConfig;
+  cfgClone?: boolean;
   encrypted?: boolean;
   vars?: OtVar[];
   key?: OtApiKey;
@@ -109,11 +110,10 @@ export interface OtKeyAccess {
   groupTree?: OtGroup[];
   keys?: OtApiKey[];
   keyGroups?: OtKeyGroup[];
-  keyGroupGrantKeys?: OtApiKey[];
   namespace?: OtNamespace;
   namespaces?: OtNamespace[];
+  namespaceTree?: OtNamespace[];
   groupNamespaces?: OtGroupNs[];
-  groupNamespaceGrantKeys?: OtApiKey[];
 }
 
 export interface OtKeyGroup {
@@ -174,7 +174,7 @@ export interface OtValue {
   vid?: number;
   nsId?: number;
   name?: string;
-  value?: string;
+  val?: string;
   type?: OtValueType;
   notes?: string;
   encrypted?: boolean;
@@ -184,6 +184,7 @@ export interface OtValue {
 export interface OtValueOp extends OtResult {
   key?: OtApiKey;
   val?: OtValue;
+  valVersions?: OtValueVer[];
   valPage?: MtPage1<OtValue, string>;
   namespace?: OtNamespace;
   values?: OtValue[];
@@ -194,6 +195,15 @@ export const enum OtValueType {
   Number = "Number",
   String = "String",
   Boolean = "Boolean",
+}
+
+export interface OtValueVer {
+  vvId?: number;
+  vid?: number;
+  val?: string;
+  type?: OtValueType;
+  notes?: string;
+  changeUtcMs?: number;
 }
 
 export interface OtVar {
@@ -216,6 +226,32 @@ Source controllers:
 export const apiV1GroupIdDelete = (gid: number): Promise<OtAdminOp> => {
   let path = "/api/v1/group/{gid}"
   path = path.replace("{ gid }".replace(/\s+/g, ""), gid.toString())
+  return doJsonIo(path, "DELETE",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ValueVerVvIdDelete = (vvId: number): Promise<OtValueOp> => {
+  let path = "/api/v1/value/version/{vvId}"
+  path = path.replace("{ vvId }".replace(/\s+/g, ""), vvId.toString())
+  return doJsonIo(path, "DELETE",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ValueVidDelete = (vid: number): Promise<OtValueOp> => {
+  let path = "/api/v1/value/{vid}"
+  const qParams = new URLSearchParams()
+  if (vid) {
+    qParams.append("vid", vid.toString())
+  }
+  path = `${path}?${qParams.toString()}`
   return doJsonIo(path, "DELETE",
       undefined
     ,
@@ -327,8 +363,8 @@ export const apiV1KeyGet = (pageSize: number, next: string): Promise<OtList<OtAp
   )
 }
 
-export const apiV1NamespaceGet = (): Promise<OtKeyAccess> => {
-  let path = "/api/v1/namespace"
+export const apiV1NsGet = (): Promise<OtKeyAccess> => {
+  let path = "/api/v1/ns"
   return doJsonIo(path, "GET",
       undefined
     ,
@@ -337,9 +373,28 @@ export const apiV1NamespaceGet = (): Promise<OtKeyAccess> => {
   )
 }
 
-export const apiV1NamespaceIdGet = (nsId: number): Promise<OtKeyAccess> => {
-  let path = "/api/v1/namespace/{nsId}"
+export const apiV1NsNsIdGet = (nsId: number): Promise<OtKeyAccess> => {
+  let path = "/api/v1/ns/{nsId}"
   path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1NsNsIdValueGet = (nsId: number, pageSize: number, next: string): Promise<OtValueOp> => {
+  let path = "/api/v1/ns/{nsId}/value"
+  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  const qParams = new URLSearchParams()
+  if (pageSize) {
+    qParams.append("pageSize", pageSize.toString())
+  }
+  if (next) {
+    qParams.append("next", next.toString())
+  }
+  path = `${path}?${qParams.toString()}`
   return doJsonIo(path, "GET",
       undefined
     ,
@@ -358,18 +413,21 @@ export const apiV1ValueGet = (): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ValueNsIdGet = (nsId: number, pageSize: number, next: string): Promise<OtValueOp> => {
-  let path = "/api/v1/value/{nsId}"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  const qParams = new URLSearchParams()
-  if (pageSize) {
-    qParams.append("pageSize", pageSize.toString())
-  }
-  if (next) {
-    qParams.append("next", next.toString())
-  }
-  path = `${path}?${qParams.toString()}`
+export const apiV1ValueVidVerGet = (vid: number): Promise<OtValueOp> => {
+  let path = "/api/v1/value/{vid}/version"
+  path = path.replace("{ vid }".replace(/\s+/g, ""), vid.toString())
   return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1ValueVerVvIdPatch = (vvId: number): Promise<OtValueOp> => {
+  let path = "/api/v1/value/version/{vvId}"
+  path = path.replace("{ vvId }".replace(/\s+/g, ""), vvId.toString())
+  return doJsonIo(path, "PATCH",
       undefined
     ,
     new Map(),
@@ -423,10 +481,31 @@ export const apiV1KeyPost = (arg1: OtApiKeyOp): Promise<OtApiKeyOp> => {
   )
 }
 
-export const apiV1NamespacePost = (arg1: OtAdminOp): Promise<OtAdminOp> => {
-  let path = "/api/v1/namespace"
+export const apiV1KeyRotatePost = (): Promise<OtApiKeyOp> => {
+  let path = "/api/v1/key/rotate"
+  return doJsonIo(path, "POST",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1NsPost = (arg1: OtAdminOp): Promise<OtAdminOp> => {
+  let path = "/api/v1/ns"
   return doJsonIo(path, "POST",
       JSON.stringify(arg1)
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1NsNsIdValuePost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
+  let path = "/api/v1/ns/{nsId}/value"
+  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
+  return doJsonIo(path, "POST",
+      JSON.stringify(arg2)
     ,
     new Map(),
     undefined
@@ -437,17 +516,6 @@ export const apiV1UnsealPost = (arg0: string): Promise<OtUnsealOp> => {
   let path = "/api/v1/unseal"
   return doJsonIo(path, "POST",
       JSON.stringify(arg0)
-    ,
-    new Map(),
-    undefined
-  )
-}
-
-export const apiV1ValueNsIdPost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
-  let path = "/api/v1/value/{nsId}"
-  path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
-  return doJsonIo(path, "POST",
-      JSON.stringify(arg2)
     ,
     new Map(),
     undefined

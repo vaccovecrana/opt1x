@@ -19,4 +19,12 @@ import io.vacco.metolithe.annotations.*;
   @MtCol
   public long createUtcMs;
 
+  public static OtConfig config(Integer cid, Integer nsId, String name) {
+    var c = new OtConfig();
+    c.cid = cid;
+    c.nsId = nsId;
+    c.name = name;
+    return c;
+  }
+
 }

@@ -3,9 +3,9 @@ import { RenderableProps } from "preact"
 
 import { boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd, IcnCopy, IcnTree } from "@ui/components/UiIcons"
-import { apiV1ConfigGet, apiV1ConfigPost, apiV1NamespaceIdGet, OtConfig, OtConfigOp, OtKeyAccess, OtList } from "@ui/rpc"
+import { apiV1ConfigGet, apiV1ConfigPost, apiV1NsNsIdGet, OtConfig, OtConfigOp, OtKeyAccess, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { rpcUiHld, uiConfigsNsIdCidFmt } from "@ui/routes"
+import { rpcUiHld, uiConfigsNsIdCidFmt, uiConfigsNsIdFmt } from "@ui/routes"
 
 type OtConfigsProps = RenderableProps<{ s?: UiStore, nsId?: number }>
 type OtConfigsState = {
@@ -28,7 +28,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespaceIdGet(this.props.nsId))
+        .then(() => apiV1NsNsIdGet(this.props.nsId))
         .then(access => this.setState({...this.state, access})),
       d
     )
@@ -63,6 +63,21 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
     this.setState({...this.state, cpyOp: {...this.state.cpyOp, cfg}})
   }
 
+  cloneConfig() {
+    const { dispatch: d } = this.props.s
+    rpcUiHld(
+      lockUi(true, d)
+        .then(() => apiV1ConfigPost(this.state.cpyOp.cfg.nsId, this.state.cpyOp))
+        .then(cpyOp => {
+          if (!cpyOp.error && cpyOp.cfg.cid) {
+            window.location.href = uiConfigsNsIdFmt(cpyOp.cfg.nsId)
+          } else {
+            this.setState({...this.state, cpyOp})
+          }
+        }), d
+    )
+  }
+
   saveConfig() {
     const { dispatch: d } = this.props.s
     this.state.cfgOp.cfg.nsId = this.props.nsId
@@ -70,9 +85,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
       lockUi(true, d)
         .then(() => apiV1ConfigPost(this.props.nsId, this.state.cfgOp))
         .then(cfgOp => {
-          if (cfgOp.error) {
-            throw cfgOp
-          } else if (cfgOp.cfg.cid) {
+          if (cfgOp.cfg.cid) {
             this.setState({...this.state, cfgOp}, () => this.configEdit(""))
             return this.loadConfigs()
           } else {
@@ -123,13 +136,13 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
               onChange={e => this.copyEdit(undefined, parseInt((e.target as any).value))}>
               <option selected disabled value={NoNsId}>Target Namespace</option>
               {options(
-                this.state.access.namespaces,
+                this.state.access.namespaceTree,
                 ns => ns.name, ns => ns.nsId
               )}
             </select>
             <input type="submit" value="Clone"
               disabled={!this.state.cpyOp?.cfg.name || !this.state.cpyOp?.cfg?.nsId}
-              onClick={() => console.log("Clone config lol")}
+              onClick={() => this.cloneConfig()}
             />
           </div>
         )}
@@ -139,7 +152,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
             <tbody>
               {this.state.cfgList.page.items.map(cfg => row([
                 cfg.name,
-                utcYyyyMmDdHhMm(cfg.createUtcMs),
+                <small>{utcYyyyMmDdHhMm(cfg.createUtcMs)}</small>,
                 <div class="row justify-center align-center">
                   <div class="col auto">
                     <a href={uiConfigsNsIdCidFmt(this.props.nsId, cfg.cid)}>
@@ -150,7 +163,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
                     <a class="ptr"
                       onClick={() => this.setState({
                         ...this.state,
-                        cpyOp: { cfg: { name: `Copy - ${cfg.name}`, nsId: cfg.nsId } }
+                        cpyOp: { cfg: { cid: cfg.cid, name: `${cfg.name}-copy`, nsId: cfg.nsId }, cfgClone: true }
                       })}>
                       <IcnCopy height={30} />
                     </a>

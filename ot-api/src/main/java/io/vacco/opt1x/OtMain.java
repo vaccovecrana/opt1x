@@ -14,11 +14,7 @@ public class OtMain {
       System.out.println(OtOptions.usage());
       return;
     }
-
-    OtOptions.jdbcUrl = "jdbc:rqlite:http://localhost:4001";
-    OtOptions.logLevel = OtOptions.LogLevel.trace;
     OtOptions.setFrom(args);
-
     var f = Feather.with(new OtRoot(), new OtService(), new OtWeb());
     var api = f.instance(OtApi.class);
     OtOptions.log.info(

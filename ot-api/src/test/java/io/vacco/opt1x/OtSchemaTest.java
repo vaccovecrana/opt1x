@@ -1,6 +1,6 @@
 package io.vacco.opt1x;
 
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import io.vacco.metolithe.changeset.*;
 import io.vacco.metolithe.dao.MtDaoMapper;
 import io.vacco.opt1x.schema.OtSchema;
@@ -14,9 +14,11 @@ import static j8spec.J8Spec.*;
 @DefinedOrder
 @RunWith(J8SpecRunner.class)
 public class OtSchemaTest {
+
+  private static final Gson g = new GsonBuilder().setPrettyPrinting().create();
+
   static {
     it("Generates schema classes", () -> {
-      var g = new GsonBuilder().setPrettyPrinting().create();
       var changeSet = new MtChangeSet().withChanges(
         new MtLogMapper(null).process(
           new MtMapper().build(OtSchema.Fmt, OtSchema.schema), MtLevel.TABLE_COMPACT

@@ -10,7 +10,8 @@ public class OtSchema {
     OtApiKey.class,   OtConfig.class,
     OtGroup.class,    OtGroupNs.class,
     OtKeyGroup.class, OtNamespace.class,
-    OtNode.class,     OtValue.class
+    OtNode.class,     OtValue.class,
+    OtValueVer.class
   };
 
 }

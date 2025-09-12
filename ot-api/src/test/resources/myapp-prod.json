@@ -1,0 +1,339 @@
+{
+  "cfg": {
+    "cid": -2110173670,
+    "nsId": 1773544902,
+    "name": "prod",
+    "createUtcMs": 1757487060243
+  },
+  "cfgClone": false,
+  "encrypted": false,
+  "vars": [
+    {
+      "node": {
+        "nid": -244173564,
+        "cid": -2110173670,
+        "label": "1",
+        "type": "Object",
+        "pNid": 1523661325,
+        "itemIdx": 14
+      }
+    },
+    {
+      "node": {
+        "nid": -151630160,
+        "cid": -2110173670,
+        "label": "2",
+        "type": "Object",
+        "pNid": 1523661325,
+        "itemIdx": 17
+      }
+    },
+    {
+      "node": {
+        "nid": -2101110893,
+        "cid": -2110173670,
+        "label": "allowed-hosts",
+        "type": "Array",
+        "pNid": 981259726,
+        "itemIdx": 11
+      }
+    },
+    {
+      "node": {
+        "nid": 1294024181,
+        "cid": -2110173670,
+        "label": "api-key",
+        "type": "Value",
+        "vid": -1414260536,
+        "pNid": 981259726,
+        "itemIdx": 20
+      },
+      "val": {
+        "nsId": -1135222423,
+        "name": "app.apiKey",
+        "val": "production-api-key",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757487004664
+      }
+    },
+    {
+      "node": {
+        "nid": 1613952258,
+        "cid": -2110173670,
+        "label": "datasource",
+        "type": "Object",
+        "pNid": 1994213817,
+        "itemIdx": 1
+      }
+    },
+    {
+      "node": {
+        "nid": 661331363,
+        "cid": -2110173670,
+        "label": "enabled",
+        "type": "Value",
+        "vid": 1260263871,
+        "pNid": -244173564,
+        "itemIdx": 16
+      },
+      "val": {
+        "vid": 1260263871,
+        "nsId": -38411530,
+        "name": "val.true",
+        "val": "true",
+        "type": "Boolean",
+        "encrypted": false,
+        "createUtcMs": 1757484674885
+      }
+    },
+    {
+      "node": {
+        "nid": 1524706748,
+        "cid": -2110173670,
+        "label": "enabled",
+        "type": "Value",
+        "vid": 69249191,
+        "pNid": -151630160,
+        "itemIdx": 19
+      },
+      "val": {
+        "vid": 69249191,
+        "nsId": -38411530,
+        "name": "val.false",
+        "val": "false",
+        "type": "Boolean",
+        "encrypted": false,
+        "createUtcMs": 1757484680046
+      }
+    },
+    {
+      "node": {
+        "nid": 1523661325,
+        "cid": -2110173670,
+        "label": "feature-flags",
+        "type": "Array",
+        "pNid": 981259726,
+        "itemIdx": 13
+      }
+    },
+    {
+      "node": {
+        "nid": -990922862,
+        "cid": -2110173670,
+        "label": "hosts.prod0",
+        "type": "Value",
+        "vid": -182498898,
+        "pNid": -2101110893,
+        "itemIdx": 12
+      },
+      "val": {
+        "vid": -182498898,
+        "nsId": -1135222423,
+        "name": "hosts.prod0",
+        "val": "prod.example.com",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757486974720
+      }
+    },
+    {
+      "node": {
+        "nid": 1534155950,
+        "cid": -2110173670,
+        "label": "level",
+        "type": "Object",
+        "pNid": -2101218442,
+        "itemIdx": 6
+      }
+    },
+    {
+      "node": {
+        "nid": -2101218442,
+        "cid": -2110173670,
+        "label": "logging",
+        "type": "Object",
+        "pNid": -1324399754,
+        "itemIdx": 5
+      }
+    },
+    {
+      "node": {
+        "nid": 981259726,
+        "cid": -2110173670,
+        "label": "myApp",
+        "type": "Object",
+        "pNid": -1324399754,
+        "itemIdx": 10
+      }
+    },
+    {
+      "node": {
+        "nid": -1093348328,
+        "cid": -2110173670,
+        "label": "name",
+        "type": "Value",
+        "vid": 1130094267,
+        "pNid": -244173564,
+        "itemIdx": 15
+      },
+      "val": {
+        "vid": 1130094267,
+        "nsId": -38411530,
+        "name": "app.featB",
+        "val": "featureB",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484659679
+      }
+    },
+    {
+      "node": {
+        "nid": 1839100067,
+        "cid": -2110173670,
+        "label": "name",
+        "type": "Value",
+        "vid": 1175585036,
+        "pNid": -151630160,
+        "itemIdx": 18
+      },
+      "val": {
+        "vid": 1175585036,
+        "nsId": -38411530,
+        "name": "app.featD",
+        "val": "featureD",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757487036305
+      }
+    },
+    {
+      "node": {
+        "nid": 366602080,
+        "cid": -2110173670,
+        "label": "password",
+        "type": "Value",
+        "vid": -1638376142,
+        "pNid": 1613952258,
+        "itemIdx": 4
+      },
+      "val": {
+        "nsId": -1135222423,
+        "name": "db.password",
+        "val": "pr0dP4zz#$%",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757486921157
+      }
+    },
+    {
+      "node": {
+        "nid": -1798774398,
+        "cid": -2110173670,
+        "label": "port",
+        "type": "Value",
+        "vid": -371791696,
+        "pNid": -494617354,
+        "itemIdx": 9
+      },
+      "val": {
+        "vid": -371791696,
+        "nsId": -1135222423,
+        "name": "app.port",
+        "val": "80",
+        "type": "Number",
+        "encrypted": false,
+        "createUtcMs": 1757486952272
+      }
+    },
+    {
+      "node": {
+        "nid": -1324399754,
+        "cid": -2110173670,
+        "label": "root",
+        "type": "Object",
+        "itemIdx": -1
+      }
+    },
+    {
+      "node": {
+        "nid": -1731537619,
+        "cid": -2110173670,
+        "label": "root",
+        "type": "Value",
+        "vid": 153050073,
+        "pNid": 1534155950,
+        "itemIdx": 7
+      },
+      "val": {
+        "vid": 153050073,
+        "nsId": -38411530,
+        "name": "log.warn",
+        "val": "WARN",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484598764
+      }
+    },
+    {
+      "node": {
+        "nid": -494617354,
+        "cid": -2110173670,
+        "label": "server",
+        "type": "Object",
+        "pNid": -1324399754,
+        "itemIdx": 8
+      }
+    },
+    {
+      "node": {
+        "nid": 1994213817,
+        "cid": -2110173670,
+        "label": "spring",
+        "type": "Object",
+        "pNid": -1324399754,
+        "itemIdx": 0
+      }
+    },
+    {
+      "node": {
+        "nid": 1790358082,
+        "cid": -2110173670,
+        "label": "url",
+        "type": "Value",
+        "vid": 1934939872,
+        "pNid": 1613952258,
+        "itemIdx": 2
+      },
+      "val": {
+        "vid": 1934939872,
+        "nsId": -1135222423,
+        "name": "db.url",
+        "val": "jdbc:postgresql://prod-db-host:5432/proddb?ssl=true",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757486849916
+      }
+    },
+    {
+      "node": {
+        "nid": -514283650,
+        "cid": -2110173670,
+        "label": "username",
+        "type": "Value",
+        "vid": 878237791,
+        "pNid": 1613952258,
+        "itemIdx": 3
+      },
+      "val": {
+        "nsId": -1135222423,
+        "name": "db.user",
+        "val": "produser",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757486903167
+      }
+    }
+  ],
+  "validations": []
+}

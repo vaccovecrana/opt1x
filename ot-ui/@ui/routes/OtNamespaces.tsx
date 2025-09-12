@@ -2,9 +2,9 @@ import { RenderableProps } from "preact"
 import * as React from "preact/compat"
 
 import { flagsOf, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
-import { apiV1NamespaceGet, OtGroup, OtGroupNs, OtKeyAccess } from "@ui/rpc"
+import { apiV1NsGet, OtGroup, OtGroupNs, OtKeyAccess } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { rpcUiHld, uiConfigsNsIdFmt, uiNamespacesIdFmt, uiValuesNsIdFmt } from "@ui/routes"
+import { rpcUiHld, uiConfigsNsIdFmt, uiNsNsIdFmt, uiNsNsIdValuesFmt } from "@ui/routes"
 import { IcnBook, IcnTree } from "@ui/components/UiIcons"
 
 type OtNsProps = RenderableProps<{ s?: UiStore }>
@@ -20,7 +20,7 @@ class OtNamespaces extends React.Component<OtNsProps, OtNsState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespaceGet())
+        .then(() => apiV1NsGet())
         .then(access => this.setState({ ...this.state, access }))
       , d
     )
@@ -55,20 +55,20 @@ class OtNamespaces extends React.Component<OtNsProps, OtNsState> {
                 const canManage = grants.find(gns => gns.manage)
                 return row([
                   canManage
-                    ? <a href={uiNamespacesIdFmt(ns.nsId)}>{ns.name}</a>
+                    ? <a href={uiNsNsIdFmt(ns.nsId)}>{ns.name}</a>
                     : ns.name,
                   this.renderGrants(grants, this.state.access.groups),
-                  utcYyyyMmDdHhMm(ns.createUtcMs),
+                  <small>{utcYyyyMmDdHhMm(ns.createUtcMs)}</small>,
                   canRw && (
                     <div class="row justify-center">
                       <div class="col auto">
-                        <a href={uiValuesNsIdFmt(ns.nsId)}>
-                          <IcnBook height={32} />
+                        <a href={uiNsNsIdValuesFmt(ns.nsId)}>
+                          <IcnBook height={28} />
                         </a>
                       </div>
                       <div class="col auto">
                         <a href={uiConfigsNsIdFmt(ns.nsId)}>
-                          <IcnTree height={32} />
+                          <IcnTree height={28} />
                         </a>
                       </div>
                     </div>

@@ -14,9 +14,15 @@
     },
     {
       "id": "tbl_OtValue",
-      "hash": "6bf80d87",
+      "hash": "2f7a1a11",
       "author": "system",
-      "sql": "CREATE TABLE IF NOT EXISTS OtValue (\n  vid integer NOT NULL PRIMARY KEY,\n  nsId integer NOT NULL,\n  name varchar(128) NOT NULL,\n  value varchar(4096) NOT NULL,\n  type varchar(64) NOT NULL,\n  notes varchar(4096),\n  encrypted boolean,\n  createUtcMs bigint,\n  CONSTRAINT fk_OtValue_2b22fe72 FOREIGN KEY (nsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT unq_OtValue_aa85f514 UNIQUE (nsId, name)\n)"
+      "sql": "CREATE TABLE IF NOT EXISTS OtValue (\n  vid integer NOT NULL PRIMARY KEY,\n  nsId integer NOT NULL,\n  name varchar(128) NOT NULL,\n  val varchar(4096) NOT NULL,\n  type varchar(64) NOT NULL,\n  notes varchar(4096),\n  encrypted boolean,\n  createUtcMs bigint,\n  CONSTRAINT fk_OtValue_2b22fe72 FOREIGN KEY (nsId) REFERENCES OtNamespace(nsId),\n  CONSTRAINT unq_OtValue_aa85f514 UNIQUE (nsId, name)\n)"
+    },
+    {
+      "id": "tbl_OtValueVer",
+      "hash": "befdd06d",
+      "author": "system",
+      "sql": "CREATE TABLE IF NOT EXISTS OtValueVer (\n  vvId integer NOT NULL PRIMARY KEY,\n  vid integer NOT NULL,\n  val varchar(4096) NOT NULL,\n  type varchar(64) NOT NULL,\n  notes varchar(4096),\n  changeUtcMs bigint,\n  CONSTRAINT fk_OtValueVer_aa102d0a FOREIGN KEY (vid) REFERENCES OtValue(vid),\n  CONSTRAINT unq_OtValueVer_337bb462 UNIQUE (vid, val, type)\n)"
     },
     {
       "id": "tbl_OtConfig",

@@ -1,7 +1,7 @@
 import * as React from "preact/compat"
+import { RenderableProps } from "preact"
 
 import { apiV1InitGet, OtInitOp } from "@ui/rpc"
-import { RenderableProps } from "preact"
 import { lockUi, UiContext, UiStore } from "@ui/store"
 import { uiUnseal } from "@ui/routes"
 

@@ -1,10 +1,10 @@
-import { RenderableProps } from "preact"
 import * as React from "preact/compat"
+import { RenderableProps } from "preact"
 
 import { boxResult, flagsOf, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
-import { apiV1NamespaceIdGet, apiV1NamespacePost, OtAdminOp, OtKeyAccess } from "@ui/rpc"
+import { apiV1NsNsIdGet, apiV1NsPost, OtAdminOp, OtKeyAccess } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { rpcUiHld, uiConfigsNsIdFmt, uiNamespacesIdFmt, uiValuesNsIdFmt } from "@ui/routes"
+import { rpcUiHld, uiConfigsNsIdFmt, uiNsNsIdFmt, uiNsNsIdValuesFmt } from "@ui/routes"
 import { IcnAdd, IcnBind, IcnBook, IcnTree } from "@ui/components/UiIcons"
 
 type OtNsProps = RenderableProps<{ s?: UiStore, nsId?: number }>
@@ -40,7 +40,7 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespaceIdGet(this.props.nsId))
+        .then(() => apiV1NsNsIdGet(this.props.nsId))
         .then(access => this.setState({...this.state, access}))
       , d
     )
@@ -86,7 +86,7 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
     }
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NamespacePost(this.state.adminOp))
+        .then(() => apiV1NsPost(this.state.adminOp))
         .then(adminOp => {
           if (adminOp.groupNs?.id) {
             adminOp.ns = undefined
@@ -182,18 +182,18 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
               {this.state.access.namespaces.map(ns => {
                 const rwg = this.state.access.groupNamespaces.find(gns => gns.read || gns.write)
                 return row([
-                  <a href={uiNamespacesIdFmt(ns.nsId)}>{ns.name}</a>,
-                  utcYyyyMmDdHhMm(ns.createUtcMs),
+                  <a href={uiNsNsIdFmt(ns.nsId)}>{ns.name}</a>,
+                  <small>{utcYyyyMmDdHhMm(ns.createUtcMs)}</small>,
                   rwg && (
                     <div class="row justify-center">
                       <div class="col auto">
-                        <a href={uiValuesNsIdFmt(ns.nsId)}>
-                          <IcnBook height={32} />
+                        <a href={uiNsNsIdValuesFmt(ns.nsId)}>
+                          <IcnBook height={28} />
                         </a>
                       </div>
                       <div class="col auto">
                         <a href={uiConfigsNsIdFmt(ns.nsId)}>
-                          <IcnTree height={32} />
+                          <IcnTree height={28} />
                         </a>
                       </div>
                     </div>

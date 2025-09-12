@@ -44,6 +44,16 @@ h1, h2, h3, h4, h5 { margin: 0px; }
 
 .ptr { cursor: pointer; }
 
-.error ul, .error li {
+.info    { border: 1px solid var(--pico-primary-focus); }
+.success { border: 1px solid var(--pico-form-element-valid-border-color); }
+.error   { border: 1px solid var(--pico-form-element-invalid-focus-color); }
+
+.error ul, .error li,
+.info ul,  .info li {
   margin-bottom: 0px;
+}
+
+.contrast {
+  font-size: 2rem;
+  font-weight: bold
 }

@@ -15,7 +15,7 @@ import static j8spec.J8Spec.*;
 @RunWith(J8SpecRunner.class)
 public class OtRenderTest {
   static {
-    OtOptions.logLevel = OtOptions.LogLevel.trace;
+    OtOptions.logLevel = OtLogLevel.trace;
     OtOptions.setFrom(new String[] {});
 
     it("Creates an intermediate map representation", () -> {

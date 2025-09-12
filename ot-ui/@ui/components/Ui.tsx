@@ -60,13 +60,11 @@ export const options = <T,>(values: T[], labelFn?: (v: T) => string, valFn?: (v:
   })
 }
 
-export const box = (value: any) => {
-  return (
-    <article>
+export const boxOk = (value: any) => (
+    <article class="success">
       {value}
     </article>
-  )
-}
+)
 
 export const boxError = (value: any) => (
   <article class="error">
@@ -75,20 +73,21 @@ export const boxError = (value: any) => (
 )
 
 export const boxValidations = (result: OtResult) => (
-  boxError(
+  <article class="info">
     <ul>
       {result.validations?.map(v => (
         <li>{v.message}</li>
       ))}
     </ul>
-  )
+  </article>
 )
 
-export const boxResult = (result: OtResult, okMsg: any) => {
+export const boxResult = (result: OtResult, okMsg?: any) => {
+  const ok = !result?.error && result?.validations?.length === 0
   return [
     result?.error && boxError(result.error),
     result?.validations?.length > 0 && boxValidations(result),
-    (!result?.error && result?.validations?.length === 0) && box(okMsg)
+    ok && okMsg && boxOk(okMsg)
   ]
 }
 
@@ -110,4 +109,11 @@ export const flagsOf = (gns: OtGroupNs): string => {
   const w = gns.write  ? "w" : "-"
   const m = gns.manage ? "m" : "-"
   return `${r}${w}${m}`
+}
+
+export const valTruncate = (st: string): string => {
+  if (st && st.length > 16) {
+    return `${st.substring(0, 15)}...`
+  }
+  return st
 }

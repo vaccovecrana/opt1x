@@ -8,6 +8,7 @@ import io.vacco.ronove.*;
 import jakarta.ws.rs.*;
 import java.util.Objects;
 
+import static io.vacco.opt1x.dto.OtApiKeyOp.keyOp;
 import static io.vacco.opt1x.schema.OtGroup.group;
 import static io.vacco.opt1x.dto.OtAdminOp.adminOp;
 import static io.vacco.opt1x.schema.OtConstants.*;
@@ -56,6 +57,11 @@ public class OtApiHdl {
     return keyService.createApiKey(cmd);
   }
 
+  @POST @Path(apiV1KeyRotate)
+  public OtApiKeyOp apiV1KeyRotatePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
+    return keyService.rotate(keyOp().withKey(myKey));
+  }
+
   @GET @Path(apiV1Group)
   public OtKeyAccess apiV1GroupGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
     return admService.accessGroupsOf(myKey.kid);
@@ -84,47 +90,71 @@ public class OtApiHdl {
     return admService.deleteGroup(adminOp().withKey(myKey).withGroup(grp));
   }
 
-  @GET @Path(apiV1Namespace)
-  public OtKeyAccess apiV1NamespaceGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
+  @GET @Path(apiV1Ns)
+  public OtKeyAccess apiV1NsGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
     return admService.accessNamespacesOf(myKey.kid);
   }
 
-  @POST @Path(apiV1Namespace)
-  public OtAdminOp apiV1NamespacePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                      @BeanParam OtAdminOp adminOp) {
+  @POST @Path(apiV1Ns)
+  public OtAdminOp apiV1NsPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                               @BeanParam OtAdminOp adminOp) {
     if (adminOp.groupNs != null) {
       return admService.bindGroupToNamespace(adminOp.withKey(myKey));
     }
     return admService.createNamespace(adminOp.withKey(myKey));
   }
 
-  @GET @Path(apiV1NamespaceId)
-  public OtKeyAccess apiV1NamespaceIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                         @PathParam(OtNamespaceDao.fld_nsId) Integer nsId) {
+  @GET @Path(apiV1NsNsId)
+  public OtKeyAccess apiV1NsNsIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                    @PathParam(OtNamespaceDao.fld_nsId) Integer nsId) {
     return admService.accessNamespacesOf(myKey.kid, nsId);
   }
 
-  @GET @Path(apiV1ValueNsId)
-  public OtValueOp apiV1ValueNsIdGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                     @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                     @QueryParam(qPageSize) int pageSize,
-                                     @QueryParam(qNext) String next) {
+  @GET @Path(apiV1NsNsIdValue)
+  public OtValueOp apiV1NsNsIdValueGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                       @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                       @QueryParam(qPageSize) int pageSize,
+                                       @QueryParam(qNext) String next) {
     return valService.valuesOf(myKey.kid, nsId, pageSize, next);
   }
 
-  @POST @Path(apiV1ValueNsId)
-  public OtValueOp apiV1ValueNsIdPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                      @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                      @BeanParam OtValueOp cmd) {
+  @POST @Path(apiV1NsNsIdValue)
+  public OtValueOp apiV1NsNsIdValuePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                        @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                        @BeanParam OtValueOp cmd) {
     if (cmd.val != null) {
       cmd.val.nsId = nsId;
     }
-    return valService.createValue(cmd.withKey(myKey));
+    return valService.upsertValue(cmd.withKey(myKey));
   }
 
   @GET @Path(apiV1Value)
   public OtValueOp apiV1ValueGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
     return valService.accessibleValuesFor(myKey);
+  }
+
+  @DELETE @Path(apiV1ValueVid)
+  public OtValueOp apiV1ValueVidDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                       @QueryParam(OtValueDao.fld_vid) Integer vid) {
+    return valService.deleteValue(myKey, vid);
+  }
+
+  @GET @Path(apiV1ValueVidVer)
+  public OtValueOp apiV1ValueVidVerGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                       @PathParam(OtValueDao.fld_vid) Integer vid) {
+    return valService.versionsOf(myKey, vid);
+  }
+
+  @PATCH @Path(apiV1ValueVerVvId)
+  public OtValueOp apiV1ValueVerVvIdPatch(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                          @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
+    return valService.restoreValueVersion(myKey, vvId);
+  }
+
+  @DELETE @Path(apiV1ValueVerVvId)
+  public OtValueOp apiV1ValueVerVvIdDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                           @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
+    return valService.deleteValueVersion(myKey, vvId);
   }
 
   @GET @Path(apiV1Config)
@@ -143,7 +173,7 @@ public class OtApiHdl {
     if (cmd.cfg != null) {
       cmd.cfg.nsId = nsId;
     }
-    return cfgService.createConfig(cmd);
+    return cmd.cfgClone ? cfgService.clone(cmd) : cfgService.createConfig(cmd);
   }
 
   @GET @Path(apiV1ConfigCid)

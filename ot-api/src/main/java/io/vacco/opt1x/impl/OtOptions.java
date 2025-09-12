@@ -2,8 +2,7 @@ package io.vacco.opt1x.impl;
 
 import io.vacco.shax.logging.ShOption;
 import org.slf4j.*;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class OtOptions {
 
@@ -11,12 +10,10 @@ public class OtOptions {
 
   public static final String Main = "main";
 
-  public enum LogLevel  { error, warning, info, debug, trace }
-  public enum LogFormat { text, json }
-
   public static final String
     kJdbcUrl    = "--jdbc-url",   kDbSeed    = "--db-seed",
     kApiHost    = "--api-host",   kApiPort   = "--api-port",
+    kApiSpring  = "--api-spring",
     kShares     = "--shares",     kThreshold = "--threshold",
     kLogFormat  = "--log-format", kLogLevel  = "--log-level",
 
@@ -28,31 +25,33 @@ public class OtOptions {
     kOidcScopes       = "--oidc-scopes",
     kAuditWebhookUrl  = "--audit-webhook-url";
 
-  public static LogFormat logFormat = LogFormat.text;
-  public static LogLevel  logLevel  = LogLevel.info;
-  public static String    host = "127.0.0.1";
-  public static String    jdbcUrl;
-  public static int       port = 7070;
-  public static long      dbSeed = 1984;
-  public static int       shares = 3, threshold = 2;
+  public static OtLogFormat logFormat = OtLogFormat.text;
+  public static OtLogLevel  logLevel  = OtLogLevel.info;
+  public static String      host = "127.0.0.1";
+  public static String      jdbcUrl;
+  public static int         port = 7070;
+  public static long        dbSeed = 1984;
+  public static int         shares = 3, threshold = 2;
+  public static boolean     apiSpring = false;
 
-  public static String    oidcIssuer;
-  public static String    oidcClientId;
-  public static String    oidcClientSecret;
-  public static String    oidcRedirectUri = "http://localhost:7070/oidc/callback"; // Default, overridable
-  public static String    oidcScopes = "openid profile email groups"; // Default, space-separated
+  public static String      oidcIssuer;
+  public static String      oidcClientId;
+  public static String      oidcClientSecret;
+  public static String      oidcRedirectUri = "http://localhost:7070/oidc/callback"; // Default, overridable
+  public static String      oidcScopes = "openid profile email groups"; // Default, space-separated
 
-  public static String    auditWebhookUrl; // If set, enables auditing
+  public static String      auditWebhookUrl; // If set, enables auditing
 
   public static String usage() {
     return String.join("\n",
       "Usage:",
       "  opt1x [options]",
       "Options:",
-      "  --jdbc-url           [string] JDBC connection string. Required. Supports sqlite (local file), rqlite (external cluster)",
+      "  --jdbc-url           [string] JDBC connection string. Required. Supports H2 (local file) or rqlite (external cluster)",
       "  --db-seed            [number] Database seed. Default: " + dbSeed,
       "  --api-host           [string] API/UI IP address. Default: " + host,
       "  --api-port           [number] API/UI port. Default: " + port,
+      "  --api-spring         [flag  ] Spring Cloud Config Server support. Default " + apiSpring,
       "  --shares             [number] Number of shares. Default: " + shares,
       "  --threshold          [number] Number of shares to unseal. Default: " + threshold,
       "  --log-format         [string] Log output format ('text' or 'json'). Default: " + logFormat,
@@ -66,12 +65,22 @@ public class OtOptions {
     );
   }
 
+  private static String[] argOf(String arg) {
+    var sep = arg.indexOf("=");
+    if (sep == -1) {
+      return new String[] { arg };
+    }
+    var a0 = new String[2];
+    a0[0] = arg.substring(0, sep);
+    a0[1] = arg.substring(sep + 1);
+    return a0;
+  }
+
   public static void setFrom(String[] args) {
-    var argIdx = Arrays.stream(args)
+    Map<String, String> argIdx = Arrays.stream(args)
       .filter(arg -> arg.startsWith("--"))
-      .map(arg -> arg.split("="))
-      .filter(pair -> pair.length == 2)
-      .collect(Collectors.toMap(pair -> pair[0], pair -> pair[1]));
+      .map(OtOptions::argOf)
+      .collect(HashMap::new, (m, v) -> m.put(v[0], v.length == 1 ? null : v[1]), HashMap::putAll);
 
     var vDbUrl = argIdx.get(kJdbcUrl);
     var vDbSeed = argIdx.get(kDbSeed);
@@ -94,8 +103,10 @@ public class OtOptions {
     port = vPort != null ? Integer.parseInt(vPort) : port;
     shares = vShares != null ? Integer.parseInt(vShares) : shares;
     threshold = vThreshold != null ? Integer.parseInt(vThreshold) : threshold;
-    logFormat = vLogFormat != null ? LogFormat.valueOf(vLogFormat) : logFormat;
-    logLevel = vLogLevel != null ? LogLevel.valueOf(vLogLevel) : logLevel;
+    logFormat = vLogFormat != null ? OtLogFormat.valueOf(vLogFormat) : logFormat;
+    logLevel = vLogLevel != null ? OtLogLevel.valueOf(vLogLevel) : logLevel;
+
+    apiSpring = argIdx.containsKey(kApiSpring);
 
     oidcIssuer = vOidcIssuer != null ? vOidcIssuer : oidcIssuer;
     oidcClientId = vOidcClientId != null ? vOidcClientId : oidcClientId;
@@ -110,7 +121,7 @@ public class OtOptions {
       }
     }
 
-    ShOption.setSysProp(ShOption.IO_VACCO_SHAX_DEVMODE, logFormat == LogFormat.text ? "true" : "false");
+    ShOption.setSysProp(ShOption.IO_VACCO_SHAX_DEVMODE, logFormat == OtLogFormat.text ? "true" : "false");
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_LOGLEVEL, logLevel.toString());
 
     log = LoggerFactory.getLogger(OtOptions.class);

@@ -49,7 +49,7 @@
         "vid": 1578233871,
         "nsId": -1477932629,
         "name": "region.us-east-1",
-        "value": "us-east-1",
+        "val": "us-east-1",
         "type": "String",
         "encrypted": false
       }
@@ -68,7 +68,7 @@
         "vid": -677286428,
         "nsId": -1477932629,
         "name": "region.us-west-1",
-        "value": "us-west-1",
+        "val": "us-west-1",
         "type": "String",
         "encrypted": false
       }
@@ -87,7 +87,7 @@
         "vid": -69047578,
         "nsId": -1291435579,
         "name": "app.sessionTimeoutMs",
-        "value": "3600000",
+        "val": "3600000",
         "type": "Number",
         "encrypted": false
       }
@@ -106,7 +106,7 @@
         "vid": -374864173,
         "nsId": -1291435579,
         "name": "app.url",
-        "value": "https://dev.flooper.io",
+        "val": "https://dev.flooper.io",
         "type": "String",
         "encrypted": false
       }
@@ -125,7 +125,7 @@
         "vid": 513932294,
         "nsId": -1291435579,
         "name": "app.conversionFactor",
-        "value": "3.1415",
+        "val": "3.1415",
         "type": "Number",
         "encrypted": false
       }
@@ -144,7 +144,7 @@
         "vid": -1716860731,
         "nsId": -1291435579,
         "name": "app.conversionEnabled",
-        "value": "true",
+        "val": "true",
         "type": "Boolean",
         "encrypted": false
       }
@@ -183,7 +183,7 @@
         "vid": -1041746703,
         "nsId": -1291435579,
         "name": "db.password",
-        "value": "PfU8q2xhGWKJzwrgKOrfgw\u003d\u003d",
+        "val": "PfU8q2xhGWKJzwrgKOrfgw\u003d\u003d",
         "type": "String",
         "encrypted": true
       }
@@ -202,7 +202,7 @@
         "vid": -1213960442,
         "nsId": -1291435579,
         "name": "db.url",
-        "value": "jdbc:postgresql://localhost:5432/flooper",
+        "val": "jdbc:postgresql://localhost:5432/flooper",
         "type": "String",
         "encrypted": false
       }
@@ -221,7 +221,7 @@
         "vid": -952537373,
         "nsId": -1291435579,
         "name": "db.user",
-        "value": "admin",
+        "val": "admin",
         "type": "String",
         "encrypted": false
       }
@@ -250,7 +250,7 @@
         "vid": 1486611791,
         "nsId": -1291435579,
         "name": "app.profiles",
-        "value": "momo,momodev,momodevblue",
+        "val": "momo,momodev,momodevblue",
         "type": "String",
         "encrypted": false
       }

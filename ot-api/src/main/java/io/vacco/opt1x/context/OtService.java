@@ -7,6 +7,7 @@ import io.vacco.metolithe.changeset.*;
 import io.vacco.metolithe.core.MtLog;
 import io.vacco.metolithe.query.MtJdbc;
 import io.vacco.murmux.http.MxLog;
+import io.vacco.opt1x.dao.OtDaos;
 import io.vacco.opt1x.impl.*;
 import org.codejargon.feather.Provides;
 import javax.inject.Singleton;
@@ -31,7 +32,7 @@ public class OtService {
     L4Log.setInfoLogger(log::info);
     L4Log.setDebugLogger(log::debug);
     L4Log.setWarnLogger(log::warn);
-    L4Log.setTraceLogger(log::info); // TODO revert this: log::trace
+    L4Log.setTraceLogger(log::trace);
 
     var hkConfig = new HikariConfig();
     hkConfig.setJdbcUrl(OtOptions.jdbcUrl);
@@ -40,6 +41,12 @@ public class OtService {
 
   @Provides @Singleton
   public MtJdbc mtJdbc(HikariDataSource hkDs, Gson g) throws Exception {
+    if (OtOptions.jdbcUrl.contains("h2")) {
+      try (var conn = hkDs.getConnection()) {
+        conn.createStatement().execute("create schema if not exists main");
+        conn.createStatement().execute("set schema main");
+      }
+    }
     try (var conn = hkDs.getConnection()) {
       var logUrl = Objects.requireNonNull(OtService.class.getResource("/ot-schema.json"));
       try (var ir = new InputStreamReader(logUrl.openStream())) {

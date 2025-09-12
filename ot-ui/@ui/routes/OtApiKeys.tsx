@@ -1,10 +1,10 @@
 import * as React from "preact/compat"
+import { RenderableProps } from "preact"
 
 import { appendPage, boxResult, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd } from "@ui/components/UiIcons"
 import { apiV1KeyGet, apiV1KeyPost, OtApiKey, OtApiKeyOp, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { RenderableProps } from "preact"
 import { rpcUiHld } from "@ui/routes"
 
 type OtApiKeysProps = RenderableProps<{ s?: UiStore }>
@@ -106,7 +106,7 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
               <tbody>
                 {this.state.keys.page.items.map(k => row([
                   k.name,
-                  utcYyyyMmDdHhMm(k.createUtcMs),
+                  <small>{utcYyyyMmDdHhMm(k.createUtcMs)}</small>,
                   k.leaf ? "no" : "yes"
                 ]))}
               </tbody>

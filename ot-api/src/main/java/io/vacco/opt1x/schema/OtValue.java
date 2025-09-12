@@ -19,7 +19,7 @@ import io.vacco.metolithe.annotations.*;
   public String name;
 
   @MtVarchar(4096) @MtNotNull @MtDao
-  public String value;
+  public String val;
 
   @MtCol @MtNotNull @MtDao
   public OtValueType type;
@@ -38,7 +38,7 @@ import io.vacco.metolithe.annotations.*;
     var ov = new OtValue();
     ov.nsId = nsId;
     ov.name = name;
-    ov.value = value;
+    ov.val = value;
     ov.type = type;
     ov.notes = notes;
     ov.encrypted = encrypted;
@@ -48,8 +48,18 @@ import io.vacco.metolithe.annotations.*;
   @Override public String toString() {
     return String.format(
         "%d, %d, %s, %s, %b",
-        vid, nsId, name, value, encrypted
+        vid, nsId, name, val, encrypted
     );
+  }
+
+  @Override public boolean equals(Object obj) {
+    return obj instanceof OtValue
+      && ((OtValue) obj).val != null
+      && ((OtValue) obj).val.equals(this.val);
+  }
+
+  @Override public int hashCode() {
+    return this.val == null ? 0 : this.val.hashCode();
   }
 
 }

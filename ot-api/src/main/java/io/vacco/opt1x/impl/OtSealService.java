@@ -77,6 +77,7 @@ public class OtSealService {
 
       this.masterApiKey.metadata2 = encryptRaw(m2, sealKey);
       this.masterApiKey.metadata3 = encryptRaw(m3, sealKey);
+      this.masterApiKey.createUtcMs = System.currentTimeMillis();
 
       var cmd = keyService.update(keyOp().withKey(this.masterApiKey));
       if (!cmd.ok()) {
@@ -86,23 +87,17 @@ public class OtSealService {
       result.rootApiKey = kr.raw;
       result.shares = sealB64();
 
-      var rootGroup = keyService.daos.grd.upsert(OtGroup.group(
-        null, Opt1x, Opt1xRoot, System.currentTimeMillis()
-      )).rec;
+      var now = System.currentTimeMillis();
 
-      var rootNs = keyService.daos.nsd.upsert(OtNamespace.namespace(
-        null, Opt1x, Opt1xRoot, System.currentTimeMillis()
-      )).rec;
+      var rootGroup = keyService.daos.grd.upsert(OtGroup.group(null, Opt1x, Opt1xRoot, now)).rec;
+      var rootNs = keyService.daos.nsd.upsert(OtNamespace.namespace(null, Opt1x, Opt1xRoot, now)).rec;
+      var rootGns = OtGroupNs.groupNs(rootGroup.gid, rootNs.nsId, masterApiKey.kid, true, true, true);
+      var rootKg = OtKeyGroup.keyGroup(masterApiKey.kid, rootGroup.gid, OtGroupRole.Admin, masterApiKey.kid);
 
-      keyService.daos.gnd.upsert(OtGroupNs.groupNs(
-        rootGroup.gid, rootNs.nsId,
-        masterApiKey.kid, true, true, true
-      ));
-
-      keyService.daos.kgd.upsert(OtKeyGroup.keyGroup(
-        masterApiKey.kid, rootGroup.gid, OtGroupRole.Admin,
-        masterApiKey.kid
-      ));
+      rootGns.grantUtcMs = now;
+      rootKg.grantUtcMs = now;
+      keyService.daos.gnd.upsert(rootGns);
+      keyService.daos.kgd.upsert(rootKg);
 
       this.sealKey = null;
       this.masterKey = null;
@@ -173,7 +168,7 @@ public class OtSealService {
   public OtValue encrypt(OtValue val) {
     checkMasterKey();
     if (val.encrypted) {
-      val.value = encryptRaw(val.value, masterKey);
+      val.val = encryptRaw(val.val, masterKey);
     }
     return val;
   }
@@ -184,7 +179,7 @@ public class OtSealService {
       return val;
     }
     var dec = value(
-      val.nsId, val.name, decryptRaw(val.value, masterKey),
+      val.nsId, val.name, decryptRaw(val.val, masterKey),
       val.type, val.notes, false
     );
     dec.createUtcMs = val.createUtcMs;

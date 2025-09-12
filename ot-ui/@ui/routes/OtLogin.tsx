@@ -1,6 +1,6 @@
 import * as React from "preact/compat"
-
 import { RenderableProps } from "preact"
+
 import { UiContext, UiStore } from "@ui/store"
 
 type OtLoginProps = RenderableProps<{ s?: UiStore, url?: string }>

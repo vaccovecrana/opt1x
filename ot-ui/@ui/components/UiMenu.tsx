@@ -3,7 +3,8 @@ import * as React from "preact/compat"
 import { IcnCode, IcnDatabase, IcnGroup, IcnLogo, IcnLogout } from "@ui/components/UiIcons"
 import { UiContext } from "@ui/store"
 import { avatar } from "@ui/components/Ui"
-import { logout, uiApiKeys, uiGroups, uiNamespaces, uiRoot } from "@ui/routes"
+import { logout, uiApiKeys, uiGroups, uiNs, uiRoot } from "@ui/routes"
+import UiVersion from "@ui/components/UiVersion"
 
 const UiMenu = () => {
   const s = React.useContext(UiContext)
@@ -34,7 +35,7 @@ const UiMenu = () => {
                   </a>
                 </li>
                 <li>
-                  <a href={uiNamespaces} class="secondary">
+                  <a href={uiNs} class="secondary">
                     <IcnCode height={32} /><small class="ml8">Namespaces</small>
                   </a>
                 </li>
@@ -48,6 +49,9 @@ const UiMenu = () => {
                 {s.state.apiKey && avatar(s.state.apiKey, true)}
               </ul>
             </nav>
+            <div class="mt16">
+              <UiVersion />
+            </div>
           </aside>
         </div>
       </div>
@@ -55,12 +59,21 @@ const UiMenu = () => {
         <div class="col auto">
           <nav>
             <ul>
-              <li><a href={uiRoot}><IcnLogo height={48} /></a></li>
+              <li>
+                <div class="row">
+                  <div class="col auto">
+                    <a href={uiRoot}><IcnLogo height={48} /></a>
+                  </div>
+                  <div class="col auto">
+                    <UiVersion />                    
+                  </div>
+                </div>
+              </li>
             </ul>
             <ul>
               {apiKey && !apiKey.leaf && (<li><a href={uiApiKeys}><IcnDatabase height={32} /></a></li>)}
               <li><a href={uiGroups}><IcnGroup height={32} /></a></li>
-              <li><a href={uiNamespaces}><IcnCode height={32} /></a></li>
+              <li><a href={uiNs}><IcnCode height={32} /></a></li>
               <li><a class="ptr" onClick={() => logout()}><IcnLogout height={32} /></a></li>
               {s.state.apiKey && avatar(s.state.apiKey, false)}
             </ul>

@@ -3,7 +3,7 @@ import * as ReactDOM from "preact/compat"
 import { useReducer } from "preact/hooks"
 import Router from 'preact-router'
 
-import { uiApiKeys, uiConfigsNsId, uiConfigsNsIdCid, uiGroups, uiGroupsId, uiInit, uiLogin, uiNamespaces, uiNamespacesId, uiUnseal, uiValuesNsId } from "@ui/routes"
+import { uiApiKeys, uiConfigsNsId, uiConfigsNsIdCid, uiGroups, uiGroupsId, uiInit, uiLogin, uiNs, uiNsNsId, uiUnseal, uiNsNsIdValues, uiValuesVid } from "@ui/routes"
 
 import { initialState, UiContext, UiReducer } from "@ui/store"
 import OtInit from "@ui/routes/OtInit"
@@ -19,6 +19,8 @@ import OtNamespace from "@ui/routes/OtNamespace"
 import OtValues from "@ui/routes/OtValues"
 import OtConfigs from "@ui/routes/OtConfigs"
 import OtConfig from "@ui/routes/OtConfig"
+import OtApiKey from "@ui/routes/OtApiKey"
+import OtValue from "@ui/routes/OtValue"
 
 class UiShell extends React.Component {
   public render() {
@@ -38,14 +40,13 @@ class UiShell extends React.Component {
                     <OtApiKeys    path={uiApiKeys} />
                     <OtGroups     path={uiGroups} />
                     <OtGroup      path={uiGroupsId} />
-                    <OtNamespaces path={uiNamespaces} />
-                    <OtNamespace  path={uiNamespacesId} />
-                    <OtValues     path={uiValuesNsId} />
+                    <OtNamespaces path={uiNs} />
+                    <OtNamespace  path={uiNsNsId} />
+                    <OtValues     path={uiNsNsIdValues} />
+                    <OtValue      path={uiValuesVid} />
                     <OtConfigs    path={uiConfigsNsId} />
                     <OtConfig     path={uiConfigsNsIdCid} />
-                    <div default>
-                      <h1>Dashboard?</h1>
-                    </div>
+                    <OtApiKey     default />
                   </Router>
                 </div>
               </div>

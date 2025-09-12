@@ -1,8 +1,9 @@
+import * as React from "preact/compat"
+import { RenderableProps } from "preact"
+
 import { boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { apiV1GroupIdDelete, apiV1GroupIdGet, apiV1GroupPost, OtAdminOp, OtGroupRole, OtKeyAccess } from "@ui/rpc"
 import { lockUi, Opt1x, UiContext, UiStore } from "@ui/store"
-import { RenderableProps } from "preact"
-import * as React from "preact/compat"
 import { rpcUiHld, uiGroupsIdFmt } from "@ui/routes"
 import { IcnAdd, IcnBind, IcnDelete } from "@ui/components/UiIcons"
 
@@ -184,7 +185,7 @@ class OtGroups extends React.Component<OtGroupProps, OtGroupState> {
             <tbody>
               {this.state.access.groups.map(grp => row([
                 <a href={uiGroupsIdFmt(grp.gid)}>{grp.name}</a>,
-                utcYyyyMmDdHhMm(grp.createUtcMs)
+                <small>{utcYyyyMmDdHhMm(grp.createUtcMs)}</small>
               ]))}
             </tbody>
           </table>

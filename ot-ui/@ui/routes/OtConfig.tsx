@@ -1,13 +1,14 @@
 import * as React from "react"
+import { RenderableProps } from "preact"
 
 import { IcnSave } from "@ui/components/UiIcons"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { RenderableProps } from "preact"
 import { apiV1ConfigCidGet, apiV1ConfigCidPost, apiV1ValueGet, OtConfigOp, OtNodeType, OtValueOp, OtVar } from "@ui/rpc"
 import { NodeAdapter, NodeType, TreeEditor } from "@ui/tree-editor/UiTree"
-import UiSearch from "@ui/components/UiSearch"
-import { rpcUiHld } from "."
+import { rpcUiHld } from "@ui/routes"
 import { boxResult } from "@ui/components/Ui"
+
+import UiSearch from "@ui/components/UiSearch"
 
 export interface OtVarV extends OtVar {
   children?: Map<string, OtVarV>
@@ -203,7 +204,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
   }
 
   renderDisplay(value: OtVarV, type: NodeType) {
-    return <input type="text" disabled value={value.val.encrypted ? "***" : value.val.value} />
+    return <input type="text" disabled value={value.val.encrypted ? "***" : value.val.val} />
   }
 
   renderAddPrimitive(
@@ -213,7 +214,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
     if (this.state.valOp) {
       return (
         <UiSearch items={this.state.valOp.values}
-          getLabel={val => `${val.name} - ${val.encrypted ? "***" : val.value}`}
+          getLabel={val => `${val.name} - ${val.encrypted ? "***" : val.val}`}
           getSearchKey={val => val.name}
           getCategory={val => this.state.valOp.namespaces.find(ns => ns.nsId === val.nsId).name}
           onSelect={val => {
@@ -246,7 +247,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
             </li>
           </ul>
         </nav>
-        {this.state.cfgOp && boxResult(this.state.cfgOp, "Config updated")}
+        {this.state.cfgOp && boxResult(this.state.cfgOp)}
         <div>
           {this.state.root && (
             <TreeEditor

@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.vacco.murmux.http.*;
 import io.vacco.murmux.middleware.*;
 import io.vacco.opt1x.impl.*;
+import io.vacco.opt1x.spring.OtSpringHdl;
 import io.vacco.ronove.murmux.RvMxAdapter;
 import java.util.function.*;
 
@@ -63,7 +64,8 @@ public class OtRootHdl extends MxRouter {
 
   @SuppressWarnings("this-escape")
   public OtRootHdl(OtSealService ss, OtAdminService as,
-                   OtApiKeyService ks, OtUiHdl uiHdl, OtApiHdl apiHdl, Gson g) {
+                   OtApiKeyService ks, OtUiHdl uiHdl,
+                   OtApiHdl apiHdl, OtSpringHdl springHdl, Gson g) {
     var errorHdl = (BiConsumer<MxExchange, Exception>) (xc, e) -> {
       xc.putAttachment(e);
       onError("Unhandled exception: {}", e, xc.io.getRequestURI());
@@ -79,6 +81,7 @@ public class OtRootHdl extends MxRouter {
     get(indexJs, uiHdl);
     get(indexJsMap, uiHdl);
     get(favicon, uiHdl);
+    get(version, uiHdl);
     prefix(ui, uiHdl);
 
     // Login actions
@@ -93,6 +96,11 @@ public class OtRootHdl extends MxRouter {
     any(apiV1Init, apiAdpHdl);
     any(apiV1Unseal, apiAdpHdl);
     prefix(apiRoot, keyApiHdl);
+
+    // Spring Cloud Config actions
+    if (OtOptions.apiSpring) {
+      prefix(springRoot, springHdl);
+    }
 
     // Authenticated preact UI routes
     noMatch(sysCheckOr(ss, keyApiHdl, false, keyUiHdl));

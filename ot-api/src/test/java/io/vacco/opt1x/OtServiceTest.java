@@ -12,6 +12,8 @@ import org.codejargon.feather.Feather;
 import org.junit.runner.RunWith;
 import java.io.*;
 
+import static io.vacco.opt1x.dto.OtConfigOp.configOp;
+import static io.vacco.opt1x.schema.OtConstants.Opt1x;
 import static io.vacco.opt1x.schema.OtValue.*;
 import static io.vacco.opt1x.dto.OtValueOp.*;
 import static io.vacco.opt1x.dto.OtAdminOp.*;
@@ -30,7 +32,7 @@ import static org.junit.Assert.*;
 public class OtServiceTest {
   static {
     OtOptions.setFrom(new String[] {
-      format("%s=%s", OtOptions.kJdbcUrl,  "jdbc:sqlite:./build/opt1x.db"),
+      format("%s=%s", OtOptions.kJdbcUrl,  "jdbc:h2:file:./build/opt1x;DB_CLOSE_DELAY=-1;LOCK_MODE=3;AUTO_RECONNECT=TRUE"),
       format("%s=%s", OtOptions.kLogLevel, "trace")
     });
   }
@@ -116,14 +118,24 @@ public class OtServiceTest {
         var as = f.instance(OtAdminService.class);
         var rk = ks.loadRootKey();
         assertTrue(rk.isPresent());
-        var gns = as.accessToNamespace(as.loadRootGroup().gid, as.loadRootNs().nsId, true, true, true);
-        assertTrue(gns.isPresent());
+        var rns = as.daos.nsd.loadWhereNameEq(Opt1x).getFirst();
+        var rgp = as.daos.grd.loadWhereNameEq(Opt1x).getFirst();
+        var access = as.accessNamespacesOf(rk.get().kid);
+        assertEquals(1, access.groupNamespaces.size());
+        var rgn = access.groupNamespaces.getFirst();
+        assertEquals(rgp.gid, rgn.gid);
+        assertEquals(rns.nsId, rgn.nsId);
+        assertTrue(rgn.read);
+        assertTrue(rgn.write);
+        assertTrue(rgn.manage);
       });
 
       it("Creates a team root key, group and namespace", () -> {
         var ks = f.instance(OtApiKeyService.class);
         var as = f.instance(OtAdminService.class);
         var rk = ks.loadRootKey();
+        var rns = as.daos.nsd.loadWhereNameEq(Opt1x).getFirst();
+        var rgp = as.daos.grd.loadWhereNameEq(Opt1x).getFirst();
         assertTrue(rk.isPresent());
 
         // Steve's admin key for team flooper
@@ -131,11 +143,11 @@ public class OtServiceTest {
         okOrExisting(steveRes);
 
         // Create flooper root namespace
-        var flpNsRes = as.createNamespace(adminOp().withKey(rk.get()).withNs(namespace(as.loadRootNs().nsId, flp)));
+        var flpNsRes = as.createNamespace(adminOp().withKey(rk.get()).withNs(namespace(rns.nsId, flp)));
         okOrExisting(flpNsRes);
 
         // Create flooper root group
-        var flpGrpRes = as.createGroup(adminOp().withKey(rk.get()).withGroup(group(as.loadRootGroup().gid, flp)));
+        var flpGrpRes = as.createGroup(adminOp().withKey(rk.get()).withGroup(group(rgp.gid, flp)));
         okOrExisting(flpGrpRes);
 
         // Grant flooper root group admin access into flooper root namespace (using root key)
@@ -215,6 +227,10 @@ public class OtServiceTest {
         var jerryRes = ks.createApiKey(keyOp().withKey(rawKey(sk.kid, jerryKey, true)));
         okOrExisting(jerryRes);
 
+        // Rotate Jerry's key
+        var jerryRotRes = ks.rotate(keyOp().withKey(jerryRes.key));
+        okOrExisting(jerryRotRes);
+
         // Verify that Steve can see Linda and Jerry's keys
         var kList = ks.loadKeysOf(sk.kid, 10, null);
         assertEquals(2, kList.page.items.size());
@@ -243,6 +259,12 @@ public class OtServiceTest {
         var jerryNsAccess = as.accessNamespacesOf(jerryRes.key.kid);
         assertEquals(2, jerryNsAccess.namespaces.size());
 
+        var jerryStageAccess = as.accessNamespacesOf(jerryRes.key.kid, flpApiStageNsRes.ns.nsId);
+        assertEquals(1, jerryStageAccess.keyGroups.size());
+        var jerryDevsAccess = as.accessGroupsOf(jerryRes.key.kid, flpDevsGrpRes.group.gid);
+        assertEquals(1, jerryDevsAccess.keyGroups.size());
+        assertEquals(OtGroupRole.Member, jerryDevsAccess.keyGroups.getFirst().role);
+
         // Verify Linda cannot create namespaces under the flooper-api-stage namespace
         var flpApiStageBadNsRes = as.createNamespace(
           adminOp()
@@ -250,6 +272,10 @@ public class OtServiceTest {
             .withNs(namespace(flpApiStageNsRes.ns.nsId, flpApiStage + "-unauthorized"))
         );
         assertFalse(flpApiStageBadNsRes.ok());
+
+        // Delete flooper-developers group
+        var delRes = as.deleteGroup(adminOp().withKey(sk).withGroup(flpDevsGrpRes.group));
+        okOrExisting(delRes);
       });
     });
 
@@ -273,18 +299,18 @@ public class OtServiceTest {
         var testPassword = "momo123";
         var encrypted = ss.encrypt(value(1, "test-value", testPassword, OtValueType.String, null, true));
         var decrypted = ss.decrypt(encrypted);
-        assertEquals(testPassword, decrypted.value);
+        assertEquals(testPassword, decrypted.val);
       });
 
       it("Creates a value in a namespace with write access", () -> {
         var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
         var flpStageNs = as.daos.nsd.loadWhereNameEq(flpApiStage).getFirst();
         testVal.nsId = flpStageNs.nsId;
-        var valRes = vs.createValue(valueOp().withKey(lk).withVal(testVal));
+        var valRes = vs.upsertValue(valueOp().withKey(lk).withVal(testVal));
         okOrExisting(valRes);
         assertEquals(flpStageNs.nsId, valRes.val.nsId);
         assertEquals(testKey, valRes.val.name);
-        assertEquals("testNsValue", valRes.val.value);
+        assertEquals("testNsValue", valRes.val.val);
         assertEquals("Test note", valRes.val.notes);
         assertFalse(valRes.val.encrypted);
         assertTrue(valRes.val.createUtcMs > 0);
@@ -294,17 +320,36 @@ public class OtServiceTest {
         assertFalse(loadRes.values.isEmpty());
       });
 
-      it("Fails to create a duplicate value in the same namespace", () -> {
+      it("Creates new value versions, replaces, and deletes them", () -> {
         var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
-        var valRes = vs.createValue(valueOp().withKey(lk).withVal(testVal));
-        assertFalse(valRes.ok());
+        var flpStageNs = as.daos.nsd.loadWhereNameEq(flpApiStage).getFirst();
+
+        testVal.nsId = flpStageNs.nsId;
+        testVal.val = "testNsNewValue";
+        testVal.notes = "Test note updated";
+
+        var verRes0 = vs.upsertValue(valueOp().withKey(lk).withVal(testVal));
+        okOrExisting(verRes0);
+        assertFalse(verRes0.valVersions.isEmpty());
+
+        testVal.val = "testNsNewNewNewValue";
+        testVal.notes = "Test note second update";
+
+        var verRes1 = vs.upsertValue(valueOp().withKey(lk).withVal(testVal));
+        okOrExisting(verRes1);
+
+        var repRes = vs.restoreValueVersion(lk, verRes1.valVersions.getFirst().vvId);
+        okOrExisting(repRes);
+        for (var vv : repRes.valVersions) {
+          okOrExisting(vs.deleteValueVersion(lk, vv.vvId));
+        }
       });
 
       it("Fails to create a value without write access", () -> {
         var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
         var flpRootNs = as.daos.nsd.loadWhereNameEq(flp).getFirst();
         testVal.nsId = flpRootNs.nsId;
-        var valRes = vs.createValue(valueOp().withKey(lk).withVal(testVal));
+        var valRes = vs.upsertValue(valueOp().withKey(lk).withVal(testVal));
         assertFalse(valRes.ok());
       });
 
@@ -313,13 +358,24 @@ public class OtServiceTest {
         var flpStageNs = as.daos.nsd.loadWhereNameEq(flpApiStage).getFirst();
         testVal.nsId = flpStageNs.nsId;
         testVal.name = secureKey;
-        testVal.value = "sensitiveData";
+        testVal.val = "sensitiveData";
         testVal.encrypted = true;
-        var valRes = vs.createValue(valueOp().withKey(lk).withVal(testVal));
+        var valRes = vs.upsertValue(valueOp().withKey(lk).withVal(testVal));
         okOrExisting(valRes);
         if (valRes.ok()) {
-          assertNotEquals("sensitiveData", testVal.value);
+          assertNotEquals("sensitiveData", testVal.val);
         }
+      });
+
+      it("Creates and deletes a value", () -> {
+        var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
+        var flpStageNs = as.daos.nsd.loadWhereNameEq(flpApiStage).getFirst();
+        var val = value(flpStageNs.nsId, "deleteKey", "deleteValue", OtValueType.String, null, false);
+        var valRes = vs.upsertValue(valueOp().withKey(lk).withVal(val));
+        okOrExisting(valRes);
+        valRes = vs.deleteValue(lk, valRes.val.vid);
+        okOrExisting(valRes);
+        assertEquals(1, (int) valRes.val.vid);
       });
     });
 
@@ -370,9 +426,7 @@ public class OtServiceTest {
         var rootNode = new OtNode();
         rootNode.cid = cfg.cid;
         rootNode.label = "root";
-        rootNode.type = OtNodeType.Value;
-        rootNode.vid = testVal.vid;
-        rootNode.pNid = null;
+        rootNode.type = OtNodeType.Object;
         rootNode.itemIdx = 0;
 
         var rootV = OtVar.of(rootNode, testVal);
@@ -390,8 +444,20 @@ public class OtServiceTest {
         childNode.pNid = rootNode.nid;
         childNode.itemIdx = 1;
 
+        // Add child node with plain value
+        var cn0 = new OtNode();
+        cn0.cid = cfg.cid;
+        cn0.label = "valChild";
+        cn0.type = OtNodeType.Value;
+        cn0.vid = testVal.vid;
+        cn0.nid = -3;
+        cn0.pNid = rootNode.nid;
+        cn0.itemIdx = 2;
+
         var childV = OtVar.of(childNode, secureVal);
-        op = new OtConfigOp().withApiKey(lk).withVars(rootV, childV).withConfig(cfg);
+        var cn0V = OtVar.of(cn0, testVal);
+
+        op = new OtConfigOp().withApiKey(lk).withVars(rootV, childV, cn0V).withConfig(cfg);
         result = cs.update(op);
         assertTrue(result.ok());
         assertNotNull(childNode.nid);
@@ -412,6 +478,22 @@ public class OtServiceTest {
         var op = new OtConfigOp().withApiKey(jk).withVars().withConfig(cfg);
         var result = cs.update(op);
         assertFalse(result.ok());
+      });
+
+      it("Clones and renders a configuration", () -> {
+        var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
+        var flpDevNs = as.daos.nsd.loadWhereNameEq(flpApiDev).getFirst();
+        var cfg = cs.daos.cfd.loadWhereNameEq(testConfig).getFirst();
+        cfg.name = format("%s-copy", cfg.name);
+        cfg.nsId = flpDevNs.nsId;
+        var cloneRes = cs.clone(configOp().withApiKey(lk).withConfig(cfg));
+        okOrExisting(cloneRes);
+        if (cloneRes.ok()) {
+          for (var fmt : OtNodeFormat.values()) {
+            var renderRes = cs.render(lk, cloneRes.cfg.cid, fmt.toString(), false);
+            OtOptions.log.info(renderRes.body.toString());
+          }
+        }
       });
     });
 

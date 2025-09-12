@@ -1,13 +1,9 @@
+## Features not yet implemented
+
 1. **Ticket: Implement Versioning and Change Tracking for Configurations**
   - **Description**: Add a new OtConfigVersion table to snapshot OtNode trees on save. Extend OtConfigService to store versions. Add UI "History" tab in OtConfig route for viewing timelines and diffs. Include basic audit logging in a new OtAuditLog table with API endpoint (/api/v1/audit).
   - **Priority**: High
   - **Estimated Effort**: Medium (schema updates, service logic, UI component).
-  - **Dependencies**: None.
-
-2. **Ticket: Add Cloning Functionality for Configs and Namespaces**
-  - **Description**: Implement "clone" methods in OtConfigService and OtNamespaceService for deep-copying trees (new IDs). Add "Clone" buttons in UI routes (OtConfigs, OtNamespace) with target prompts.
-  - **Priority**: High
-  - **Estimated Effort**: Medium (recursive copy logic, UI buttons).
   - **Dependencies**: None.
 
 3. **Ticket: Introduce Global Search Across Entities**
@@ -40,12 +36,6 @@
   - **Estimated Effort**: Medium (JSON serialization, validation).
   - **Dependencies**: None.
 
-8. **Ticket: Add Config Validation with Schemas**
-  - **Description**: Create OtSchema table. Use JSON Schema lib in OtConfigService for save/render validation.
-  - **Priority**: Medium-Low
-  - **Estimated Effort**: Medium (new table, lib integration).
-  - **Dependencies**: None.
-
 9. **Ticket: Enhance Secrets Management with Rotation and TTL**
   - **Description**: Add cron for key rotation in OtSealService. UI alerts for expiring secrets.
   - **Priority**: Low-Medium
@@ -69,9 +59,3 @@
   - **Priority**: Medium
   - **Estimated Effort**: Medium (endpoint, parsing, revocation trigger).
   - **Dependencies**: Tickets 10 and 11 (identity and OIDC setup).
-
-13. **Ticket: Support CLI Tool for Bulk Operations and Integrations**
-  - **Description**: Build simple CLI wrapping API (e.g., for bulk clone/export). Add Git sync hooks if time allows.
-  - **Priority**: Low-Medium
-  - **Estimated Effort**: Low (Java CLI with picocli).
-  - **Dependencies**: Core features like cloning/export.

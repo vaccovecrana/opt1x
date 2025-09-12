@@ -1,7 +1,7 @@
 package io.vacco.opt1x.impl;
 
 import io.vacco.metolithe.dao.MtQuery;
-import io.vacco.opt1x.dao.OtApiKeyDao;
+import io.vacco.opt1x.dao.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.schema.*;
 import java.security.*;
@@ -11,6 +11,7 @@ import static java.lang.String.format;
 import static io.vacco.opt1x.schema.OtConstants.*;
 import static io.vacco.opt1x.impl.OtDataIO.*;
 import static io.vacco.opt1x.impl.OtOptions.onError;
+import static io.vacco.opt1x.schema.OtApiKey.rawKey;
 
 public class OtApiKeyService {
 
@@ -55,11 +56,11 @@ public class OtApiKeyService {
     return daos.akd.loadWhereNameEq(OtConstants.Opt1x).stream().findFirst();
   }
 
-  public Optional<OtApiKey> loadKey(String keyHash) {
-    if (keyHash == null || keyHash.isEmpty()) {
+  public Optional<OtApiKey> loadKey(String key) {
+    if (key == null || key.isEmpty()) {
       return Optional.empty();
     }
-    var hash = sha256Of(keyHash);
+    var hash = sha256Of(key);
     return daos.akd.loadWhereHashEq(hash)
       .stream()
       .findFirst();
@@ -87,13 +88,14 @@ public class OtApiKeyService {
     ok0.ifPresent(k0 -> {
       cmd.withError(format("API key [%s] already exists", k0.name));
       cmd.raw = null;
-      cmd.key = k0; // TODO security: just provide enough detail about the existing key (no hash, no path, no metadata, etc.).
+      cmd.key = rawKey(null, k0.name, k0.leaf);
+      cmd.key.kid = k0.kid;
     });
     return cmd;
   }
 
   public OtApiKeyOp newKey(OtApiKeyOp cmd) {
-    var raw = format("%s%s", Long.toHexString(random.nextLong()), Long.toHexString(random.nextLong()));
+    var raw = String.format("%016x%016x%08x", random.nextLong(), random.nextLong(), random.nextInt());
     cmd.key.path = pathPrefix(cmd.key.name);
     cmd.key.hash = sha256Of(raw);
     cmd.key.createUtcMs = System.currentTimeMillis();
@@ -113,6 +115,29 @@ public class OtApiKeyService {
     } catch (Exception e) {
       onError("API key create error", e);
       return new OtApiKeyOp().withError(e);
+    }
+  }
+
+  /*
+   * We assume that the provided key for rotation has already been
+   * authenticated/unwrapped from an incoming JWT token.
+   */
+  public OtApiKeyOp rotate(OtApiKeyOp cmd) {
+    try {
+      var k0 = daos.akd.load(cmd.key.kid);
+      if (k0.isEmpty()) {
+        return cmd.withError(format("API key [%d] not found", cmd.key.kid));
+      } else if (k0.get().name.equals(Opt1x)) {
+        return cmd.withError(format("API key [%s] must not be rotated", k0.get().name));
+      }
+      var result = newKey(cmd).validate(this::validateParentApiKey);
+      if (result.ok()) {
+        daos.akd.upsert(result.key);
+      }
+      return cmd;
+    } catch (Exception e) {
+      onError("API key rotate error", e);
+      return cmd.withError(e);
     }
   }
 

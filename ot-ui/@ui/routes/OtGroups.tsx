@@ -1,8 +1,9 @@
+import * as React from "preact/compat"
+import { RenderableProps } from "preact"
+
 import { headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { apiV1GroupGet, OtGroupRole, OtKeyAccess } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { RenderableProps } from "preact"
-import * as React from "preact/compat"
 import { rpcUiHld, uiGroupsIdFmt } from "@ui/routes"
 
 type OtGroupsProps = RenderableProps<{ s?: UiStore }>
@@ -41,7 +42,7 @@ class OtGroups extends React.Component<OtGroupsProps, OtGroupsState> {
                     ? <a href={uiGroupsIdFmt(grp.gid)}>{grp.name}</a>
                     : grp.name,
                   role,
-                  utcYyyyMmDdHhMm(grp.createUtcMs)
+                  <small>{utcYyyyMmDdHhMm(grp.createUtcMs)}</small>
                 ])
               })}
             </tbody>

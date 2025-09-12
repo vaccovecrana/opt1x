@@ -1,0 +1,414 @@
+{
+  "cfg": {
+    "cid": -593018822,
+    "nsId": 1773544902,
+    "name": "base",
+    "createUtcMs": 1757484886736
+  },
+  "cfgClone": false,
+  "encrypted": false,
+  "vars": [
+    {
+      "node": {
+        "nid": -1928428729,
+        "cid": -593018822,
+        "label": "1",
+        "type": "Object",
+        "pNid": -1054812467,
+        "itemIdx": 39
+      }
+    },
+    {
+      "node": {
+        "nid": -949935172,
+        "cid": -593018822,
+        "label": "2",
+        "type": "Object",
+        "pNid": -1054812467,
+        "itemIdx": 42
+      }
+    },
+    {
+      "node": {
+        "nid": -1054715340,
+        "cid": -593018822,
+        "label": "allowed-hosts",
+        "type": "Array",
+        "pNid": -1915769442,
+        "itemIdx": 35
+      }
+    },
+    {
+      "node": {
+        "nid": -1812818651,
+        "cid": -593018822,
+        "label": "api-key",
+        "type": "Value",
+        "vid": 1839172748,
+        "pNid": -1915769442,
+        "itemIdx": 45
+      },
+      "val": {
+        "vid": 1839172748,
+        "nsId": -38411530,
+        "name": "app.apiKey",
+        "val": "default-api-key",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484864955
+      }
+    },
+    {
+      "node": {
+        "nid": -943393707,
+        "cid": -593018822,
+        "label": "application",
+        "type": "Object",
+        "pNid": 1414165035,
+        "itemIdx": 1
+      }
+    },
+    {
+      "node": {
+        "nid": 190643710,
+        "cid": -593018822,
+        "label": "com.example.myapp",
+        "type": "Value",
+        "vid": -2048292483,
+        "pNid": 1770708188,
+        "itemIdx": 31
+      },
+      "val": {
+        "vid": -2048292483,
+        "nsId": -38411530,
+        "name": "log.debug",
+        "val": "DEBUG",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484593060
+      }
+    },
+    {
+      "node": {
+        "nid": 657106435,
+        "cid": -593018822,
+        "label": "datasource",
+        "type": "Object",
+        "pNid": 1414165035,
+        "itemIdx": 3
+      }
+    },
+    {
+      "node": {
+        "nid": 846397247,
+        "cid": -593018822,
+        "label": "enabled",
+        "type": "Value",
+        "vid": 1260263871,
+        "pNid": -1928428729,
+        "itemIdx": 41
+      },
+      "val": {
+        "vid": 1260263871,
+        "nsId": -38411530,
+        "name": "val.true",
+        "val": "true",
+        "type": "Boolean",
+        "encrypted": false,
+        "createUtcMs": 1757484674885
+      }
+    },
+    {
+      "node": {
+        "nid": -35374579,
+        "cid": -593018822,
+        "label": "enabled",
+        "type": "Value",
+        "vid": 69249191,
+        "pNid": -949935172,
+        "itemIdx": 44
+      },
+      "val": {
+        "vid": 69249191,
+        "nsId": -38411530,
+        "name": "val.false",
+        "val": "false",
+        "type": "Boolean",
+        "encrypted": false,
+        "createUtcMs": 1757484680046
+      }
+    },
+    {
+      "node": {
+        "nid": -1054812467,
+        "cid": -593018822,
+        "label": "feature-flags",
+        "type": "Array",
+        "pNid": -1915769442,
+        "itemIdx": 38
+      }
+    },
+    {
+      "node": {
+        "nid": 1205637041,
+        "cid": -593018822,
+        "label": "host.local",
+        "type": "Value",
+        "vid": 1893857231,
+        "pNid": -1054715340,
+        "itemIdx": 36
+      },
+      "val": {
+        "vid": 1893857231,
+        "nsId": -38411530,
+        "name": "host.local",
+        "val": "localhost",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484606119
+      }
+    },
+    {
+      "node": {
+        "nid": 18556856,
+        "cid": -593018822,
+        "label": "host.localIP",
+        "type": "Value",
+        "vid": 1954799718,
+        "pNid": -1054715340,
+        "itemIdx": 37
+      },
+      "val": {
+        "vid": 1954799718,
+        "nsId": -38411530,
+        "name": "host.localIP",
+        "val": "127.0.0.1",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484615455
+      }
+    },
+    {
+      "node": {
+        "nid": 1770708188,
+        "cid": -593018822,
+        "label": "level",
+        "type": "Object",
+        "pNid": -1620091189,
+        "itemIdx": 29
+      }
+    },
+    {
+      "node": {
+        "nid": -1620091189,
+        "cid": -593018822,
+        "label": "logging",
+        "type": "Object",
+        "pNid": 1744369219,
+        "itemIdx": 28
+      }
+    },
+    {
+      "node": {
+        "nid": -1915769442,
+        "cid": -593018822,
+        "label": "myApp",
+        "type": "Object",
+        "pNid": 1744369219,
+        "itemIdx": 34
+      }
+    },
+    {
+      "node": {
+        "nid": -1977885462,
+        "cid": -593018822,
+        "label": "name",
+        "type": "Value",
+        "vid": 1197184328,
+        "pNid": -943393707,
+        "itemIdx": 2
+      },
+      "val": {
+        "vid": 1197184328,
+        "nsId": -38411530,
+        "name": "app.name",
+        "val": "flooper",
+        "type": "String",
+        "notes": "Let's go lol!",
+        "encrypted": false,
+        "createUtcMs": 1757487387803
+      }
+    },
+    {
+      "node": {
+        "nid": 1826087871,
+        "cid": -593018822,
+        "label": "name",
+        "type": "Value",
+        "vid": -1256795416,
+        "pNid": -1928428729,
+        "itemIdx": 40
+      },
+      "val": {
+        "vid": -1256795416,
+        "nsId": -38411530,
+        "name": "app.featA",
+        "val": "featureA",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484647783
+      }
+    },
+    {
+      "node": {
+        "nid": 1263793520,
+        "cid": -593018822,
+        "label": "name",
+        "type": "Value",
+        "vid": 1130094267,
+        "pNid": -949935172,
+        "itemIdx": 43
+      },
+      "val": {
+        "vid": 1130094267,
+        "nsId": -38411530,
+        "name": "app.featB",
+        "val": "featureB",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484659679
+      }
+    },
+    {
+      "node": {
+        "nid": -519927201,
+        "cid": -593018822,
+        "label": "password",
+        "type": "Value",
+        "vid": 1567799573,
+        "pNid": 657106435,
+        "itemIdx": 5
+      },
+      "val": {
+        "vid": 1567799573,
+        "nsId": -38411530,
+        "name": "db.password",
+        "val": "defaultpassword",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484817336
+      }
+    },
+    {
+      "node": {
+        "nid": 475698409,
+        "cid": -593018822,
+        "label": "port",
+        "type": "Value",
+        "vid": 1133600246,
+        "pNid": 217129132,
+        "itemIdx": 33
+      },
+      "val": {
+        "vid": 1133600246,
+        "nsId": -38411530,
+        "name": "app.port",
+        "val": "8080",
+        "type": "Number",
+        "encrypted": false,
+        "createUtcMs": 1757485050592
+      }
+    },
+    {
+      "node": {
+        "nid": 1744369219,
+        "cid": -593018822,
+        "label": "root",
+        "type": "Object",
+        "itemIdx": -1
+      }
+    },
+    {
+      "node": {
+        "nid": 1731110760,
+        "cid": -593018822,
+        "label": "root",
+        "type": "Value",
+        "vid": 258092367,
+        "pNid": 1770708188,
+        "itemIdx": 30
+      },
+      "val": {
+        "vid": 258092367,
+        "nsId": -38411530,
+        "name": "log.info",
+        "val": "INFO",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484584683
+      }
+    },
+    {
+      "node": {
+        "nid": 217129132,
+        "cid": -593018822,
+        "label": "server",
+        "type": "Object",
+        "pNid": 1744369219,
+        "itemIdx": 32
+      }
+    },
+    {
+      "node": {
+        "nid": 1414165035,
+        "cid": -593018822,
+        "label": "spring",
+        "type": "Object",
+        "pNid": 1744369219,
+        "itemIdx": 0
+      }
+    },
+    {
+      "node": {
+        "nid": -1844187005,
+        "cid": -593018822,
+        "label": "url",
+        "type": "Value",
+        "vid": 170871182,
+        "pNid": 657106435,
+        "itemIdx": 6
+      },
+      "val": {
+        "vid": 170871182,
+        "nsId": -38411530,
+        "name": "db.url",
+        "val": "jdbc:postgresql://localhost:5432/defaultdb",
+        "type": "String",
+        "notes": "type error",
+        "encrypted": false,
+        "createUtcMs": 1757484767384
+      }
+    },
+    {
+      "node": {
+        "nid": -1590811357,
+        "cid": -593018822,
+        "label": "username",
+        "type": "Value",
+        "vid": -1553358773,
+        "pNid": 657106435,
+        "itemIdx": 4
+      },
+      "val": {
+        "vid": -1553358773,
+        "nsId": -38411530,
+        "name": "db.user",
+        "val": "defaultuser",
+        "type": "String",
+        "encrypted": false,
+        "createUtcMs": 1757484801256
+      }
+    }
+  ],
+  "validations": []
+}

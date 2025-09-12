@@ -91,11 +91,12 @@ public class OtApiKeyHdl implements MxHandler {
       }
       return Optional.empty();
     } catch (Exception e) {
-      throw new IllegalStateException("Session cookie read error", e);
+      onError("Session cookie read error", e);
+      return Optional.empty();
     }
   }
 
-  @Override public void handle(MxExchange xc) { // these should always be HTTPS requests, or add an option to enable/disable secure cookie
+  @Override public void handle(MxExchange xc) { // TODO these should always be HTTPS requests, or add an option to enable/disable secure cookie
     try {
       var apiKey = apiKeyHeaderOf(xc);
       if (apiKey.isPresent()) {
@@ -113,7 +114,7 @@ public class OtApiKeyHdl implements MxHandler {
         cookieAuth(xc, cook.get());
         return;
       }
-      toLogin(xc); // wish there was a better way to identify API/Browser calls.
+      toLogin(xc); // wish there was a better way to identify API vs Browser calls.
     } catch (Exception e) {
       onError("API key authentication error", e);
       toLogin(xc);

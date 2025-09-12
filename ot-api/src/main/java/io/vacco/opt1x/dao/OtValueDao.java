@@ -19,7 +19,7 @@ public class OtValueDao extends MtWriteDao<io.vacco.opt1x.schema.OtValue, java.l
   public static final String fld_vid = "vid";
   public static final String fld_nsId = "nsId";
   public static final String fld_name = "name";
-  public static final String fld_value = "value";
+  public static final String fld_val = "val";
   public static final String fld_type = "type";
   public static final String fld_encrypted = "encrypted";
   public static final String fld_createUtcMs = "createUtcMs";
@@ -56,8 +56,8 @@ public class OtValueDao extends MtWriteDao<io.vacco.opt1x.schema.OtValue, java.l
     return loadWhereEq(fld_name, name);
   }
 
-  public MtFieldDescriptor fld_value() {
-    return this.dsc.getField(fld_value);
+  public MtFieldDescriptor fld_val() {
+    return this.dsc.getField(fld_val);
   }
 
   public MtFieldDescriptor fld_type() {

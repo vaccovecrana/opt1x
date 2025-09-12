@@ -40,4 +40,7 @@ val copyTs = tasks.register<Copy>("copyTs") {
 tasks.processResources {
   dependsOn(copyJs)
   dependsOn(copyTs)
+  filesMatching("ui/version") {
+    expand("projectVersion" to version)
+  }
 }

@@ -28,7 +28,7 @@ public class OtRender {
       if (current.val == null) {
         throw new IllegalStateException("Value node without val");
       }
-      return parse(current.val.value, current.val.type);
+      return parse(current.val.val, current.val.type);
     } else {
       var ch = children.getOrDefault(current.node.nid, Collections.emptyList());
       ch.sort(Comparator.comparingInt(nid -> {

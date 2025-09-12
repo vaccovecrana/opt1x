@@ -1,0 +1,1394 @@
+[
+  {
+    "name": "[B"
+  },
+  {
+    "name": "[Lcom.zaxxer.hikari.util.ConcurrentBag$IConcurrentBagEntry;"
+  },
+  {
+    "name": "[Ljava.sql.Statement;"
+  },
+  {
+    "name": "apple.security.AppleProvider",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.AESCipher$General",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.ARCFOURCipher",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.ChaCha20Cipher$ChaCha20Poly1305",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.DESCipher",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.DESedeCipher",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.DHParameters",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.GaloisCounterMode$AESGCM",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.HmacCore$HmacSHA384",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.crypto.provider.TlsMasterSecretGenerator",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.zaxxer.hikari.HikariConfig",
+    "allDeclaredFields": true,
+    "queryAllPublicMethods": true,
+    "methods": [
+      {
+        "name": "getAllowPoolSuspension",
+        "parameterTypes": []
+      },
+      {
+        "name": "getAutoCommit",
+        "parameterTypes": []
+      },
+      {
+        "name": "getCatalog",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionInitSql",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionTestQuery",
+        "parameterTypes": []
+      },
+      {
+        "name": "getConnectionTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSource",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceJNDI",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDataSourceProperties",
+        "parameterTypes": []
+      },
+      {
+        "name": "getDriverClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getExceptionOverrideClassName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getHealthCheckProperties",
+        "parameterTypes": []
+      },
+      {
+        "name": "getHealthCheckRegistry",
+        "parameterTypes": []
+      },
+      {
+        "name": "getIdleTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getInitializationFailTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "getIsolateInternalQueries",
+        "parameterTypes": []
+      },
+      {
+        "name": "getJdbcUrl",
+        "parameterTypes": []
+      },
+      {
+        "name": "getKeepaliveTime",
+        "parameterTypes": []
+      },
+      {
+        "name": "getLeakDetectionThreshold",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaxLifetime",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMaximumPoolSize",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMetricRegistry",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMetricsTrackerFactory",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMinimumIdle",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPassword",
+        "parameterTypes": []
+      },
+      {
+        "name": "getPoolName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getReadOnly",
+        "parameterTypes": []
+      },
+      {
+        "name": "getRegisterMbeans",
+        "parameterTypes": []
+      },
+      {
+        "name": "getScheduledExecutor",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSchema",
+        "parameterTypes": []
+      },
+      {
+        "name": "getThreadFactory",
+        "parameterTypes": []
+      },
+      {
+        "name": "getTransactionIsolation",
+        "parameterTypes": []
+      },
+      {
+        "name": "getUsername",
+        "parameterTypes": []
+      },
+      {
+        "name": "getValidationTimeout",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAllowPoolSuspension",
+        "parameterTypes": []
+      },
+      {
+        "name": "isAutoCommit",
+        "parameterTypes": []
+      },
+      {
+        "name": "isIsolateInternalQueries",
+        "parameterTypes": []
+      },
+      {
+        "name": "isReadOnly",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRegisterMbeans",
+        "parameterTypes": []
+      },
+      {
+        "name": "setAllowPoolSuspension",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setAutoCommit",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setCatalog",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setClass",
+        "parameterTypes": [
+          "java.lang.Class"
+        ]
+      },
+      {
+        "name": "setConnectionInitSql",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setConnectionTestQuery",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setConnectionTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setDataSource",
+        "parameterTypes": [
+          "javax.sql.DataSource"
+        ]
+      },
+      {
+        "name": "setDataSourceClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDataSourceJNDI",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setDataSourceProperties",
+        "parameterTypes": [
+          "java.util.Properties"
+        ]
+      },
+      {
+        "name": "setDriverClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setExceptionOverrideClassName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setHealthCheckProperties",
+        "parameterTypes": [
+          "java.util.Properties"
+        ]
+      },
+      {
+        "name": "setHealthCheckRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setIdleTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setInitializationFailTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setIsolateInternalQueries",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setJdbcUrl",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setKeepaliveTime",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setLeakDetectionThreshold",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setMaxLifetime",
+        "parameterTypes": [
+          "long"
+        ]
+      },
+      {
+        "name": "setMaximumPoolSize",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setMetricRegistry",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "setMetricsTrackerFactory",
+        "parameterTypes": [
+          "com.zaxxer.hikari.metrics.MetricsTrackerFactory"
+        ]
+      },
+      {
+        "name": "setMinimumIdle",
+        "parameterTypes": [
+          "int"
+        ]
+      },
+      {
+        "name": "setPassword",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setPoolName",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setReadOnly",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setRegisterMbeans",
+        "parameterTypes": [
+          "boolean"
+        ]
+      },
+      {
+        "name": "setScheduledExecutor",
+        "parameterTypes": [
+          "java.util.concurrent.ScheduledExecutorService"
+        ]
+      },
+      {
+        "name": "setSchema",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setThreadFactory",
+        "parameterTypes": [
+          "java.util.concurrent.ThreadFactory"
+        ]
+      },
+      {
+        "name": "setTransactionIsolation",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setUsername",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      },
+      {
+        "name": "setValidationTimeout",
+        "parameterTypes": [
+          "long"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.zaxxer.hikari.pool.PoolBase",
+    "fields": [
+      {
+        "name": "catalog"
+      }
+    ]
+  },
+  {
+    "name": "com.zaxxer.hikari.pool.PoolEntry",
+    "fields": [
+      {
+        "name": "state"
+      }
+    ]
+  },
+  {
+    "name": "io.rqlite.jdbc.L4Driver"
+  },
+  {
+    "name": "io.vacco.jwt.Alg",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.jwt.JwtKey",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.metolithe.changeset.MtChange",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.metolithe.changeset.MtChangeSet",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.metolithe.util.MtPage1",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.context.OtRoot",
+    "queryAllDeclaredMethods": true,
+    "methods": [
+      {
+        "name": "gson",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.context.OtService",
+    "queryAllDeclaredMethods": true,
+    "methods": [
+      {
+        "name": "adminService",
+        "parameterTypes": [
+          "io.vacco.opt1x.dao.OtDaos",
+          "io.vacco.opt1x.impl.OtApiKeyService"
+        ]
+      },
+      {
+        "name": "configService",
+        "parameterTypes": [
+          "io.vacco.opt1x.dao.OtDaos",
+          "io.vacco.opt1x.impl.OtValueService",
+          "io.vacco.opt1x.impl.OtAdminService",
+          "io.vacco.opt1x.impl.OtSealService",
+          "com.google.gson.Gson"
+        ]
+      },
+      {
+        "name": "dataSource",
+        "parameterTypes": []
+      },
+      {
+        "name": "keyService",
+        "parameterTypes": [
+          "io.vacco.opt1x.dao.OtDaos"
+        ]
+      },
+      {
+        "name": "mtJdbc",
+        "parameterTypes": [
+          "com.zaxxer.hikari.HikariDataSource",
+          "com.google.gson.Gson"
+        ]
+      },
+      {
+        "name": "otDaos",
+        "parameterTypes": [
+          "io.vacco.metolithe.query.MtJdbc"
+        ]
+      },
+      {
+        "name": "otSealService",
+        "parameterTypes": [
+          "com.google.gson.Gson",
+          "io.vacco.opt1x.impl.OtApiKeyService"
+        ]
+      },
+      {
+        "name": "otValueService",
+        "parameterTypes": [
+          "io.vacco.opt1x.dao.OtDaos",
+          "io.vacco.opt1x.impl.OtAdminService",
+          "io.vacco.opt1x.impl.OtSealService"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.context.OtWeb",
+    "queryAllDeclaredMethods": true,
+    "methods": [
+      {
+        "name": "otApi",
+        "parameterTypes": [
+          "io.vacco.opt1x.impl.OtSealService",
+          "io.vacco.opt1x.impl.OtApiKeyService",
+          "io.vacco.opt1x.impl.OtAdminService",
+          "io.vacco.opt1x.impl.OtValueService",
+          "io.vacco.opt1x.impl.OtConfigService",
+          "com.google.gson.Gson"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtAdminOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtApiKeyOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtConfigOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtInitOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtJwtKey",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtKeyAccess",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtList",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtResult",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtUnsealOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtValidation",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtValueOp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.dto.OtVar",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtApiKey",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtConfig",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtGroup",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtGroupNs",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtGroupRole",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtKeyGroup",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtNamespace",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtNode",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtNodeFormat",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtNodeType",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtValue",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtValueType",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.opt1x.schema.OtValueVer",
+    "allDeclaredFields": true,
+    "allPublicFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.spring.OtPropSrc",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.spring.OtSpringApp",
+    "allDeclaredFields": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.opt1x.web.OtApiHdl",
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true,
+    "allDeclaredFields": true
+  },
+  {
+    "name": "io.vacco.ronove.RvAttachmentParam",
+    "methods": [
+      {
+        "name": "value",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "io.vacco.shax.ShaxServiceProvider"
+  },
+  {
+    "name": "io.vacco.shax.logging.ShLogConfig",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "jakarta.ws.rs.PathParam",
+    "methods": [
+      {
+        "name": "value",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "jakarta.ws.rs.QueryParam",
+    "methods": [
+      {
+        "name": "value",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Boolean",
+    "methods": [
+      {
+        "name": "valueOf",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Class",
+    "methods": [
+      {
+        "name": "getRecordComponents",
+        "parameterTypes": []
+      },
+      {
+        "name": "isRecord",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Integer",
+    "methods": [
+      {
+        "name": "valueOf",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.lang.Object",
+    "allDeclaredFields": true
+  },
+  {
+    "name": "java.lang.Thread",
+    "fields": [
+      {
+        "name": "threadLocalRandomProbe"
+      }
+    ]
+  },
+  {
+    "name": "java.lang.reflect.RecordComponent",
+    "methods": [
+      {
+        "name": "getName",
+        "parameterTypes": []
+      },
+      {
+        "name": "getType",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.security.AlgorithmParametersSpi"
+  },
+  {
+    "name": "java.security.KeyStoreSpi"
+  },
+  {
+    "name": "java.security.SecureRandomParameters"
+  },
+  {
+    "name": "java.sql.Date"
+  },
+  {
+    "name": "java.util.ArrayList",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.util.LinkedHashMap",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.ForkJoinTask",
+    "fields": [
+      {
+        "name": "aux"
+      },
+      {
+        "name": "status"
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.atomic.AtomicBoolean",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.atomic.AtomicMarkableReference",
+    "fields": [
+      {
+        "name": "pair"
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.atomic.AtomicReference",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.atomic.Striped64",
+    "fields": [
+      {
+        "name": "base"
+      },
+      {
+        "name": "cellsBusy"
+      }
+    ]
+  },
+  {
+    "name": "javax.security.auth.x500.X500Principal",
+    "fields": [
+      {
+        "name": "thisX500Name"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "sun.security.x509.X500Name"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "jdk.internal.misc.Unsafe"
+  },
+  {
+    "name": "org.h2.Driver"
+  },
+  {
+    "name": "sun.security.pkcs12.PKCS12KeyStore",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.pkcs12.PKCS12KeyStore$DualFormatPKCS12",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.DSA$SHA224withDSA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.DSA$SHA256withDSA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.NativePRNG",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.security.SecureRandomParameters"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA2$SHA224",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA2$SHA256",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA5$SHA384",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA5$SHA512",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.X509Factory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.rsa.PSSParameters",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.rsa.RSAKeyFactory$Legacy",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.rsa.RSAPSSSignature",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.rsa.RSASignature$SHA224withRSA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.ssl.KeyManagerFactoryImpl$SunX509",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.ssl.SSLContextImpl$DefaultSSLContext",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.ssl.TrustManagerFactoryImpl$PKIXFactory",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.AuthorityInfoAccessExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.AuthorityKeyIdentifierExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.BasicConstraintsExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.CRLDistributionPointsExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.CertificatePoliciesExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.ExtendedKeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.IssuerAlternativeNameExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.KeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.NetscapeCertTypeExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.PrivateKeyUsageExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.SubjectAlternativeNameExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.x509.SubjectKeyIdentifierExtension",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Boolean",
+          "java.lang.Object"
+        ]
+      }
+    ]
+  }
+]

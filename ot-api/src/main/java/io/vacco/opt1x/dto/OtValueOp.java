@@ -11,6 +11,9 @@ public class OtValueOp extends OtResult {
   /** input/output parameter */
   public OtValue val;
 
+  /** output parameter, list of value versions */
+  public List<OtValueVer> valVersions = new ArrayList<>();
+
   /** Output parameters, used during raw value editing. */
   public MtPage1<OtValue, String> valPage;
   public OtNamespace namespace;
