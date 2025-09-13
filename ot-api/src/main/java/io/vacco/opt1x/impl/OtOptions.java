@@ -23,7 +23,7 @@ public class OtOptions {
     kOidcClientSecret = "--oidc-client-secret",
     kOidcRedirectUri  = "--oidc-redirect-uri",
     kOidcScopes       = "--oidc-scopes",
-    kAuditWebhookUrl  = "--audit-webhook-url";
+    kOtelCollectorUrl = "--audit-webhook-url";
 
   public static OtLogFormat logFormat = OtLogFormat.text;
   public static OtLogLevel  logLevel  = OtLogLevel.info;
@@ -40,7 +40,7 @@ public class OtOptions {
   public static String      oidcRedirectUri = "http://localhost:7070/oidc/callback"; // Default, overridable
   public static String      oidcScopes = "openid profile email groups"; // Default, space-separated
 
-  public static String      auditWebhookUrl; // If set, enables auditing
+  public static String      otelCollectorUrl; // If set, enables OpenTelemetry auditing
 
   public static String usage() {
     return String.join("\n",
@@ -55,13 +55,14 @@ public class OtOptions {
       "  --shares             [number] Number of shares. Default: " + shares,
       "  --threshold          [number] Number of shares to unseal. Default: " + threshold,
       "  --log-format         [string] Log output format ('text' or 'json'). Default: " + logFormat,
-      "  --log-level          [string] Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel,
-      "  --oidc-issuer        [string] OIDC issuer URL (autodiscovery endpoint). Enables OIDC if provided",
-      "  --oidc-client-id     [string] OIDC client ID. Required if OIDC enabled",
-      "  --oidc-client-secret [string] OIDC client secret. Required if OIDC enabled",
-      "  --oidc-redirect-uri  [string] OIDC redirect URI. Default: " + oidcRedirectUri,
-      "  --oidc-scopes        [string] OIDC scopes (space-separated). Default: '" + oidcScopes + "'",
-      "  --audit-webhook-url  [string] Webhook URL for audit events. Enables auditing if provided"
+      "  --log-level          [string] Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel // ,
+      // TODO features to be implemented
+      // "  --oidc-issuer        [string] OIDC issuer URL (autodiscovery endpoint). Enables OIDC if provided",
+      // "  --oidc-client-id     [string] OIDC client ID. Required if OIDC enabled",
+      // "  --oidc-client-secret [string] OIDC client secret. Required if OIDC enabled",
+      // "  --oidc-redirect-uri  [string] OIDC redirect URI. Default: " + oidcRedirectUri,
+      // "  --oidc-scopes        [string] OIDC scopes (space-separated). Default: '" + oidcScopes + "'",
+      // "  --otel-collector-url [string] OpenTelemetry Collector URL for audit events. Enables auditing if provided"
     );
   }
 
@@ -95,7 +96,7 @@ public class OtOptions {
     var vOidcClientSecret = argIdx.get(kOidcClientSecret);
     var vOidcRedirectUri = argIdx.get(kOidcRedirectUri);
     var vOidcScopes = argIdx.get(kOidcScopes);
-    var vAuditWebhookUrl = argIdx.get(kAuditWebhookUrl);
+    var vOtelCollectorUrl = argIdx.get(kOtelCollectorUrl);
 
     jdbcUrl = vDbUrl != null ? vDbUrl : jdbcUrl;
     dbSeed = vDbSeed != null ? Long.parseLong(vDbSeed) : dbSeed;
@@ -113,7 +114,7 @@ public class OtOptions {
     oidcClientSecret = vOidcClientSecret != null ? vOidcClientSecret : oidcClientSecret;
     oidcRedirectUri = vOidcRedirectUri != null ? vOidcRedirectUri : oidcRedirectUri;
     oidcScopes = vOidcScopes != null ? vOidcScopes : oidcScopes;
-    auditWebhookUrl = vAuditWebhookUrl != null ? vAuditWebhookUrl : auditWebhookUrl;
+    otelCollectorUrl = vOtelCollectorUrl != null ? vOtelCollectorUrl : otelCollectorUrl;
 
     if (oidcIssuer != null) {
       if (oidcClientId == null || oidcClientSecret == null) {

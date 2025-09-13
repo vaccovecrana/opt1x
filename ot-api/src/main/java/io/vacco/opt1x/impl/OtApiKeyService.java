@@ -61,9 +61,12 @@ public class OtApiKeyService {
       return Optional.empty();
     }
     var hash = sha256Of(key);
-    return daos.akd.loadWhereHashEq(hash)
-      .stream()
-      .findFirst();
+    var ok = daos.akd.loadWhereHashEq(hash).stream().findFirst();
+    if (ok.isPresent()) {
+      ok.get().accessUtcMs = System.currentTimeMillis();
+      daos.akd.update(ok.get());
+    }
+    return ok;
   }
 
   public OtApiKeyOp validateParentApiKey(OtApiKeyOp cmd) {
