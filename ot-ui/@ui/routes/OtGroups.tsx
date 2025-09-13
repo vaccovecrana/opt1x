@@ -29,7 +29,7 @@ class OtGroups extends React.Component<OtGroupsProps, OtGroupsState> {
     return (
       <div>
         <nav>
-          <ul><li><h1>Groups</h1></li></ul>
+          <ul><li><h1>Key Groups</h1></li></ul>
         </nav>
         {this.state.access && (
           <table class="striped">

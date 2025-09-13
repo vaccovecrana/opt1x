@@ -30,6 +30,7 @@ dependencies {
   api("com.h2database:h2:2.3.232")
   api("io.rqlite:rqlite-jdbc:8.42.0.3")
   api("com.zaxxer:HikariCP:5.0.1")
+  api(project(":ot-ui"))
 
   testImplementation("io.vacco.metolithe:mt-codegen:${mtVer}")
 }

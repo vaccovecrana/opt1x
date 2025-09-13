@@ -78,8 +78,8 @@ class OtApiKey extends React.Component<OtApiKeyProps, OtApiKeyState> {
         )}
         {this.state.access && (
           <div className="grid">
-            {this.renderCard("Groups", this.state.access.groupTree?.length, "Accessible groups")}
-            {this.renderCard("Namespaces", this.state.access.namespaceTree?.length, "Accessible namespaces")}
+            {this.renderCard("Groups", this.state.access.groupTree?.length || 0, "Accessible groups")}
+            {this.renderCard("Namespaces", this.state.access.namespaceTree?.length || 0, "Accessible namespaces")}
           </div>
         )}
       </div>

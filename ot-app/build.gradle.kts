@@ -5,7 +5,6 @@ plugins {
 
 dependencies {
   implementation(project(":ot-api"))
-  implementation(project(":ot-ui"))
 }
 
 application { mainClass.set("io.vacco.opt1x.OtMain") }

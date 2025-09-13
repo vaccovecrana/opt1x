@@ -146,7 +146,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
             />
           </div>
         )}
-        {this.state.cfgList && (
+        {this.state.cfgList && this.state.cfgList.page.items.length > 0 && (
           <table class="striped">
             {headers(["Name", "Created", "Actions"])}
             <tbody>

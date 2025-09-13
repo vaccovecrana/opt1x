@@ -1,6 +1,6 @@
 import * as React from "preact/compat"
 
-import { IcnCode, IcnKey, IcnGroup, IcnLogo, IcnLogout } from "@ui/components/UiIcons"
+import { IcnCode, IcnFilters, IcnKey, IcnLogo, IcnLogout } from "@ui/components/UiIcons"
 import { UiContext } from "@ui/store"
 import { avatar } from "@ui/components/Ui"
 import { logout, uiApiKeys, uiGroups, uiNs, uiRoot } from "@ui/routes"
@@ -31,7 +31,7 @@ const UiMenu = () => {
                 )}
                 <li>
                   <a href={uiGroups} class="secondary">
-                    <IcnGroup height={32} /><small class="ml8">Key Groups</small>
+                    <IcnFilters height={32} /><small class="ml8">Key Groups</small>
                   </a>
                 </li>
                 <li>
@@ -72,7 +72,7 @@ const UiMenu = () => {
             </ul>
             <ul>
               {apiKey && !apiKey.leaf && (<li><a href={uiApiKeys}><IcnKey height={32} /></a></li>)}
-              <li><a href={uiGroups}><IcnGroup height={32} /></a></li>
+              <li><a href={uiGroups}><IcnFilters height={32} /></a></li>
               <li><a href={uiNs}><IcnCode height={32} /></a></li>
               <li><a class="ptr" onClick={() => logout()}><IcnLogout height={32} /></a></li>
               {s.state.apiKey && avatar(s.state.apiKey, false)}

@@ -9,3 +9,5 @@ bin/
 
 .vscode/
 node_modules/
+
+*.mv.db

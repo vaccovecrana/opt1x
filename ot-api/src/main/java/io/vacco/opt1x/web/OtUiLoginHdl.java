@@ -12,14 +12,12 @@ import static java.lang.String.format;
 
 public class OtUiLoginHdl implements MxHandler {
 
-  private final OtAdminService  admService;
   private final OtApiKeyService keyService;
   private final OtSealService   sealService;
   private final Gson            g;
 
-  public OtUiLoginHdl(OtAdminService admService, OtApiKeyService keyService,
+  public OtUiLoginHdl(OtApiKeyService keyService,
                       OtSealService sealService, Gson g) {
-    this.admService = Objects.requireNonNull(admService);
     this.keyService = Objects.requireNonNull(keyService);
     this.sealService = Objects.requireNonNull(sealService);
     this.g = Objects.requireNonNull(g);

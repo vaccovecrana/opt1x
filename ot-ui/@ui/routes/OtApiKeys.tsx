@@ -99,7 +99,7 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
               onClick={() => this.saveKey()} />
           </div>
         )}
-        {this.state.keys && (
+        {this.state.keys && this.state.keys.page.items.length > 0 && (
           <div>
             <table class="striped">
               {headers(["Name", "Created", "Management"])}

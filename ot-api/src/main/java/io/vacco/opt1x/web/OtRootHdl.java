@@ -73,7 +73,7 @@ public class OtRootHdl extends MxRouter {
     var apiAdpHdl = new RvMxAdapter<>(apiHdl, errorHdl, g::fromJson, g::toJson).build();
     var keyApiHdl = new OtApiKeyHdl(ss, ks, apiAdpHdl, g);
     var keyUiHdl = new OtApiKeyHdl(ss, ks, uiHdl, g);
-    var loginHdl = new OtUiLoginHdl(as, ks, ss, g);
+    var loginHdl = new OtUiLoginHdl(ks, ss, g);
 
     // UI static resources
     get(indexCss, uiHdl);
