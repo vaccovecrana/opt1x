@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static io.vacco.opt1x.schema.OtConfig.config;
 import static io.vacco.opt1x.dto.OtConfigOp.configOp;
 import static io.vacco.opt1x.schema.OtConstants.*;
-import static io.vacco.opt1x.impl.OtOptions.onError;
+import static io.vacco.opt1x.impl.OtOptions.*;
 import static java.lang.String.format;
 import static java.util.Objects.requireNonNull;
 
@@ -144,9 +144,13 @@ public class OtConfigService {
   public OtConfigOp writeTree(OtConfigOp cmd, Map<String, OtVar> treeIdx) {
     try {
       daos.onTxResult(cmd, daos.ndd.sql().tx((tx, conn) -> {
-        daos.ndd.deleteWhereCidEq(cmd.cfg.cid);
-        for (var e : treeIdx.entrySet()) {
-          daos.ndd.save(e.getValue().node);
+        var nl0 = daos.ndd.loadWhereCidEq(cmd.cfg.cid);
+        nl0.sort(Comparator.comparingInt(n -> n.itemIdx));
+        for (var n : nl0.reversed()) {
+          daos.ndd.delete(n);
+        }
+        for (var v : treeIdx.values()) {
+          daos.ndd.save(v.node);
         }
       }));
       return cmd;
@@ -230,6 +234,7 @@ public class OtConfigService {
       }
       daos.onTxResult(cmd, daos.cfd.sql().tx((tx, conn) -> {
         var nodes = daos.ndd.loadWhereCidEq(clone.cid);
+        nodes.sort(Comparator.comparingInt(n -> n.itemIdx));
         if (nodes.isEmpty()) {
           tx.rollback();
           cmd.withError("Config clone - no config nodes were found");
@@ -242,7 +247,6 @@ public class OtConfigService {
           return;
         }
         var idIdx = new HashMap<Integer, Integer>();
-        nodes.sort(Comparator.comparingInt(n -> n.itemIdx));
         for (var node : nodes) {
           var oldId = node.nid;
           node.cid = createCmd.cfg.cid;
@@ -323,6 +327,31 @@ public class OtConfigService {
         return error(new RvResponse<>(), Response.Status.BAD_REQUEST, cmd.error);
       }
       return render(cmd, fmt);
+    } catch (Exception e) {
+      return error(new RvResponse<>(), Response.Status.BAD_REQUEST, e.getMessage());
+    }
+  }
+
+  public RvResponse<Object> render(OtApiKey key, String nsName, String cfgName, String otFormat, boolean encrypted) {
+    try {
+      var configs = daos.cfd.loadPageItems(
+        daos.cfd.query()
+          .innerJoin(daos.nsd.dsc, daos.cfd.dsc)
+          .eq(daos.nsd.fld_name(), nsName)
+          .and()
+          .eq(daos.cfd.fld_name(), cfgName)
+      );
+      if (configs.isEmpty()) {
+        throw new IllegalArgumentException(format(
+          "Config [%s] not found in namespace [%s]",
+          cfgName, nsName
+        ));
+      }
+      if (configs.size() > 1) {
+        onWarning("Named namespace/config request with multiple matches: {}", null, configs);
+      }
+      var cfg = configs.getFirst();
+      return render(key, cfg.cid, otFormat, encrypted);
     } catch (Exception e) {
       return error(new RvResponse<>(), Response.Status.BAD_REQUEST, e.getMessage());
     }

@@ -2,6 +2,7 @@ package io.vacco.opt1x;
 
 import com.google.gson.Gson;
 import com.zaxxer.hikari.HikariDataSource;
+import io.vacco.murmux.http.MxStatus;
 import io.vacco.opt1x.context.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.impl.*;
@@ -494,6 +495,15 @@ public class OtServiceTest {
             OtOptions.log.info(renderRes.body.toString());
           }
         }
+      });
+
+      it("Renders a named configuration", () -> {
+        var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
+        var cfg = cs.daos.cfd.loadWhereNameEq(testConfig).getFirst();
+        var ns = as.daos.nsd.loadExisting(cfg.nsId);
+        var raw = cs.render(lk, ns.name, cfg.name, OtNodeFormat.props.name(), true);
+        assertEquals(MxStatus._200.code, raw.status.getStatusCode());
+        OtOptions.log.info(raw.body.toString());
       });
     });
 

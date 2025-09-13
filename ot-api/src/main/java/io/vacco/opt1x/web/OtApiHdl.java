@@ -110,65 +110,65 @@ public class OtApiHdl {
     return admService.accessNamespacesOf(myKey.kid, nsId);
   }
 
-  @GET @Path(apiV1NsNsIdValue)
-  public OtValueOp apiV1NsNsIdValueGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                       @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                       @QueryParam(qPageSize) int pageSize,
-                                       @QueryParam(qNext) String next) {
+  @GET @Path(apiV1NsNsIdVal)
+  public OtValueOp apiV1NsNsIdValGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                     @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                     @QueryParam(qPageSize) int pageSize,
+                                     @QueryParam(qNext) String next) {
     return valService.valuesOf(myKey.kid, nsId, pageSize, next);
   }
 
-  @POST @Path(apiV1NsNsIdValue)
-  public OtValueOp apiV1NsNsIdValuePost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                        @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                        @BeanParam OtValueOp cmd) {
+  @POST @Path(apiV1NsNsIdVal)
+  public OtValueOp apiV1NsNsIdValPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                      @PathParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                      @BeanParam OtValueOp cmd) {
     if (cmd.val != null) {
       cmd.val.nsId = nsId;
     }
     return valService.upsertValue(cmd.withKey(myKey));
   }
 
-  @GET @Path(apiV1Value)
-  public OtValueOp apiV1ValueGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
+  @GET @Path(apiV1Val)
+  public OtValueOp apiV1ValGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey) {
     return valService.accessibleValuesFor(myKey);
   }
 
-  @DELETE @Path(apiV1ValueVid)
-  public OtValueOp apiV1ValueVidDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                       @QueryParam(OtValueDao.fld_vid) Integer vid) {
+  @DELETE @Path(apiV1ValVid)
+  public OtValueOp apiV1ValVidDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                     @QueryParam(OtValueDao.fld_vid) Integer vid) {
     return valService.deleteValue(myKey, vid);
   }
 
-  @GET @Path(apiV1ValueVidVer)
-  public OtValueOp apiV1ValueVidVerGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                       @PathParam(OtValueDao.fld_vid) Integer vid) {
+  @GET @Path(apiV1ValVidVer)
+  public OtValueOp apiV1ValVidVerGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                     @PathParam(OtValueDao.fld_vid) Integer vid) {
     return valService.versionsOf(myKey, vid);
   }
 
-  @PATCH @Path(apiV1ValueVerVvId)
-  public OtValueOp apiV1ValueVerVvIdPatch(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                          @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
+  @PATCH @Path(apiV1ValVerVvId)
+  public OtValueOp apiV1ValVerVvIdPatch(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                        @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
     return valService.restoreValueVersion(myKey, vvId);
   }
 
-  @DELETE @Path(apiV1ValueVerVvId)
-  public OtValueOp apiV1ValueVerVvIdDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                           @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
+  @DELETE @Path(apiV1ValVerVvId)
+  public OtValueOp apiV1ValVerVvIdDelete(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                         @PathParam(OtValueVerDao.fld_vvId) Integer vvId) {
     return valService.deleteValueVersion(myKey, vvId);
   }
 
-  @GET @Path(apiV1Config)
-  public OtList<OtConfig, String> apiV1ConfigGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                 @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                                 @QueryParam(qPageSize) int pageSize,
-                                                 @QueryParam(qNext) String next) {
+  @GET @Path(apiV1Cfg)
+  public OtList<OtConfig, String> apiV1CfgGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                              @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                              @QueryParam(qPageSize) int pageSize,
+                                              @QueryParam(qNext) String next) {
     return cfgService.configsOf(myKey.kid, nsId, pageSize, next);
   }
 
-  @POST @Path(apiV1Config)
-  public OtConfigOp apiV1ConfigPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                    @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
-                                    @BeanParam OtConfigOp cmd) {
+  @POST @Path(apiV1Cfg)
+  public OtConfigOp apiV1CfgPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                 @QueryParam(OtNamespaceDao.fld_nsId) Integer nsId,
+                                 @BeanParam OtConfigOp cmd) {
     cmd.key = myKey;
     if (cmd.cfg != null) {
       cmd.cfg.nsId = nsId;
@@ -176,10 +176,10 @@ public class OtApiHdl {
     return cmd.cfgClone ? cfgService.clone(cmd) : cfgService.createConfig(cmd);
   }
 
-  @GET @Path(apiV1ConfigCid)
-  public OtConfigOp apiV1ConfigCidGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                      @PathParam(OtConfigDao.fld_cid) Integer cid,
-                                      @QueryParam(OtValueDao.fld_encrypted) boolean encrypted) {
+  @GET @Path(apiV1CfgCid)
+  public OtConfigOp apiV1CfgCidGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                   @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                   @QueryParam(OtValueDao.fld_encrypted) boolean encrypted) {
     var cmd = new OtConfigOp();
     cmd.key = myKey;
     cmd.cfg = new OtConfig();
@@ -188,10 +188,10 @@ public class OtApiHdl {
     return cfgService.load(cmd);
   }
 
-  @POST @Path(apiV1ConfigCid)
-  public OtConfigOp apiV1ConfigCidPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                       @PathParam(OtConfigDao.fld_cid) Integer cid,
-                                       @BeanParam OtConfigOp cmd) {
+  @POST @Path(apiV1CfgCid)
+  public OtConfigOp apiV1CfgCidPost(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                    @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                    @BeanParam OtConfigOp cmd) {
     cmd.key = myKey;
     if (cmd.vars != null && cmd.cfg != null) {
       cmd.cfg.cid = cid;
@@ -202,12 +202,29 @@ public class OtApiHdl {
     return cfgService.update(cmd);
   }
 
-  @GET @Path(apiV1ConfigIdFmt)
-  public RvResponse<Object> apiV1ConfigIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
-                                                @PathParam(OtConfigDao.fld_cid) Integer cid,
+  @GET @Path(apiV1CfgIdFmt)
+  public RvResponse<Object> apiV1CfgIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                             @PathParam(OtConfigDao.fld_cid) Integer cid,
+                                             @PathParam(kFmt) String otFmt,
+                                             @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
+    return cfgService.render(myKey, cid, otFmt, encrypted == null || encrypted);
+  }
+
+  @GET @Path(apiV1CfgNsCfg)
+  public RvResponse<Object> apiV1CfgNsCfgGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                             @PathParam(kNsName) String nsName,
+                                             @PathParam(kCfgName) String cfgName,
+                                             @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
+    return cfgService.render(myKey, nsName, cfgName, OtNodeFormat.json.toString(), encrypted);
+  }
+
+  @GET @Path(apiV1CfgNsCfgFmt)
+  public RvResponse<Object> apiV1CfgNsCfgFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+                                                @PathParam(kNsName) String nsName,
+                                                @PathParam(kCfgName) String cfgName,
                                                 @PathParam(kFmt) String otFmt,
                                                 @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
-    return cfgService.render(myKey, cid, otFmt, encrypted == null || encrypted);
+    return cfgService.render(myKey, nsName, cfgName, otFmt, encrypted);
   }
 
 }

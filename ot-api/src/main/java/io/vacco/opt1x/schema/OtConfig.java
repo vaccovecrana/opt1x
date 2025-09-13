@@ -27,4 +27,8 @@ import io.vacco.metolithe.annotations.*;
     return c;
   }
 
+  @Override public String toString() {
+    return String.format("%d %s", cid, name);
+  }
+
 }

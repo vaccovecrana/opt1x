@@ -8,10 +8,10 @@ import static io.vacco.opt1x.schema.OtConstants.*;
 
 public class OtSpringApp {
 
-  public String          name;  // e.g., "flooper" or "application"
-  public List<String>    profiles;     // e.g., ["dev", "stage"] or ["default"]
-  public OtNodeFormat    format;       // e.g., "json", "yaml", "properties"
-  public String          label;        // e.g., "main" or null if not provided
+  public String          name;      // e.g., "flooper" or "application"
+  public List<String>    profiles;  // e.g., ["dev", "stage"] or ["default"]
+  public OtNodeFormat    format;    // e.g., "json", "yaml", "properties"
+  public String          label;     // e.g., "main" or null if not provided
   public String          version;
   public List<OtPropSrc> propertySources;
 

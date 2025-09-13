@@ -3,7 +3,7 @@ import { RenderableProps } from "preact"
 
 import { IcnSave } from "@ui/components/UiIcons"
 import { lockUi, UiContext, UiStore } from "@ui/store"
-import { apiV1ConfigCidGet, apiV1ConfigCidPost, apiV1ValueGet, OtConfigOp, OtNodeType, OtValueOp, OtVar } from "@ui/rpc"
+import { apiV1CfgCidGet, apiV1CfgCidPost, apiV1ValGet, OtConfigOp, OtNodeType, OtValueOp, OtVar } from "@ui/rpc"
 import { NodeAdapter, NodeType, TreeEditor } from "@ui/tree-editor/UiTree"
 import { rpcUiHld } from "@ui/routes"
 import { boxResult } from "@ui/components/Ui"
@@ -87,8 +87,8 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
     rpcUiHld(
       lockUi(true, d)
         .then(() => Promise.all([
-          apiV1ValueGet(),
-          apiV1ConfigCidGet(this.props.cid, true)
+          apiV1ValGet(),
+          apiV1CfgCidGet(this.props.cid, true)
         ]))
         .then(([valOp, cfgOp]) => {
           const [root, mxIdx] = this.readTree(cfgOp)
@@ -104,7 +104,7 @@ class OtConfig extends React.Component<OtConfigProps, OtConfigState> implements 
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1ConfigCidPost(this.props.cid, this.state.cfgOp))
+        .then(() => apiV1CfgCidPost(this.props.cid, this.state.cfgOp))
         .then(cfgOp => {
           if (!cfgOp.error) {
             const [root, mxIdx] = this.readTree(cfgOp)

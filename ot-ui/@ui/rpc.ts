@@ -234,7 +234,7 @@ export const apiV1GroupIdDelete = (gid: number): Promise<OtAdminOp> => {
   )
 }
 
-export const apiV1ValueVerVvIdDelete = (vvId: number): Promise<OtValueOp> => {
+export const apiV1ValVerVvIdDelete = (vvId: number): Promise<OtValueOp> => {
   let path = "/api/v1/value/version/{vvId}"
   path = path.replace("{ vvId }".replace(/\s+/g, ""), vvId.toString())
   return doJsonIo(path, "DELETE",
@@ -245,7 +245,7 @@ export const apiV1ValueVerVvIdDelete = (vvId: number): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ValueVidDelete = (vid: number): Promise<OtValueOp> => {
+export const apiV1ValVidDelete = (vid: number): Promise<OtValueOp> => {
   let path = "/api/v1/value/{vid}"
   const qParams = new URLSearchParams()
   if (vid) {
@@ -260,7 +260,7 @@ export const apiV1ValueVidDelete = (vid: number): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ConfigGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtConfig, string>> => {
+export const apiV1CfgGet = (nsId: number, pageSize: number, next: string): Promise<OtList<OtConfig, string>> => {
   let path = "/api/v1/config"
   const qParams = new URLSearchParams()
   if (nsId) {
@@ -281,7 +281,42 @@ export const apiV1ConfigGet = (nsId: number, pageSize: number, next: string): Pr
   )
 }
 
-export const apiV1ConfigCidGet = (cid: number, encrypted: boolean): Promise<OtConfigOp> => {
+export const apiV1CfgNsCfgGet = (nsName: string, cfgName: string, encrypted: boolean): Promise<Object> => {
+  let path = "/api/v1/config/of/{nsName}/{cfgName}"
+  path = path.replace("{ nsName }".replace(/\s+/g, ""), nsName.toString())
+  path = path.replace("{ cfgName }".replace(/\s+/g, ""), cfgName.toString())
+  const qParams = new URLSearchParams()
+  if (encrypted) {
+    qParams.append("encrypted", encrypted.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1CfgNsCfgFmtGet = (nsName: string, cfgName: string, fmt: string, encrypted: boolean): Promise<Object> => {
+  let path = "/api/v1/config/of/{nsName}/{cfgName}/{fmt}"
+  path = path.replace("{ nsName }".replace(/\s+/g, ""), nsName.toString())
+  path = path.replace("{ cfgName }".replace(/\s+/g, ""), cfgName.toString())
+  path = path.replace("{ fmt }".replace(/\s+/g, ""), fmt.toString())
+  const qParams = new URLSearchParams()
+  if (encrypted) {
+    qParams.append("encrypted", encrypted.toString())
+  }
+  path = `${path}?${qParams.toString()}`
+  return doJsonIo(path, "GET",
+      undefined
+    ,
+    new Map(),
+    undefined
+  )
+}
+
+export const apiV1CfgCidGet = (cid: number, encrypted: boolean): Promise<OtConfigOp> => {
   let path = "/api/v1/config/{cid}"
   path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
   const qParams = new URLSearchParams()
@@ -297,7 +332,7 @@ export const apiV1ConfigCidGet = (cid: number, encrypted: boolean): Promise<OtCo
   )
 }
 
-export const apiV1ConfigIdFmtGet = (cid: number, fmt: string, encrypted: boolean): Promise<Object> => {
+export const apiV1CfgIdFmtGet = (cid: number, fmt: string, encrypted: boolean): Promise<Object> => {
   let path = "/api/v1/config/{cid}/{fmt}"
   path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
   path = path.replace("{ fmt }".replace(/\s+/g, ""), fmt.toString())
@@ -384,7 +419,7 @@ export const apiV1NsNsIdGet = (nsId: number): Promise<OtKeyAccess> => {
   )
 }
 
-export const apiV1NsNsIdValueGet = (nsId: number, pageSize: number, next: string): Promise<OtValueOp> => {
+export const apiV1NsNsIdValGet = (nsId: number, pageSize: number, next: string): Promise<OtValueOp> => {
   let path = "/api/v1/ns/{nsId}/value"
   path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
   const qParams = new URLSearchParams()
@@ -403,7 +438,7 @@ export const apiV1NsNsIdValueGet = (nsId: number, pageSize: number, next: string
   )
 }
 
-export const apiV1ValueGet = (): Promise<OtValueOp> => {
+export const apiV1ValGet = (): Promise<OtValueOp> => {
   let path = "/api/v1/value"
   return doJsonIo(path, "GET",
       undefined
@@ -413,7 +448,7 @@ export const apiV1ValueGet = (): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ValueVidVerGet = (vid: number): Promise<OtValueOp> => {
+export const apiV1ValVidVerGet = (vid: number): Promise<OtValueOp> => {
   let path = "/api/v1/value/{vid}/version"
   path = path.replace("{ vid }".replace(/\s+/g, ""), vid.toString())
   return doJsonIo(path, "GET",
@@ -424,7 +459,7 @@ export const apiV1ValueVidVerGet = (vid: number): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ValueVerVvIdPatch = (vvId: number): Promise<OtValueOp> => {
+export const apiV1ValVerVvIdPatch = (vvId: number): Promise<OtValueOp> => {
   let path = "/api/v1/value/version/{vvId}"
   path = path.replace("{ vvId }".replace(/\s+/g, ""), vvId.toString())
   return doJsonIo(path, "PATCH",
@@ -435,7 +470,7 @@ export const apiV1ValueVerVvIdPatch = (vvId: number): Promise<OtValueOp> => {
   )
 }
 
-export const apiV1ConfigPost = (nsId: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
+export const apiV1CfgPost = (nsId: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
   let path = "/api/v1/config"
   const qParams = new URLSearchParams()
   if (nsId) {
@@ -450,7 +485,7 @@ export const apiV1ConfigPost = (nsId: number, arg2: OtConfigOp): Promise<OtConfi
   )
 }
 
-export const apiV1ConfigCidPost = (cid: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
+export const apiV1CfgCidPost = (cid: number, arg2: OtConfigOp): Promise<OtConfigOp> => {
   let path = "/api/v1/config/{cid}"
   path = path.replace("{ cid }".replace(/\s+/g, ""), cid.toString())
   return doJsonIo(path, "POST",
@@ -501,7 +536,7 @@ export const apiV1NsPost = (arg1: OtAdminOp): Promise<OtAdminOp> => {
   )
 }
 
-export const apiV1NsNsIdValuePost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
+export const apiV1NsNsIdValPost = (nsId: number, arg2: OtValueOp): Promise<OtValueOp> => {
   let path = "/api/v1/ns/{nsId}/value"
   path = path.replace("{ nsId }".replace(/\s+/g, ""), nsId.toString())
   return doJsonIo(path, "POST",

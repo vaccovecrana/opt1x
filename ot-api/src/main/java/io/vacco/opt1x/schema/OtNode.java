@@ -31,7 +31,10 @@ import io.vacco.metolithe.annotations.*;
   public Integer itemIdx;
 
   @Override public String toString() {
-    return String.format("(%s) %s -> %d", pNid == null ? 'r' : 'c', label, vid);
+    return String.format(
+      "(%s %d) %s -> %d",
+      pNid == null ? 'r' : 'c', itemIdx, label, vid
+    );
   }
 
 }

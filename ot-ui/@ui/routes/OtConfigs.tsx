@@ -3,7 +3,7 @@ import { RenderableProps } from "preact"
 
 import { boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd, IcnCopy, IcnTree } from "@ui/components/UiIcons"
-import { apiV1ConfigGet, apiV1ConfigPost, apiV1NsNsIdGet, OtConfig, OtConfigOp, OtKeyAccess, OtList } from "@ui/rpc"
+import { apiV1CfgGet, apiV1CfgPost, apiV1NsNsIdGet, OtConfig, OtConfigOp, OtKeyAccess, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
 import { rpcUiHld, uiConfigsNsIdCidFmt, uiConfigsNsIdFmt } from "@ui/routes"
 
@@ -38,7 +38,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1ConfigGet(this.props.nsId, 25, this.state.cfgList?.page?.nx1))
+        .then(() => apiV1CfgGet(this.props.nsId, 25, this.state.cfgList?.page?.nx1))
         .then(cfgList => this.setState({...this.state, cfgList})),
       d
     )
@@ -67,7 +67,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1ConfigPost(this.state.cpyOp.cfg.nsId, this.state.cpyOp))
+        .then(() => apiV1CfgPost(this.state.cpyOp.cfg.nsId, this.state.cpyOp))
         .then(cpyOp => {
           if (!cpyOp.error && cpyOp.cfg.cid) {
             window.location.href = uiConfigsNsIdFmt(cpyOp.cfg.nsId)
@@ -83,7 +83,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
     this.state.cfgOp.cfg.nsId = this.props.nsId
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1ConfigPost(this.props.nsId, this.state.cfgOp))
+        .then(() => apiV1CfgPost(this.props.nsId, this.state.cfgOp))
         .then(cfgOp => {
           if (cfgOp.cfg.cid) {
             this.setState({...this.state, cfgOp}, () => this.configEdit(""))

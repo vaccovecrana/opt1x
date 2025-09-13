@@ -22,8 +22,7 @@ public class OtConstants {
   public static final String Opt1xKey = "X-Opt1x-Key";
 
   public static final String
-    kGoto = "goto", kFmt = "fmt", kNs = "ns", kCfg = "cfg",
-    kAuth = "Authorization", kAuthenticate = "WWW-Authenticate";
+    kGoto = "goto", kFmt = "fmt", kNsName = "nsName", kCfgName = "cfgName";
 
   public static final String qPageSize = "pageSize", qNext = "next";
 
@@ -37,14 +36,16 @@ public class OtConstants {
     apiV1GroupId      = "/api/v1/group/{gid}",
     apiV1Ns           = "/api/v1/ns",
     apiV1NsNsId       = "/api/v1/ns/{nsId}",
-    apiV1NsNsIdValue  = "/api/v1/ns/{nsId}/value",
-    apiV1Value        = "/api/v1/value",
-    apiV1ValueVid     = "/api/v1/value/{vid}",
-    apiV1ValueVidVer  = "/api/v1/value/{vid}/version",
-    apiV1ValueVerVvId = "/api/v1/value/version/{vvId}",
-    apiV1Config       = "/api/v1/config",
-    apiV1ConfigCid    = "/api/v1/config/{cid}",
-    apiV1ConfigIdFmt  = "/api/v1/config/{cid}/{fmt}",
+    apiV1NsNsIdVal    = "/api/v1/ns/{nsId}/value",
+    apiV1Val          = "/api/v1/value",
+    apiV1ValVid       = "/api/v1/value/{vid}",
+    apiV1ValVidVer    = "/api/v1/value/{vid}/version",
+    apiV1ValVerVvId   = "/api/v1/value/version/{vvId}",
+    apiV1Cfg          = "/api/v1/config",
+    apiV1CfgCid       = "/api/v1/config/{cid}",
+    apiV1CfgIdFmt     = "/api/v1/config/{cid}/{fmt}",
+    apiV1CfgNsCfg     = "/api/v1/config/of/{nsName}/{cfgName}",
+    apiV1CfgNsCfgFmt  = "/api/v1/config/of/{nsName}/{cfgName}/{fmt}",
 
     springRoot        = "/spring";
 

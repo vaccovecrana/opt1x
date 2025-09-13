@@ -2,7 +2,7 @@ import * as React from "preact/compat"
 import { RenderableProps } from "preact"
 
 import { lockUi, UiContext, UiStore } from '@ui/store'
-import { apiV1NsNsIdValuePost, apiV1ValueVerVvIdDelete, apiV1ValueVerVvIdPatch, apiV1ValueVidVerGet, OtValueOp, OtValueType, OtValueVer } from '@ui/rpc'
+import { apiV1NsNsIdValPost, apiV1ValVerVvIdDelete, apiV1ValVerVvIdPatch, apiV1ValVidVerGet, OtValueOp, OtValueType, OtValueVer } from '@ui/rpc'
 import { headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { rpcUiHld } from "@ui/routes"
 import { IcnDelete, IcnRefresh } from "@ui/components/UiIcons"
@@ -22,7 +22,7 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
     const { dispatch: d } = this.props.s
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1ValueVidVerGet(this.props.vid))
+        .then(() => apiV1ValVidVerGet(this.props.vid))
         .then((valOp) => this.setState({ valOp })),
         d
     )
@@ -35,7 +35,7 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
     }
     rpcUiHld(
       lockUi(true, d)
-        .then(() => apiV1NsNsIdValuePost(this.state.valOp.val.nsId, this.state.valOp))
+        .then(() => apiV1NsNsIdValPost(this.state.valOp.val.nsId, this.state.valOp))
         .then(valOp => this.setState({...this.state, valOp})), d
     )
   }
@@ -48,7 +48,7 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
       }
       rpcUiHld(
         lockUi(true, d)
-          .then(() => apiV1ValueVerVvIdDelete(vv.vvId))
+          .then(() => apiV1ValVerVvIdDelete(vv.vvId))
           .then(valOp => this.setState({...this.state, valOp})), d
       )
     }
@@ -62,7 +62,7 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
       }
       rpcUiHld(
         lockUi(true, d)
-          .then(() => apiV1ValueVerVvIdPatch(vv.vvId))
+          .then(() => apiV1ValVerVvIdPatch(vv.vvId))
           .then(valOp => this.setState({...this.state, valOp})), d
       )
     }

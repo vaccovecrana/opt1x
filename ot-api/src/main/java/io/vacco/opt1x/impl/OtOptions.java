@@ -141,16 +141,31 @@ public class OtOptions {
     return args;
   }
 
+  private static String logFmt(String msgFmt, Exception e, Object[] args) {
+    args[args.length - 1] = e.getMessage() != null ? e.getMessage() : e.getClass().getCanonicalName();
+    msgFmt = msgFmt + " - {}";
+    return msgFmt;
+  }
+
   public static void onError(String msg, Exception e, Object ... args) {
     args = merge(args, e);
     if (log.isDebugEnabled()) {
       log.debug(msg, args);
     } else if (e != null) {
-      args[args.length - 1] = e.getMessage() != null ? e.getMessage() : e.getClass().getCanonicalName();
-      msg = msg + " - {}";
+      msg = logFmt(msg, e, args);
       log.error(msg, args);
     } else {
       log.error(msg, args);
+    }
+  }
+
+  public static void onWarning(String msg, Exception e, Object ... args) {
+    args = merge(args, e);
+    if (e != null) {
+      msg = logFmt(msg, e, args);
+      log.warn(msg, args);
+    } else {
+      log.warn(msg, args);
     }
   }
 

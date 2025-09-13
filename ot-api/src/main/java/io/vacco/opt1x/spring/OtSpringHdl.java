@@ -18,7 +18,9 @@ import static io.vacco.opt1x.schema.OtConstants.*;
 
 public class OtSpringHdl implements MxHandler {
 
-  public static final String Basic = "Basic ";
+  public static final String
+    Basic = "Basic ",
+    kAuth = "Authorization", kAuthenticate = "WWW-Authenticate";
 
   private final OtSealService   sealService;
   private final OtApiKeyService keyService;

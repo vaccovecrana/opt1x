@@ -91,7 +91,7 @@ public class OtApiKeyService {
     ok0.ifPresent(k0 -> {
       cmd.withError(format("API key [%s] already exists", k0.name));
       cmd.raw = null;
-      cmd.key = rawKey(null, k0.name, k0.leaf);
+      cmd.key = rawKey(k0.pKid, k0.name, k0.leaf);
       cmd.key.kid = k0.kid;
     });
     return cmd;
