@@ -1,11 +1,5 @@
 ## Features not yet implemented
 
-1. **Ticket: Implement Versioning and Change Tracking for Configurations**
-  - **Description**: Add a new OtConfigVersion table to snapshot OtNode trees on save. Extend OtConfigService to store versions. Add UI "History" tab in OtConfig route for viewing timelines and diffs. Include basic audit logging in a new OtAuditLog table with API endpoint (/api/v1/audit).
-  - **Priority**: High
-  - **Estimated Effort**: Medium (schema updates, service logic, UI component).
-  - **Dependencies**: None.
-
 3. **Ticket: Introduce Global Search Across Entities**
   - **Description**: Add /api/v1/search endpoint querying names/paths/values. Implement global search bar in UiMenu, rendering results in new OtSearch route.
   - **Priority**: High
@@ -22,12 +16,6 @@
   - **Description**: Create OtWebhook table. Trigger async notifications in services (e.g., post-save). Add UI section in OtConfig for managing webhooks.
   - **Priority**: Medium
   - **Estimated Effort**: Medium (table, async logic, UI form).
-  - **Dependencies**: None.
-
-6. **Ticket: Support Environment Profiles for Configs**
-  - **Description**: Add "env" field to OtNamespace/OtConfig. Extend rendering to merge/override by env (?env=prod). Add env dropdowns in UI editors.
-  - **Priority**: Medium
-  - **Estimated Effort**: Medium (schema, render logic, UI updates).
   - **Dependencies**: None.
 
 7. **Ticket: Implement Backup/Export and Restore Functionality**
