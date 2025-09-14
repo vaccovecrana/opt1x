@@ -1,7 +1,7 @@
 import * as React from "preact/compat"
 import { RenderableProps } from "preact"
 
-import { boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { boxHero, boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd, IcnCopy, IcnTree } from "@ui/components/UiIcons"
 import { apiV1CfgGet, apiV1CfgPost, apiV1NsNsIdGet, OtConfig, OtConfigOp, OtKeyAccess, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
@@ -146,7 +146,7 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
             />
           </div>
         )}
-        {this.state.cfgList && this.state.cfgList.page.items.length > 0 && (
+        {this.state.cfgList && this.state.cfgList.page.items.length > 0 ? (
           <table class="striped">
             {headers(["Name", "Created", "Actions"])}
             <tbody>
@@ -172,7 +172,10 @@ class OtConfigs extends React.Component<OtConfigsProps, OtConfigsState> {
               ]))}
             </tbody>
           </table>
-        )}
+        ) : boxHero([
+          "Here you can define configuration trees.",
+          "Each namespace can contain multiple configurations."
+        ])}
       </div>
     )
   }

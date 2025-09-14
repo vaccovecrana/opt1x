@@ -175,7 +175,8 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
               onClick={() => this.saveOp()} />
           </div>
         )}
-        {this.state.access?.namespaces?.length > 0 && (
+        {this.state.access?.namespaces?.length > 0 && [
+          <h3>Sub-groups</h3>,
           <table class="striped">
             {headers(["Name", "Created", "Actions"])}
             <tbody>
@@ -202,7 +203,7 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
               })}
             </tbody>
           </table>
-        )}
+        ]}
         {this.state.access?.groupNamespaces?.length > 0 && [
           <h3>Group Access</h3>,
           <table class="striped">

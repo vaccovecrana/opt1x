@@ -45,7 +45,7 @@ public class OtSpringEnvelope {
       app.propertySources.clear();
     }
     app.label = appNs.path;
-    app.version = Long.toHexString(appNs.createUtcMs); // TODO this needs tweaks.
+    app.version = Long.toString(appNs.createUtcMs);
 
     var orderedConfigs = new ArrayList<>(configs);
     Collections.reverse(orderedConfigs);

@@ -1,7 +1,7 @@
 import { RenderableProps } from "preact"
 import * as React from "preact/compat"
 
-import { flagsOf, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { boxHero, flagsOf, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { apiV1NsGet, OtGroup, OtGroupNs, OtKeyAccess } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
 import { rpcUiHld, uiConfigsNsIdFmt, uiNsNsIdFmt, uiNsNsIdValuesFmt } from "@ui/routes"
@@ -43,7 +43,7 @@ class OtNamespaces extends React.Component<OtNsProps, OtNsState> {
         <nav>
           <ul><li><h1>Namespaces</h1></li></ul>
         </nav>
-        {this.state.access && (
+        {this.state.access?.namespaces?.length > 0 ? (
           <table class="striped">
             {headers(["Name", "Grant group/flags", "Created", "Actions"])}
             <tbody>
@@ -77,7 +77,9 @@ class OtNamespaces extends React.Component<OtNsProps, OtNsState> {
               })}
             </tbody>
           </table>
-        )}
+        ) : boxHero([
+          "Namespaces store variable definitions and configurations, giving you clear control boundaries across applications accessing configuration data."
+        ])}
       </div>
     )
   }

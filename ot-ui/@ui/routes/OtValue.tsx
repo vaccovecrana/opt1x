@@ -3,7 +3,7 @@ import { RenderableProps } from "preact"
 
 import { lockUi, UiContext, UiStore } from '@ui/store'
 import { apiV1NsNsIdValPost, apiV1ValVerVvIdDelete, apiV1ValVerVvIdPatch, apiV1ValVidVerGet, OtValueOp, OtValueType, OtValueVer } from '@ui/rpc'
-import { headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { boxHero, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { rpcUiHld } from "@ui/routes"
 import { IcnDelete, IcnRefresh } from "@ui/components/UiIcons"
 
@@ -114,7 +114,7 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
             </div>
           </div>
         )}
-        {this.state.valOp?.valVersions?.length > 0 && (
+        {this.state.valOp?.valVersions?.length > 0 ? (
           <table class="striped">
             {headers(["Value", "Type", "Changed", "Notes", "Actions"])}
             <tbody>
@@ -142,7 +142,9 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
               })}
             </tbody>
           </table>
-        )}
+        ) : boxHero([
+          "Value versions will appear here whenever this value changes."
+        ])}
       </div>
     )
   }

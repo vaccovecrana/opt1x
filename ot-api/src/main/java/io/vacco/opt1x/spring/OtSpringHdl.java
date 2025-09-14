@@ -123,7 +123,7 @@ public class OtSpringHdl implements MxHandler {
         .commit();
     } catch (Exception e) {
       onError("Spring cloud config error", e);
-      xc.withStatus(MxStatus._500).commit();
+      xc.withStatus(MxStatus._400).commit();
     }
   }
 

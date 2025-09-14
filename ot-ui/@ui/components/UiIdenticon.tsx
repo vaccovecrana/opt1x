@@ -1,6 +1,6 @@
 import * as React from "preact/compat";
-import { FunctionalComponent } from 'preact';
-import { useMemo } from 'preact/hooks';
+import { FunctionalComponent } from "preact";
+import { useMemo } from "preact/hooks";
 
 interface IdenticonProps {
   seed: string;       // Required seed (e.g., API key)
@@ -127,7 +127,7 @@ const UiIdenticon: FunctionalComponent<IdenticonProps> = ({
 UiIdenticon.defaultProps = {
   size: 8,
   scale: 4,
-  className: 'identicon',
+  className: "identicon",
 } as Partial<IdenticonProps>;
 
 export default UiIdenticon;

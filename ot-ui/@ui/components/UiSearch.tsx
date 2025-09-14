@@ -48,6 +48,11 @@ function UiSearch<K>({ items, getLabel, getSearchKey, onSelect, onCancel, getCat
     setHighlightedIndex(-1)
   }, [query])
 
+  const cancel = () => {
+    setQuery("")
+    onCancel()
+  }
+
   return (
     <div class="uiSearch">
       <input type="text" value={query}
@@ -65,17 +70,14 @@ function UiSearch<K>({ items, getLabel, getSearchKey, onSelect, onCancel, getCat
             onSelect(selected)
             setQuery("")
             setHighlightedIndex(-1)
+          } else if (e.key === "Escape") {
+            cancel()
           }
         }}
         placeholder="Search..."
       />
       {Object.keys(grouped).length > 0 && (
-        <div
-          class="dropDown"
-          onBlur={() => {
-            setQuery("")
-            onCancel()
-          }}>
+        <div class="dropDown" onBlur={() => cancel()}>
           {Object.entries(grouped).map(([cat, groupItems]) => (
             <div key={cat}>
               {cat && <h3 class="category">{cat}</h3>}

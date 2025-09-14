@@ -4,7 +4,7 @@ import { RenderableProps } from "preact"
 import { lockUi, UiContext, UiStore } from '@ui/store'
 import { apiV1NsNsIdValGet, apiV1NsNsIdValPost, apiV1ValVidDelete, OtValue, OtValueOp, OtValueType } from '@ui/rpc'
 import { IcnAdd, IcnDelete, IcnEdit } from "@ui/components/UiIcons"
-import { boxResult, headers, options, row, utcYyyyMmDdHhMm, valTruncate } from "@ui/components/Ui"
+import { boxHero, boxResult, headers, options, row, utcYyyyMmDdHhMm, valTruncate } from "@ui/components/Ui"
 import { rpcUiHld, uiValuesVidFmt } from "@ui/routes"
 
 type OtValuesVProps = RenderableProps<{ s?: UiStore, nsId?: number }>
@@ -139,7 +139,7 @@ class OtValuesV extends React.Component<OtValuesVProps, OtValuesVState> {
             />
           </div>
         )}
-        {this.state.listOp?.valPage?.items?.length > 0 && (
+        {this.state.listOp?.valPage?.items?.length > 0 ? (
           <table class="striped">
             {headers(["Name", "Value", "Encrypted", "Created", "Actions"])}
             <tbody>
@@ -167,7 +167,10 @@ class OtValuesV extends React.Component<OtValuesVProps, OtValuesVState> {
               })}
             </tbody>
           </table>
-        )}
+        ) : boxHero([
+          "Here you can define values that configuration trees can reference.",
+          "Child namespaces can also define value lists that override values in parent namespaces."
+        ])}
       </div>
     )
   }

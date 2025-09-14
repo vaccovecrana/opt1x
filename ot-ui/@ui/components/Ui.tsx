@@ -60,10 +60,16 @@ export const options = <T,>(values: T[], labelFn?: (v: T) => string, valFn?: (v:
   })
 }
 
+export const boxHero = (lines: string[]) => (
+  <article class="card info hero p24">
+    {lines.map(text => <div>{text}</div>)}
+  </article>
+)
+
 export const boxOk = (value: any) => (
-    <article class="success">
-      {value}
-    </article>
+  <article class="success">
+    {value}
+  </article>
 )
 
 export const boxError = (value: any) => (

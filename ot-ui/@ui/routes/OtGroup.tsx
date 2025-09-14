@@ -1,7 +1,7 @@
 import * as React from "preact/compat"
 import { RenderableProps } from "preact"
 
-import { boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { boxHero, boxResult, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { apiV1GroupIdDelete, apiV1GroupIdGet, apiV1GroupPost, OtAdminOp, OtGroupRole, OtKeyAccess } from "@ui/rpc"
 import { lockUi, Opt1x, UiContext, UiStore } from "@ui/store"
 import { rpcUiHld, uiGroupsIdFmt } from "@ui/routes"
@@ -179,7 +179,8 @@ class OtGroups extends React.Component<OtGroupProps, OtGroupState> {
               onClick={() => this.saveOp()} />
           </div>
         )}
-        {this.state.access?.groups?.length > 0 && (
+        {this.state.access?.groups?.length > 0 && [
+          <h3>Sub-groups</h3>,
           <table class="striped">
             {headers(["Name", "Created"])}
             <tbody>
@@ -189,8 +190,8 @@ class OtGroups extends React.Component<OtGroupProps, OtGroupState> {
               ]))}
             </tbody>
           </table>
-        )}
-        {this.state.access?.keyGroups?.length > 0 && [
+        ]}
+        {this.state.access?.keyGroups?.length > 0 ? [
           <h3>Key Access</h3>,
           <table class="striped">
             {headers(["Key", "Role", "Granted"])}
@@ -208,7 +209,9 @@ class OtGroups extends React.Component<OtGroupProps, OtGroupState> {
               })}
             </tbody>
           </table>
-        ]}
+        ] : boxHero([
+          "This group has no API keys associated with it. Bind API keys in the parent group's view."
+        ])}
       </div>
     )
   }

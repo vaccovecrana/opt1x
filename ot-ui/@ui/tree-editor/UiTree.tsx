@@ -188,7 +188,11 @@ export const TreeEditor = <K, >({ value, onChange, adapter }: TreeEditorProps<K>
             <div>
               <span class="ptr" onClick={() => handleAdd(val0, NodeType.Arr)}><IcnTreeArr height={24} /></span>
               <span class="ptr" onClick={() => handleAdd(val0, NodeType.Obj)}><IcnTreeObj height={24} /></span>
-              {adapter.renderAddPrimitive && <span class="ptr" onClick={() => setAddingPrimitive(true)}><IcnTreeAdd height={24} /></span>}
+              {adapter.renderAddPrimitive && (
+                <span class="ptr" onClick={() => setAddingPrimitive(true)}>
+                  <IcnTreeAdd height={24} />
+                </span>
+              )}
             </div>
           ) : (
             adapter.renderAddPrimitive(

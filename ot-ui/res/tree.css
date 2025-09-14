@@ -3,7 +3,7 @@
 .uiTree textarea,
 .uiTree button {
   appearance: auto !important; /* Restore native OS look */
-  width: auto !important; /* Undo full-width */
+  width: 160px !important; /* Undo full-width */
   height: auto !important; /* Undo calculated height */
   padding: 0 !important; /* Remove custom padding (browser will add minimal) */
   border: revert !important; /* Or '1px solid' if you want a basic border */
@@ -23,11 +23,6 @@
 .uiTree select:invalid {
   color: revert !important;
   opacity: revert !important;
-}
-
-/* Text selection */
-.uiTree ::selection {
-  background-color: revert !important;
 }
 
 .uiTree {

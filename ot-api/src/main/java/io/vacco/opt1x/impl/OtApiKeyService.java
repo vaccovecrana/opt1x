@@ -121,7 +121,7 @@ public class OtApiKeyService {
     }
   }
 
-  /*
+  /**
    * We assume that the provided key for rotation has already been
    * authenticated/unwrapped from an incoming JWT token.
    */

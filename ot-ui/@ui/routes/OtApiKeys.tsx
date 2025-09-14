@@ -1,7 +1,7 @@
 import * as React from "preact/compat"
 import { RenderableProps } from "preact"
 
-import { appendPage, boxResult, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { appendPage, boxHero, boxResult, headers, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { IcnAdd } from "@ui/components/UiIcons"
 import { apiV1KeyGet, apiV1KeyPost, OtApiKey, OtApiKeyOp, OtList } from "@ui/rpc"
 import { lockUi, UiContext, UiStore } from "@ui/store"
@@ -23,12 +23,17 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
 
   loadKeys() {
     const { dispatch: d } = this.props.s
+    if (!this.state.keyOp?.error && this.state.keyOp?.key?.kid && this.state.keys?.page?.nx1) {
+      this.state.keys.page.nx1 = undefined
+    }
     rpcUiHld(
       lockUi(true, d)
-      .then(() => apiV1KeyGet(2, this.state.keys?.page?.nx1))
+      .then(() => apiV1KeyGet(25, this.state.keys?.page?.nx1))
       .then(keys => {
         if (keys.error) {
           throw keys
+        } else if (this.state.keyOp?.key?.kid) {
+          this.setState({...this.state, keys})
         } else {
           keys = this.state.keys ? appendPage(this.state.keys, keys) : keys
           this.setState({...this.state, keys})
@@ -45,8 +50,7 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
         .then(keyOp => {
           if (keyOp.key.kid) {
             keyOp.key.name = ""
-            this.setState({...this.state, keyOp})
-            return this.loadKeys()
+            this.setState({...this.state, keyOp}, () => this.loadKeys())
           } else {
             this.setState({...this.state, keyOp})
           }
@@ -99,7 +103,7 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
               onClick={() => this.saveKey()} />
           </div>
         )}
-        {this.state.keys && this.state.keys.page.items.length > 0 && (
+        {this.state.keys && this.state.keys.page.items.length > 0 ? (
           <div>
             <table class="striped">
               {headers(["Name", "Created", "Management"])}
@@ -117,7 +121,9 @@ class OtApiKeys extends React.Component<OtApiKeysProps, OtApiKeysState> {
               </div>
             )}
           </div>
-        )}
+        ) : boxHero([
+          "API keys allow you to grant users/applications individual access to namespace resources via key groups."
+        ])}
       </div>
     )
   }

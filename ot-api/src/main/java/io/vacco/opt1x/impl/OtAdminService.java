@@ -74,20 +74,6 @@ public class OtAdminService {
       .collect(toList());
   }
 
-  private List<OtApiKey> keysOf(List<Integer> kids) {
-    return daos.akd
-      .loadWhereKidIn(kids.toArray(Integer[]::new))
-      .values().stream()
-      .flatMap(Collection::stream)
-      .peek(k -> {
-        if (k.name.equals(OtConstants.Opt1x)) {
-          k.metadata2 = null;
-          k.metadata3 = null;
-        }
-      })
-      .collect(toList());
-  }
-
   public OtKeyAccess accessGroupsOf(Integer kid) {
     var out = new OtKeyAccess();
     out.keyGroups = daos.kgd.loadPageItems(

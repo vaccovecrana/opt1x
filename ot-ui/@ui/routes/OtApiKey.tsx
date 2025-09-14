@@ -44,11 +44,11 @@ class OtApiKey extends React.Component<OtApiKeyProps, OtApiKeyState> {
 
   renderCard(title: string, content: any, footer: string) {
     return (
-      <article className="card">
+      <article class="card">
         <header>
           <h4>{title}</h4>
         </header>
-        <p className="contrast">
+        <p class="contrast">
           {content}
         </p>
         <footer>
@@ -61,12 +61,12 @@ class OtApiKey extends React.Component<OtApiKeyProps, OtApiKeyState> {
   render() {
     const {apiKey} = this.props.s.state
     return (
-      <div className="container">
+      <div class="container">
         <nav>
           <ul><li><h1>{apiKey?.path}</h1></li></ul>
           <ul>
             <li>
-              <a className="ptr" onClick={() => this.rotateKey()}>
+              <a class="ptr" onClick={() => this.rotateKey()}>
                 <IcnRefresh height={32} />
               </a>
             </li>
@@ -77,7 +77,7 @@ class OtApiKey extends React.Component<OtApiKeyProps, OtApiKeyState> {
           <div>Key rotated: <code>{this.state.rotateOp?.raw}</code></div>
         )}
         {this.state.access && (
-          <div className="grid">
+          <div class="grid">
             {this.renderCard("Groups", this.state.access.groupTree?.length || 0, "Accessible groups")}
             {this.renderCard("Namespaces", this.state.access.namespaceTree?.length || 0, "Accessible namespaces")}
           </div>
