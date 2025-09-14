@@ -24,3 +24,12 @@ graalvmNative {
     }
   }
 }
+
+val copyLic = tasks.register<Copy>("copyLic") {
+  from("../NOTICE", "../LICENSE")
+  into("build/resources/main")
+}
+
+tasks.processResources {
+  dependsOn(copyLic)
+}
