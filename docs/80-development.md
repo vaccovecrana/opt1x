@@ -1,6 +1,6 @@
 ## Development setup
 
-Requires Java 21+m and Gradle 8 or later.
+Requires Java 21+ and Gradle 8 or later.
 
 Create a file with the following content at `~/.gsOrgConfig.json`:
 ```
