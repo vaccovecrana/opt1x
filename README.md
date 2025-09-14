@@ -8,6 +8,10 @@ This reduces technical debt by making configs explicit, searchable, and less pro
 
 It focuses on simplicity: API-key based access, namespaced RBAC, encrypted values, and tree-structured configs exportable as JSON/YAML/TOML/Properties.
 
+![namespaces](./docs/img/namespace-03.png)
+![values](./docs/img/values-02.png)
+![configs](./docs/img/configs-04.png)
+
 ## Quick start
 
 Download the latest [release](https://github.com/vaccovecrana/opt1x/releases), or boot from a Docker image.
