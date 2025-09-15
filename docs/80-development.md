@@ -1,4 +1,4 @@
-## Development setup
+# Development setup
 
 Requires Java 21+ and Gradle 8 or later.
 

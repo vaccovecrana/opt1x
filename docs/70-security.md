@@ -1,4 +1,4 @@
-## Security Notes
+# Security Notes
 
 - Always unseal before use.
 - Rotate keys periodically: POST `/api/v1/key/rotate` with `{ "kid": <kid> }`.
