@@ -28,15 +28,15 @@ opt1x --api-spring --jdbc-url=jdbc:h2:file:./o1x;DB_CLOSE_DELAY=-1;LOCK_MODE=3;A
 4. Click `Namespaces -> o1x`. Create namespace `/o1x/my-app`.
 5. Click the `Book` icon and add some values: `db.url` (string), `db.user` (string).
 6. Create a `test` config tree, binding keys to values. Let's model a Spring Boot config:
-   1. Click the `</>` object button.
-   2. Change `key1`  to `spring`.
-   3. Click the `</>` object button again to add a nested object.
-   4. Change `key1` again to `datasource`.
-   5. Click the `(+)` (value reference) button, and type `db.` in the input field.
-   6. Choose the `db.url` value from the dropdown.
-   7. Change `key1` to `url`.
-   8. Repeat from #5, now use the `db.user` value, and set a `username` key.
-   9. Save the configuration tree.
+   - Click the `</>` object button.
+   - Change `key1`  to `spring`.
+   - Click the `</>` object button again to add a nested object.
+   - Change `key1` again to `datasource`.
+   - Click the `(+)` (value reference) button, and type `db.` in the input field.
+   - Choose the `db.url` value from the dropdown.
+   - Change `key1` to `url`.
+   - Repeat from #5, now use the `db.user` value, and set a `username` key.
+   - Save the configuration tree.
 
 Lastly, request this configuration in YAML format from a `curl` call (your Spring Boot app would do the same).
 
