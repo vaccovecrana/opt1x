@@ -55,7 +55,7 @@ public class OtConfigService {
       cmd = requireNonNull(cmd).validate(cmd0 -> {
         var kg = admService.canAccessNs(cmd0.key.kid, cmd0.cfg.nsId, false, true, false);
         if (kg.isEmpty()) {
-          return admService.noNsAccess(cmd0, cmd0.key.kid, cmd0.cfg.nsId, write);
+          return admService.noNsAccess(cmd0, cmd0.key, cmd0.cfg.nsId, write);
         }
         return cmd0;
       });
@@ -65,6 +65,7 @@ public class OtConfigService {
         .validate(this::duplicateConfig);
       if (cmd.ok()) {
         daos.cfd.save(cmd.cfg);
+        OtAudit.createConfig(cmd.key.name, cmd.cfg.name, daos.nsd.loadExisting(cmd.cfg.nsId).path);
       }
       return cmd;
     } catch (Exception e) {
@@ -166,7 +167,7 @@ public class OtConfigService {
       cmd.cfg = daos.cfd.loadExisting(cmd.cfg.cid);
       var kg = admService.canAccessNs(cmd.key.kid, cmd.cfg.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, cmd.cfg.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, cmd.cfg.nsId, write);
       }
       for (var otv : requireNonNull(requireNonNull(cmd).vars)) {
         if (!OtValid.validate(otv.node, cmd).ok()) {
@@ -183,19 +184,23 @@ public class OtConfigService {
       if (!cmd.ok()) {
         return cmd;
       }
-      return writeTree(cmd, treeIdx);
+      cmd = writeTree(cmd, treeIdx);
+      if (cmd.ok()) {
+        OtAudit.updateConfig(cmd.key.name, cmd.cfg.name, daos.nsd.loadExisting(cmd.cfg.nsId).path, treeIdx);
+      }
+      return cmd;
     } catch (Exception e) {
       onError("Config update error", e);
       return cmd.withError(e);
     }
   }
 
-  public OtConfigOp load(OtConfigOp cmd) {
+  public OtConfigOp load(OtRequest req, OtConfigOp cmd) {
     try {
       cmd.cfg = daos.cfd.loadExisting(cmd.cfg.cid);
       var kg = admService.canAccessNs(cmd.key.kid, cmd.cfg.nsId, true, false, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, cmd.cfg.nsId, read);
+        return admService.noNsAccess(cmd, cmd.key, cmd.cfg.nsId, read);
       }
       if (cmd.ok()) {
         var nodes = daos.ndd.loadWhereCidEq(cmd.cfg.cid);
@@ -214,6 +219,9 @@ public class OtConfigService {
           return OtVar.of(node, value);
         }).collect(Collectors.toList());
       }
+      if (cmd.ok()) {
+        OtAudit.loadConfig(cmd.key.name, cmd.cfg.name, daos.nsd.loadExisting(cmd.cfg.nsId).path, req);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Config load error", e);
@@ -226,11 +234,11 @@ public class OtConfigService {
       var clone = config(cmd.cfg.cid, cmd.cfg.nsId, cmd.cfg.name);
       var kg = admService.canAccessNs(cmd.key.kid, cmd.cfg.nsId, true, false, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, cmd.cfg.nsId, read);
+        return admService.noNsAccess(cmd, cmd.key, cmd.cfg.nsId, read);
       }
       kg = admService.canAccessNs(cmd.key.kid, clone.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, clone.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, clone.nsId, write);
       }
       daos.onTxResult(cmd, daos.cfd.sql().tx((tx, conn) -> {
         var nodes = daos.ndd.loadWhereCidEq(clone.cid);
@@ -260,6 +268,9 @@ public class OtConfigService {
           daos.ndd.save(node);
         }
       }));
+      if (cmd.ok()) {
+        OtAudit.cloneConfig(cmd.key.name, cmd.cfg.name, daos.nsd.loadExisting(cmd.cfg.nsId).path);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Config clone error", e);
@@ -272,7 +283,7 @@ public class OtConfigService {
     try {
       var kg = admService.canAccessNs(kid, nsId, true, false, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(out, kid, nsId, read);
+        return admService.noNsAccess(out, daos.akd.loadExisting(kid), nsId, read);
       }
       out.page = daos.cfd.loadPage1(
         daos.cfd.query().eq(daos.cfd.fld_nsId(), nsId).limit(pageSize),
@@ -310,20 +321,20 @@ public class OtConfigService {
     }
   }
 
-  public RvResponse<Object> render(OtApiKey key, Integer cid, String otFormat, boolean encrypted) {
+  public RvResponse<Object> render(OtRequest req, OtApiKey key, Integer cid, String otFormat, boolean encrypted) {
     try {
       var cmd = configOp();
       var fmt = OtNodeFormat.valueOf(otFormat);
       var cfg = daos.cfd.loadExisting(cid);
       var kg = admService.canAccessNs(key.kid, cfg.nsId, true, false, false);
       if (kg.isEmpty()) {
-        cmd = admService.noNsAccess(cmd, key.kid, cfg.nsId, read);
+        cmd = admService.noNsAccess(cmd, key, cfg.nsId, read);
         return error(new RvResponse<>(), Response.Status.UNAUTHORIZED, cmd.error);
       }
       cmd.cfg = cfg;
       cmd.encrypted = encrypted;
       cmd.key = key;
-      if (!load(cmd).ok()) {
+      if (!load(req, cmd).ok()) {
         return error(new RvResponse<>(), Response.Status.BAD_REQUEST, cmd.error);
       }
       return render(cmd, fmt);
@@ -332,7 +343,9 @@ public class OtConfigService {
     }
   }
 
-  public RvResponse<Object> render(OtApiKey key, String nsName, String cfgName, String otFormat, boolean encrypted) {
+  public RvResponse<Object> render(OtRequest req, OtApiKey key,
+                                   String nsName, String cfgName, String otFormat,
+                                   boolean encrypted) {
     try {
       var configs = daos.cfd.loadPageItems(
         daos.cfd.query()
@@ -351,7 +364,7 @@ public class OtConfigService {
         onWarning("Named namespace/config request with multiple matches: {}", null, configs);
       }
       var cfg = configs.getFirst();
-      return render(key, cfg.cid, otFormat, encrypted);
+      return render(req, key, cfg.cid, otFormat, encrypted);
     } catch (Exception e) {
       return error(new RvResponse<>(), Response.Status.BAD_REQUEST, e.getMessage());
     }

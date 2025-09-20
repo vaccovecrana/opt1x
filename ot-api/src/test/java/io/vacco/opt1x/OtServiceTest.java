@@ -7,11 +7,15 @@ import io.vacco.opt1x.context.*;
 import io.vacco.opt1x.dto.*;
 import io.vacco.opt1x.impl.*;
 import io.vacco.opt1x.schema.*;
+import io.vacco.shax.otel.OtHttpSink;
 import j8spec.annotation.DefinedOrder;
 import j8spec.junit.J8SpecRunner;
 import org.codejargon.feather.Feather;
 import org.junit.runner.RunWith;
+
+import java.awt.*;
 import java.io.*;
+import java.util.ArrayList;
 
 import static io.vacco.opt1x.dto.OtConfigOp.configOp;
 import static io.vacco.opt1x.schema.OtConstants.Opt1x;
@@ -32,10 +36,13 @@ import static org.junit.Assert.*;
 @RunWith(J8SpecRunner.class)
 public class OtServiceTest {
   static {
-    OtOptions.setFrom(new String[] {
-      format("%s=%s", OtOptions.kJdbcUrl,  "jdbc:h2:file:./build/opt1x;DB_CLOSE_DELAY=-1;LOCK_MODE=3;AUTO_RECONNECT=TRUE"),
-      format("%s=%s", OtOptions.kLogLevel, "trace")
-    });
+    var args = new ArrayList<String>();
+    args.add(format("%s=%s", OtOptions.kJdbcUrl,  "jdbc:h2:file:./build/opt1x;DB_CLOSE_DELAY=-1;LOCK_MODE=3;AUTO_RECONNECT=TRUE"));
+    args.add(format("%s=%s", OtOptions.kLogLevel, "trace"));
+    if (!GraphicsEnvironment.isHeadless()) {
+      args.add(format("%s=%s", OtOptions.kOtlpEndpoint, "http://192.168.122.152:4318"));
+    }
+    OtOptions.setFrom(args.toArray(String[]::new));
   }
 
   private static final Feather f = Feather.with(new OtRoot(), new OtService());
@@ -417,6 +424,10 @@ public class OtServiceTest {
         assertFalse(result.ok());
       });
 
+      var testReq = new OtRequest();
+      testReq.host = "localhost";
+      testReq.protocol = "test";
+
       it("Adds nodes to a configuration and loads them with/without decryption", () -> {
         var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
         var testVal = vs.daos.vld.loadWhereNameEq(testKey).getFirst();
@@ -466,7 +477,7 @@ public class OtServiceTest {
         op.encrypted = true;
         op.error = null;
         op.validations.clear();
-        var load = cs.load(op);
+        var load = cs.load(testReq, op);
         assertTrue(load.ok());
 
         var g = f.instance(Gson.class);
@@ -491,7 +502,7 @@ public class OtServiceTest {
         okOrExisting(cloneRes);
         if (cloneRes.ok()) {
           for (var fmt : OtNodeFormat.values()) {
-            var renderRes = cs.render(lk, cloneRes.cfg.cid, fmt.toString(), false);
+            var renderRes = cs.render(testReq, lk, cloneRes.cfg.cid, fmt.toString(), false);
             OtOptions.log.info(renderRes.body.toString());
           }
         }
@@ -501,7 +512,7 @@ public class OtServiceTest {
         var lk = as.daos.akd.loadWhereNameEq(lindaKey).getFirst();
         var cfg = cs.daos.cfd.loadWhereNameEq(testConfig).getFirst();
         var ns = as.daos.nsd.loadExisting(cfg.nsId);
-        var raw = cs.render(lk, ns.name, cfg.name, OtNodeFormat.props.name(), true);
+        var raw = cs.render(testReq, lk, ns.name, cfg.name, OtNodeFormat.props.name(), true);
         assertEquals(MxStatus._200.code, raw.status.getStatusCode());
         OtOptions.log.info(raw.body.toString());
       });
@@ -512,6 +523,8 @@ public class OtServiceTest {
       assertNotNull(ds);
       ds.close();
     });
+
+    it("Flushes OTEL logs, if any", () -> Thread.sleep(OtHttpSink.TimeoutDefaultMs));
   }
 
 }

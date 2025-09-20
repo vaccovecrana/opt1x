@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import io.vacco.jwt.*;
 import io.vacco.murmux.http.*;
 import io.vacco.opt1x.dao.OtApiKeyDao;
+import io.vacco.opt1x.dto.OtRequest;
 import io.vacco.opt1x.dto.OtUnsealOp;
 import io.vacco.opt1x.impl.*;
 import io.vacco.opt1x.schema.*;
@@ -46,6 +47,7 @@ public class OtApiKeyHdl implements MxHandler {
     var key = keyService.loadKey(apiKey);
     if (key.isPresent()) {
       xc.putAttachment(key.get());
+      xc.putAttachment(OtRequest.from(xc));
       next.handle(xc);
       return;
     }
@@ -75,6 +77,7 @@ public class OtApiKeyHdl implements MxHandler {
     if (validateCookie(c).isPresent()) {
       var key = g.fromJson(c.jwt.getGrant(Opt1xKey).toString(), OtApiKey.class);
       xc.putAttachment(key);
+      xc.putAttachment(OtRequest.from(xc));
       next.handle(xc);
     } else {
       toLogin(xc);

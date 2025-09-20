@@ -7,6 +7,7 @@ public class OtConstants {
   }
 
   public static final String Opt1x = "o1x";
+  public static final String Opt1xL = "opt1x";
   public static final String Opt1xRoot = pathPrefix(Opt1x);
 
   public static final String read = "read", write = "write";
@@ -22,7 +23,8 @@ public class OtConstants {
   public static final String Opt1xKey = "X-Opt1x-Key";
 
   public static final String
-    kGoto = "goto", kFmt = "fmt", kNsName = "nsName", kCfgName = "cfgName";
+    kGoto = "goto", kFmt = "fmt", kNsName = "nsName", kCfgName = "cfgName",
+    kEvent = "event", kCookie = "Cookie";
 
   public static final String qPageSize = "pageSize", qNext = "next";
 

@@ -44,10 +44,11 @@ public class OtAdminService {
     return out;
   }
 
-  public <T extends OtResult> T noNsAccess(T cmd, Integer kid, Integer nsId, String type) {
+  public <T extends OtResult> T noNsAccess(T cmd, OtApiKey key, Integer nsId, String type) {
+    daos.nsd.load(nsId).ifPresent(ns -> OtAudit.noNsAccess(key, ns.path, type));
     return cmd.withError(format(
       "Admin - key [%d] has no [%s] access into namespace [%d]",
-      kid, type, nsId
+      key.kid, type, nsId
     ));
   }
 
@@ -89,7 +90,7 @@ public class OtAdminService {
         .innerJoin(daos.grd.dsc, daos.kgd.dsc)
         .eq(daos.akd.fld_kid(), kid)
     );
-    var tree = new TreeMap<String, OtGroup>();  // TODO find a way to improve this group expansion logic
+    var tree = new TreeMap<String, OtGroup>(); // TODO find a way to improve this group expansion logic
     for (var grp : out.groups) {
       tree.putIfAbsent(grp.path, grp);
       var branch = daos.grd.loadPageItems(
@@ -276,6 +277,7 @@ public class OtAdminService {
           .validate(this::duplicateNs);
         if (cmd.ok()) {
           daos.nsd.save(cmd.ns);
+          OtAudit.createNamespace(cmd.key, cmd.ns);
         }
       }
       return cmd.clearKeyGroup();
@@ -298,6 +300,7 @@ public class OtAdminService {
           .validate(this::duplicateGroup);
         if (cmd.ok()) {
           daos.grd.save(cmd.group);
+          OtAudit.createGroup(cmd.key, cmd.group);
         }
       }
       return cmd.clearKeyGroup();
@@ -333,6 +336,9 @@ public class OtAdminService {
         }));
         cmd.withGroup(group);
       }
+      if (cmd.ok()) {
+        OtAudit.deleteGroup(cmd.key, cmd.group);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Admin  - Group delete error", e);
@@ -355,6 +361,7 @@ public class OtAdminService {
         });
       if (cmd.ok()) {
         daos.gnd.upsert(cmd.groupNs);
+        OtAudit.bindGroupToNamespace(cmd.key, cmd.group.path, cmd.ns.path);
       }
       return cmd.clearKeyGroup();
     } catch (Exception e) {
@@ -380,6 +387,9 @@ public class OtAdminService {
           return cmd.withError(format("Admin - do not bind any keys to the %s group", Opt1x));
         }
         daos.kgd.upsert(cmd.keyGroupBind);
+        OtAudit.bindKeyToGroup(
+          cmd.key.name, daos.akd.loadExisting(cmd.keyGroupBind.kid).name, grp.path
+        );
       }
       return cmd.clearKeyGroup();
     } catch (Exception e) {

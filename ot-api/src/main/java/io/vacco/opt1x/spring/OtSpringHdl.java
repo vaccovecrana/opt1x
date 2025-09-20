@@ -3,6 +3,7 @@ package io.vacco.opt1x.spring;
 import com.google.gson.Gson;
 import io.vacco.murmux.http.*;
 import io.vacco.opt1x.dto.OtConfigOp;
+import io.vacco.opt1x.dto.OtRequest;
 import io.vacco.opt1x.impl.*;
 import io.vacco.opt1x.schema.*;
 import io.vacco.ronove.RvResponse;
@@ -51,7 +52,7 @@ public class OtSpringHdl implements MxHandler {
     return Optional.empty();
   }
 
-  private List<OtConfigOp> init(OtApiKey key, OtSpringApp app) {
+  private List<OtConfigOp> init(OtRequest req, OtApiKey key, OtSpringApp app) {
     var nsName = app.name;
     var daos = cfgService.daos;
     var q = daos.cfd.query()
@@ -71,7 +72,7 @@ public class OtSpringHdl implements MxHandler {
     }
     var opIdx = cfl.stream()
       .map(cfg -> cfgService.load(
-        configOp().withApiKey(key).withConfig(cfg).withEncrypted(false)
+        req, configOp().withApiKey(key).withConfig(cfg).withEncrypted(false)
       )).collect(Collectors.toMap(op -> op.cfg.name, Function.identity()));
     var opl = new ArrayList<OtConfigOp>();
     for (var profile : app.profiles) {
@@ -98,7 +99,7 @@ public class OtSpringHdl implements MxHandler {
         xc.withStatus(MxStatus._400).commit();
         return;
       }
-      var opl = init(oKey.get(), app);
+      var opl = init(OtRequest.from(xc), oKey.get(), app);
       if (opl.isEmpty()) {
         xc.withStatus(MxStatus._400).commit();
         return;

@@ -7,7 +7,7 @@ import io.vacco.metolithe.annotations.*;
   @MtPk @MtDao(loadEq = true, loadIn = true)
   public Integer kid;
 
-  @MtFk(OtApiKey.class)
+  @MtFk(OtApiKey.class) @MtDao
   public Integer pKid;
 
   @MtVarchar(64) @MtNotNull

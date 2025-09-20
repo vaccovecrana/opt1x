@@ -1,8 +1,13 @@
 package io.vacco.opt1x.impl;
 
 import io.vacco.shax.logging.ShOption;
+import io.vacco.shax.otel.OtHttpSink;
 import org.slf4j.*;
 import java.util.*;
+import java.util.function.Function;
+
+import static java.lang.Integer.parseInt;
+import static java.lang.Long.parseLong;
 
 public class OtOptions {
 
@@ -23,7 +28,10 @@ public class OtOptions {
     kOidcClientSecret = "--oidc-client-secret",
     kOidcRedirectUri  = "--oidc-redirect-uri",
     kOidcScopes       = "--oidc-scopes",
-    kOtelCollectorUrl = "--audit-webhook-url";
+
+    kOtlpEndpoint     = "--otlp-endpoint",
+    kOtlpTimeoutMs    = "--otlp-timeout-ms",
+    kOtlpHeaders      = "--otlp-headers";
 
   public static OtLogFormat logFormat = OtLogFormat.text;
   public static OtLogLevel  logLevel  = OtLogLevel.info;
@@ -40,8 +48,6 @@ public class OtOptions {
   public static String      oidcRedirectUri = "http://localhost:7070/oidc/callback"; // Default, overridable
   public static String      oidcScopes = "openid profile email groups"; // Default, space-separated
 
-  public static String      otelCollectorUrl; // If set, enables OpenTelemetry auditing
-
   public static String usage() {
     return String.join("\n",
       "Usage:",
@@ -55,14 +61,16 @@ public class OtOptions {
       "  --shares             [number] Number of shares. Default: " + shares,
       "  --threshold          [number] Number of shares to unseal. Default: " + threshold,
       "  --log-format         [string] Log output format ('text' or 'json'). Default: " + logFormat,
-      "  --log-level          [string] Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel // ,
+      "  --log-level          [string] Log level ('error', 'warning', 'info', 'debug', 'trace'). Default: " + logLevel,
+      "  --otlp-endpoint      [string] OTEL collector URL for audit events. Enables auditing if provided.",
+      "  --otlp-headers       [string] OTEL collector headers to include with each request (i.e. API keys, etc.). Default empty.",
+      "  --otlp-timeout-ms    [number] OTEL collector timeout in milliseconds. Default " + OtHttpSink.TimeoutDefaultMs
       // TODO features to be implemented
       // "  --oidc-issuer        [string] OIDC issuer URL (autodiscovery endpoint). Enables OIDC if provided",
       // "  --oidc-client-id     [string] OIDC client ID. Required if OIDC enabled",
       // "  --oidc-client-secret [string] OIDC client secret. Required if OIDC enabled",
       // "  --oidc-redirect-uri  [string] OIDC redirect URI. Default: " + oidcRedirectUri,
       // "  --oidc-scopes        [string] OIDC scopes (space-separated). Default: '" + oidcScopes + "'",
-      // "  --otel-collector-url [string] OpenTelemetry Collector URL for audit events. Enables auditing if provided"
     );
   }
 
@@ -77,44 +85,32 @@ public class OtOptions {
     return a0;
   }
 
+  private static <T> T loadProp(String v, Function<String, T> onLoad) {
+    return onLoad.apply(v);
+  }
+
   public static void setFrom(String[] args) {
     Map<String, String> argIdx = Arrays.stream(args)
       .filter(arg -> arg.startsWith("--"))
       .map(OtOptions::argOf)
       .collect(HashMap::new, (m, v) -> m.put(v[0], v.length == 1 ? null : v[1]), HashMap::putAll);
 
-    var vDbUrl = argIdx.get(kJdbcUrl);
-    var vDbSeed = argIdx.get(kDbSeed);
-    var vHost = argIdx.get(kApiHost);
-    var vPort = argIdx.get(kApiPort);
-    var vShares = argIdx.get(kShares);
-    var vThreshold = argIdx.get(kThreshold);
-    var vLogFormat = argIdx.get(kLogFormat);
-    var vLogLevel = argIdx.get(kLogLevel);
-    var vOidcIssuer = argIdx.get(kOidcIssuer);
-    var vOidcClientId = argIdx.get(kOidcClientId);
-    var vOidcClientSecret = argIdx.get(kOidcClientSecret);
-    var vOidcRedirectUri = argIdx.get(kOidcRedirectUri);
-    var vOidcScopes = argIdx.get(kOidcScopes);
-    var vOtelCollectorUrl = argIdx.get(kOtelCollectorUrl);
-
-    jdbcUrl = vDbUrl != null ? vDbUrl : jdbcUrl;
-    dbSeed = vDbSeed != null ? Long.parseLong(vDbSeed) : dbSeed;
-    host = vHost != null ? vHost : host;
-    port = vPort != null ? Integer.parseInt(vPort) : port;
-    shares = vShares != null ? Integer.parseInt(vShares) : shares;
-    threshold = vThreshold != null ? Integer.parseInt(vThreshold) : threshold;
-    logFormat = vLogFormat != null ? OtLogFormat.valueOf(vLogFormat) : logFormat;
-    logLevel = vLogLevel != null ? OtLogLevel.valueOf(vLogLevel) : logLevel;
+    jdbcUrl = loadProp(argIdx.get(kJdbcUrl), Function.identity());
+    dbSeed = loadProp(argIdx.get(kDbSeed), v -> v != null ? parseLong(v) : dbSeed);
+    host = loadProp(argIdx.get(kApiHost), v -> v != null ? v : host);
+    port = loadProp(argIdx.get(kApiPort), v -> v != null ? parseInt(v) : port);
+    shares = loadProp(argIdx.get(kShares), v -> v != null ? parseInt(v) : shares);
+    threshold = loadProp(argIdx.get(kThreshold), v -> v != null ? parseInt(v) : threshold);
+    logFormat = loadProp(argIdx.get(kLogFormat), v -> v != null ? OtLogFormat.valueOf(v) : logFormat);
+    logLevel = loadProp(argIdx.get(kLogLevel), v -> v != null ? OtLogLevel.valueOf(v) : logLevel);
 
     apiSpring = argIdx.containsKey(kApiSpring);
 
-    oidcIssuer = vOidcIssuer != null ? vOidcIssuer : oidcIssuer;
-    oidcClientId = vOidcClientId != null ? vOidcClientId : oidcClientId;
-    oidcClientSecret = vOidcClientSecret != null ? vOidcClientSecret : oidcClientSecret;
-    oidcRedirectUri = vOidcRedirectUri != null ? vOidcRedirectUri : oidcRedirectUri;
-    oidcScopes = vOidcScopes != null ? vOidcScopes : oidcScopes;
-    otelCollectorUrl = vOtelCollectorUrl != null ? vOtelCollectorUrl : otelCollectorUrl;
+    oidcIssuer = argIdx.get(kOidcIssuer);
+    oidcClientId = argIdx.get(kOidcClientId);
+    oidcClientSecret = argIdx.get(kOidcClientSecret);
+    oidcRedirectUri = argIdx.get(kOidcRedirectUri);
+    oidcScopes = argIdx.get(kOidcScopes);
 
     if (oidcIssuer != null) {
       if (oidcClientId == null || oidcClientSecret == null) {
@@ -122,9 +118,17 @@ public class OtOptions {
       }
     }
 
+    if (argIdx.get(kOtlpEndpoint) != null) {
+      ShOption.setSysProp(ShOption.OTEL_EXPORTER_OTLP_ENDPOINT, argIdx.get(kOtlpEndpoint));
+      if (argIdx.get(kOtlpHeaders) != null) {
+        ShOption.setSysProp(ShOption.OTEL_EXPORTER_OTLP_HEADERS, argIdx.get(kOtlpHeaders));
+      }
+      if (argIdx.get(kOtlpTimeoutMs) != null) {
+        ShOption.setSysProp(ShOption.OTEL_EXPORTER_OTLP_TIMEOUT, argIdx.get(kOtlpTimeoutMs));
+      }
+    }
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_DEVMODE, logFormat == OtLogFormat.text ? "true" : "false");
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_LOGLEVEL, logLevel.toString());
-
     log = LoggerFactory.getLogger(OtOptions.class);
   }
 

@@ -17,6 +17,7 @@ import java.util.Map;
 public class OtApiKeyDao extends MtWriteDao<io.vacco.opt1x.schema.OtApiKey, java.lang.Integer> {
 
   public static final String fld_kid = "kid";
+  public static final String fld_pKid = "pKid";
   public static final String fld_name = "name";
   public static final String fld_path = "path";
   public static final String fld_hash = "hash";
@@ -37,6 +38,10 @@ public class OtApiKeyDao extends MtWriteDao<io.vacco.opt1x.schema.OtApiKey, java
 
   public final Map<java.lang.Integer, List<io.vacco.opt1x.schema.OtApiKey>> loadWhereKidIn(java.lang.Integer ... values) {
     return loadWhereIn(fld_kid, values);
+  }
+
+  public MtFieldDescriptor fld_pKid() {
+    return this.dsc.getField(fld_pKid);
   }
 
   public MtFieldDescriptor fld_name() {

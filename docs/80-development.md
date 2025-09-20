@@ -21,8 +21,8 @@ gradle :opt1x-linux-amd64:run \
   --args="--api-spring --jdbc-url=jdbc:h2:file:./o1x;DB_CLOSE_DELAY=-1;LOCK_MODE=3;AUTO_RECONNECT=TRUE"
 ```
 
-If you are testing against a `rqlite` cluster, use:
+If you are testing against a `rqlite` cluster (writing to an OTEL collector, Signoz in this case), use:
 ```
 gradle :opt1x-linux-amd64:run \
-  --args="--api-spring --jdbc-url=jdbc:rqlite:http://localhost:4001"
+  --args="--api-spring --jdbc-url=jdbc:rqlite:http://localhost:4001 --otlp-endpoint=http://192.168.122.152:4318"
 ```

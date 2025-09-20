@@ -3,6 +3,8 @@ plugins {
   id("org.graalvm.buildtools.native") version "0.11.0"
 }
 
+// repositories { mavenLocal() }
+
 dependencies {
   implementation(project(":ot-api"))
 }

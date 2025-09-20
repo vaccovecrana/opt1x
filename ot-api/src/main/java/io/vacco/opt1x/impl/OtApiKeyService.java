@@ -113,6 +113,12 @@ public class OtApiKeyService {
         .validate(this::validateParentApiKey);
       if (result.ok()) {
         daos.akd.upsert(result.key);
+        OtAudit.createApiKey(
+          result.key.pKid != null
+            ? daos.akd.loadExisting(result.key.pKid).name
+            : null,
+          result.key.name
+        );
       }
       return result;
     } catch (Exception e) {
@@ -136,6 +142,7 @@ public class OtApiKeyService {
       var result = newKey(cmd).validate(this::validateParentApiKey);
       if (result.ok()) {
         daos.akd.upsert(result.key);
+        OtAudit.rotateApiKey(result.key);
       }
       return cmd;
     } catch (Exception e) {
@@ -148,7 +155,8 @@ public class OtApiKeyService {
     try {
       cmd = validateParentApiKey(cmd);
       if (cmd.ok()) {
-        cmd.key = daos.akd.update(cmd.key).rec;
+        daos.akd.update(cmd.key);
+        OtAudit.updateApiKey(cmd.key);
       }
       return cmd;
     } catch (Exception e) {

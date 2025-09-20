@@ -64,7 +64,7 @@ public class OtValueService {
       cmd.clear();
       var kg = admService.canAccessNs(Objects.requireNonNull(cmd).key.kid, cmd.val.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, cmd.val.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, cmd.val.nsId, write);
       }
       cmd.val.createUtcMs = System.currentTimeMillis();
       cmd = OtValid
@@ -84,6 +84,9 @@ public class OtValueService {
         }));
         cmd.valVersions = daos.vvd.loadWhereVidEq(cmd.val.vid);
       }
+      if (cmd.ok()) {
+        OtAudit.upsertValue(cmd.key.name, cmd.val.name, cmd.val.val, daos.nsd.loadExisting(cmd.val.nsId).path);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Value create error", e);
@@ -97,7 +100,7 @@ public class OtValueService {
       var v0 = daos.vld.loadExisting(vid);
       var kg = admService.canAccessNs(key.kid, v0.nsId, true, false, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, v0.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, v0.nsId, write);
       }
       cmd.val = v0;
       cmd.valVersions = daos.vvd.loadWhereVidEq(vid);
@@ -116,7 +119,7 @@ public class OtValueService {
       var v0 = daos.vld.loadExisting(vv.vid);
       var kg = admService.canAccessNs(key.kid, v0.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, v0.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, v0.nsId, write);
       }
       daos.onTxResult(cmd, daos.vvd.sql().tx((tx, conn) -> {
         var vv0 = version(v0, System.currentTimeMillis());
@@ -128,6 +131,9 @@ public class OtValueService {
       }));
       cmd.valVersions = daos.vvd.loadWhereVidEq(v0.vid);
       cmd.namespace = daos.nsd.loadExisting(v0.nsId);
+      if (cmd.ok()) {
+        OtAudit.restoreValueVersion(key.name, cmd.val.name, v0.val, cmd.val.val, cmd.namespace.path);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Value version restore error", e);
@@ -142,12 +148,15 @@ public class OtValueService {
       var v0 = daos.vld.loadExisting(vv.vid);
       var kg = admService.canAccessNs(key.kid, v0.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, cmd.key.kid, v0.nsId, write);
+        return admService.noNsAccess(cmd, cmd.key, v0.nsId, write);
       }
       daos.vvd.deleteWhereIdEq(vvId);
       cmd.val = v0;
       cmd.valVersions = daos.vvd.loadWhereVidEq(v0.vid);
       cmd.namespace = daos.nsd.loadExisting(v0.nsId);
+      if (cmd.ok()) {
+        OtAudit.deleteValueVersion(key.name, v0.name, vv.val, cmd.namespace.path);
+      }
       return cmd;
     } catch (Exception e) {
       onError("Value version delete error", e);
@@ -185,7 +194,7 @@ public class OtValueService {
     try {
       var kg = admService.canAccessNs(kid, nsId, true, false, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(out, kid, nsId, read);
+        return admService.noNsAccess(out, daos.akd.loadExisting(kid), nsId, read);
       }
       var nsIdFld = daos.vld.fld_nsId();
       out.valPage = daos.vld.loadPage1(
@@ -206,7 +215,7 @@ public class OtValueService {
       var v0 = daos.vld.loadExisting(vid);
       var kg = admService.canAccessNs(key.kid, v0.nsId, false, true, false);
       if (kg.isEmpty()) {
-        return admService.noNsAccess(cmd, key.kid, v0.nsId, write);
+        return admService.noNsAccess(cmd, key, v0.nsId, write);
       }
       var configs = daos.cfd.loadPageItems(
         daos.cfd.query()
@@ -227,6 +236,9 @@ public class OtValueService {
       var versions = daos.vvd.deleteWhereVidEq(vid);
       var value = daos.vld.deleteWhereIdEq(vid);
       cmd.val.vid = versions.cmd.rowCount + value.cmd.rowCount;
+      if (cmd.ok()) {
+        OtAudit.deleteValue(key.name, v0.name);
+      }
       return cmd;
     } catch (Exception e) {
       return cmd.withError(e);

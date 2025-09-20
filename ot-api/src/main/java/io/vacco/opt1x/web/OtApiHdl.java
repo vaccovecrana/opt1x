@@ -177,7 +177,8 @@ public class OtApiHdl {
   }
 
   @GET @Path(apiV1CfgCid)
-  public OtConfigOp apiV1CfgCidGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+  public OtConfigOp apiV1CfgCidGet(@RvAttachmentParam(OtRequest.class) OtRequest req,
+                                   @RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                    @PathParam(OtConfigDao.fld_cid) Integer cid,
                                    @QueryParam(OtValueDao.fld_encrypted) boolean encrypted) {
     var cmd = new OtConfigOp();
@@ -185,7 +186,7 @@ public class OtApiHdl {
     cmd.cfg = new OtConfig();
     cmd.cfg.cid = cid;
     cmd.encrypted = encrypted;
-    return cfgService.load(cmd);
+    return cfgService.load(req, cmd);
   }
 
   @POST @Path(apiV1CfgCid)
@@ -203,28 +204,31 @@ public class OtApiHdl {
   }
 
   @GET @Path(apiV1CfgIdFmt)
-  public RvResponse<Object> apiV1CfgIdFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+  public RvResponse<Object> apiV1CfgIdFmtGet(@RvAttachmentParam(OtRequest.class) OtRequest req,
+                                             @RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                              @PathParam(OtConfigDao.fld_cid) Integer cid,
                                              @PathParam(kFmt) String otFmt,
                                              @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
-    return cfgService.render(myKey, cid, otFmt, encrypted == null || encrypted);
+    return cfgService.render(req, myKey, cid, otFmt, encrypted == null || encrypted);
   }
 
   @GET @Path(apiV1CfgNsCfg)
-  public RvResponse<Object> apiV1CfgNsCfgGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+  public RvResponse<Object> apiV1CfgNsCfgGet(@RvAttachmentParam(OtRequest.class) OtRequest req,
+                                             @RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                              @PathParam(kNsName) String nsName,
                                              @PathParam(kCfgName) String cfgName,
                                              @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
-    return cfgService.render(myKey, nsName, cfgName, OtNodeFormat.json.toString(), encrypted);
+    return cfgService.render(req, myKey, nsName, cfgName, OtNodeFormat.json.toString(), encrypted);
   }
 
   @GET @Path(apiV1CfgNsCfgFmt)
-  public RvResponse<Object> apiV1CfgNsCfgFmtGet(@RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
+  public RvResponse<Object> apiV1CfgNsCfgFmtGet(@RvAttachmentParam(OtRequest.class) OtRequest req,
+                                                @RvAttachmentParam(OtApiKey.class) OtApiKey myKey,
                                                 @PathParam(kNsName) String nsName,
                                                 @PathParam(kCfgName) String cfgName,
                                                 @PathParam(kFmt) String otFmt,
                                                 @QueryParam(OtValueDao.fld_encrypted) Boolean encrypted) {
-    return cfgService.render(myKey, nsName, cfgName, otFmt, encrypted);
+    return cfgService.render(req, myKey, nsName, cfgName, otFmt, encrypted);
   }
 
 }
