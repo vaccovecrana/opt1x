@@ -904,6 +904,38 @@
     "allDeclaredFields": true
   },
   {
+    "name":"io.vacco.shax.otel.schema.OtAttribute",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtBatch",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtLogRecord",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtResource",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtResourceLog",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtScope",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtScopeLog",
+    "allDeclaredFields":true
+  },
+  {
+    "name":"io.vacco.shax.otel.schema.OtValue",
+    "allDeclaredFields":true
+  },
+  {
     "name": "jakarta.ws.rs.PathParam",
     "methods": [
       {

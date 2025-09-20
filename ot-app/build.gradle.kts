@@ -9,7 +9,10 @@ dependencies {
   implementation(project(":ot-api"))
 }
 
-application { mainClass.set("io.vacco.opt1x.OtMain") }
+application {
+  mainClass.set("io.vacco.opt1x.OtMain")
+  // applicationDefaultJvmArgs = listOf("-agentlib:native-image-agent=config-output-dir=.")
+}
 
 graalvmNative {
   binaries {
