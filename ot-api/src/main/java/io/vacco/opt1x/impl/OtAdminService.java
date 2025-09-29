@@ -287,6 +287,19 @@ public class OtAdminService {
     }
   }
 
+  public OtAdminOp deleteNamespace(OtAdminOp cmd) {
+    try {
+      cmd.clear();
+      if (cmd.validate(this::canManageNs).ok()) {
+
+      }
+      return cmd.clearKeyGroup();
+    } catch (Exception e) {
+      onError("Admin - Namespace delete error", e);
+      return cmd.clearKeyGroup().withError(e);
+    }
+  }
+
   public OtAdminOp createGroup(OtAdminOp cmd) {
     try {
       cmd.clear();
