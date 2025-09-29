@@ -176,7 +176,7 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
           </div>
         )}
         {this.state.access?.namespaces?.length > 0 && [
-          <h3>Sub-groups</h3>,
+          <h3>Sub-namespaces</h3>,
           <table class="striped">
             {headers(["Name", "Created", "Actions"])}
             <tbody>
@@ -205,7 +205,7 @@ class OtNamespace extends React.Component<OtNsProps, OtNsState> {
           </table>
         ]}
         {this.state.access?.groupNamespaces?.length > 0 && [
-          <h3>Group Access</h3>,
+          <h3>Namespace Access</h3>,
           <table class="striped">
             {headers(["Group", "Permissions", "Granted"])}
             <tbody>
