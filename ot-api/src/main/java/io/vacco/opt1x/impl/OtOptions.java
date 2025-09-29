@@ -1,6 +1,6 @@
 package io.vacco.opt1x.impl;
 
-import io.vacco.shax.logging.ShOption;
+import io.vacco.shax.logging.*;
 import io.vacco.shax.otel.OtHttpSink;
 import org.slf4j.*;
 import java.util.*;
@@ -126,6 +126,8 @@ public class OtOptions {
       if (argIdx.get(kOtlpTimeoutMs) != null) {
         ShOption.setSysProp(ShOption.OTEL_EXPORTER_OTLP_TIMEOUT, argIdx.get(kOtlpTimeoutMs));
       }
+    } else {
+      ShOption.setLoggerSysProp(OtAudit.class.getCanonicalName(), ShLogLevel.ERROR);
     }
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_DEVMODE, logFormat == OtLogFormat.text ? "true" : "false");
     ShOption.setSysProp(ShOption.IO_VACCO_SHAX_LOGLEVEL, logLevel.toString());

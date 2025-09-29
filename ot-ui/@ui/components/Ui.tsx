@@ -88,8 +88,13 @@ export const boxValidations = (result: OtResult) => (
   </article>
 )
 
-export const boxResult = (result: OtResult, okMsg?: any) => {
+export const isOk = (result: OtResult) => {
   const ok = !result?.error && result?.validations?.length === 0
+  return ok
+}
+
+export const boxResult = (result: OtResult, okMsg?: any) => {
+  var ok = isOk(result)
   return [
     result?.error && boxError(result.error),
     result?.validations?.length > 0 && boxValidations(result),

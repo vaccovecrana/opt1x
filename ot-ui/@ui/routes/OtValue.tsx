@@ -3,7 +3,7 @@ import { RenderableProps } from "preact"
 
 import { lockUi, UiContext, UiStore } from '@ui/store'
 import { apiV1NsNsIdValPost, apiV1ValVerVvIdDelete, apiV1ValVerVvIdPatch, apiV1ValVidVerGet, OtValueOp, OtValueType, OtValueVer } from '@ui/rpc'
-import { boxHero, headers, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
+import { boxHero, boxResult, headers, isOk, options, row, utcYyyyMmDdHhMm } from "@ui/components/Ui"
 import { rpcUiHld } from "@ui/routes"
 import { IcnDelete, IcnRefresh } from "@ui/components/UiIcons"
 
@@ -49,7 +49,15 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
       rpcUiHld(
         lockUi(true, d)
           .then(() => apiV1ValVerVvIdDelete(vv.vvId))
-          .then(valOp => this.setState({...this.state, valOp})), d
+          .then(valOp => {
+            if (isOk(valOp)) {
+              this.setState({...this.state, valOp})
+            } else {
+              this.state.valOp.error = valOp.error
+              this.state.valOp.validations = valOp.validations
+              this.setState({...this.state, valOp: {...this.state.valOp}})
+            }
+          }), d
       )
     }
   }
@@ -63,7 +71,15 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
       rpcUiHld(
         lockUi(true, d)
           .then(() => apiV1ValVerVvIdPatch(vv.vvId))
-          .then(valOp => this.setState({...this.state, valOp})), d
+          .then(valOp => {
+            if (isOk(valOp)) {
+              this.setState({...this.state, valOp})
+            } else {
+              this.state.valOp.error = valOp.error
+              this.state.valOp.validations = valOp.validations
+              this.setState({...this.state, valOp: {...this.state.valOp}})
+            }
+          }), d
       )
     }
   }
@@ -88,6 +104,9 @@ class OtValue extends React.Component<OtValueProps, OtValueState> {
         <nav>
           <ul><li><h1>{this.state.valOp?.namespace.path}</h1></li></ul>
         </nav>
+        {(this.state.valOp?.updated || !isOk(this.state.valOp)) && boxResult(this.state.valOp, (
+          <div>Value updated</div>
+        ))}
         {this.state.valOp && (
           <h3>{this.state.valOp.val.name}</h3>
         )}

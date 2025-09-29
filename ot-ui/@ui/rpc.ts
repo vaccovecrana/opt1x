@@ -184,6 +184,7 @@ export interface OtValue {
 export interface OtValueOp extends OtResult {
   key?: OtApiKey;
   val?: OtValue;
+  updated?: boolean;
   valVersions?: OtValueVer[];
   valPage?: MtPage1<OtValue, string>;
   namespace?: OtNamespace;

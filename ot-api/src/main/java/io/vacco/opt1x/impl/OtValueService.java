@@ -62,6 +62,7 @@ public class OtValueService {
   public OtValueOp upsertValue(OtValueOp cmd) {
     try {
       cmd.clear();
+      cmd.updated = false;
       var kg = admService.canAccessNs(Objects.requireNonNull(cmd).key.kid, cmd.val.nsId, false, true, false);
       if (kg.isEmpty()) {
         return admService.noNsAccess(cmd, cmd.key, cmd.val.nsId, write);
@@ -86,6 +87,7 @@ public class OtValueService {
       }
       if (cmd.ok()) {
         OtAudit.upsertValue(cmd.key.name, cmd.val.name, cmd.val.val, daos.nsd.loadExisting(cmd.val.nsId).path);
+        cmd.updated = true;
       }
       return cmd;
     } catch (Exception e) {
@@ -113,7 +115,7 @@ public class OtValueService {
   }
 
   public OtValueOp restoreValueVersion(OtApiKey key, Integer vvId) {
-    var cmd = valueOp();
+    var cmd = valueOp().withKey(key);
     try {
       var vv = daos.vvd.loadExisting(vvId);
       var v0 = daos.vld.loadExisting(vv.vid);
@@ -142,7 +144,7 @@ public class OtValueService {
   }
 
   public OtValueOp deleteValueVersion(OtApiKey key, Integer vvId) {
-    var cmd = valueOp();
+    var cmd = valueOp().withKey(key);
     try {
       var vv = daos.vvd.loadExisting(vvId);
       var v0 = daos.vld.loadExisting(vv.vid);
@@ -228,7 +230,7 @@ public class OtValueService {
         cmd.validations.addAll(
           configs.stream()
             .map(cfg -> vld(null, cfg.name, null, null))
-            .collect(toList())
+            .toList()
         );
         return cmd.withError(format("Value delete - value [%d] has active configuration references", vid));
       }

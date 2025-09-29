@@ -10,6 +10,7 @@ public class OtValueOp extends OtResult {
 
   /** input/output parameter */
   public OtValue val;
+  public boolean updated;
 
   /** output parameter, list of value versions */
   public List<OtValueVer> valVersions = new ArrayList<>();
